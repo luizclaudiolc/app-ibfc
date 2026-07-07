@@ -1,0 +1,23 @@
+<footer
+  class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50 px-6 py-2 flex justify-around items-center max-w-xl mx-auto"
+>
+  <button (click)="mudarAba('feed')" class="flex flex-col items-center gap-0.5 focus:outline-none">
+    <span class="text-xl" [class.opacity-50]="abaAtiva() !== 'feed'">🏠</span>
+    <span
+      class="text-[10px] font-bold tracking-wide"
+      [class.text-sky-600]="abaAtiva() === 'feed'"
+      [class.text-slate-400]="abaAtiva() !== 'feed'"
+      >Início</span
+    >
+  </button>
+
+  <button (click)="mudarAba('admin')" class="flex flex-col items-center gap-0.5 focus:outline-none">
+    <span class="text-xl" [class.opacity-50]="abaAtiva() !== 'admin'">🛠️</span>
+    <span
+      class="text-[10px] font-bold tracking-wide"
+      [class.text-sky-600]="abaAtiva() === 'admin'"
+      [class.text-slate-400]="abaAtiva() !== 'admin'"
+      >Painel</span
+    >
+  </button>
+</footer>

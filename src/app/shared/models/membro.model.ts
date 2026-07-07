@@ -1,14 +1,15 @@
 export interface Membro {
   id: string;
   nome: string;
+  sobrenome: string;
   email: string;
   telefone: string;
   cargo: string;
   nivel: 'Admin' | 'User';
   status: 'Ativo' | 'Inativo';
-  aniversario: string;
-  foto?: string;
-  setorResponsavel?: string;
+  data_nascimento: string;
+  foto_url?: string;
+  setor_responsavel?: string;
 }
 
 export interface UsuarioLogado {
