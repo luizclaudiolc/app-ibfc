@@ -30,6 +30,18 @@ export const routes: Routes = [
             (m) => m.PerfilComponent,
           ),
       },
+      {
+        path: 'admin',
+        loadComponent: () =>
+          import('./features/dashboard/pages/admin/admin').then((m) => m.AdminComponent),
+      },
+      {
+        path: 'membros-gestao',
+        loadComponent: () =>
+          import('./features/dashboard/pages/admin/membros-gestao/membros-gestao').then(
+            (m) => m.MembrosGestaoComponent,
+          ),
+      },
     ],
   },
   { path: '', redirectTo: 'dashboard/home', pathMatch: 'full' },

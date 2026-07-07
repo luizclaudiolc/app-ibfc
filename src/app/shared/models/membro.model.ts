@@ -6,7 +6,7 @@ export interface Membro {
   telefone: string;
   cargo: string;
   nivel: 'Admin' | 'User';
-  status: 'Ativo' | 'Inativo';
+  status: 'ATIVO' | 'INATIVO';
   data_nascimento: string;
   foto_url?: string;
   setor_responsavel?: string;

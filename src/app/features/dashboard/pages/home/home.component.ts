@@ -8,7 +8,7 @@ import { Membro } from '../../../../shared/models/membro.model';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { MembroService } from '../../../../core/services/membro.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -54,6 +54,7 @@ export class HomeComponent implements OnInit {
     private avisoService: AvisoService,
     private escalaService: EscalaService,
     private membroService: MembroService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {

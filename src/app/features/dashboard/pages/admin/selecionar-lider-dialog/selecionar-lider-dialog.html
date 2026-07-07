@@ -1,0 +1,47 @@
+<h2 mat-dialog-title>Definir Liderança</h2>
+<mat-dialog-content class="flex flex-col gap-4">
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Setor</mat-label>
+    <mat-select [(ngModel)]="setorSelecionado">
+      @for (setor of setores; track setor.value) {
+        <mat-option [value]="setor.value">{{ setor.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Adicionar Membros</mat-label>
+    <mat-chip-grid #chipGrid>
+      @for (membro of membrosSelecionados; track membro.id) {
+        <mat-chip-row (removed)="remover(membro)">
+          {{ membro.nome }}
+          <button matChipRemove><mat-icon>cancel</mat-icon></button>
+        </mat-chip-row>
+      }
+      <input
+        placeholder="Digite o nome..."
+        #inputMembro
+        [matChipInputFor]="chipGrid"
+        [matAutocomplete]="auto"
+        (input)="filtrar($event)"
+      />
+    </mat-chip-grid>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selecionar($event)">
+      @for (membro of membrosFiltrados; track membro.id) {
+        <mat-option [value]="membro">{{ membro.nome }} {{ membro.sobrenome }}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button
+    mat-flat-button
+    color="primary"
+    [disabled]="!setorSelecionado || membrosSelecionados.length === 0"
+    (click)="confirmar()"
+  >
+    Confirmar
+  </button>
+</mat-dialog-actions>

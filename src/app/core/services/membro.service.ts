@@ -110,4 +110,13 @@ export class MembroService {
       map((res) => res.data),
     );
   }
+
+  atualizarSetor(id: string, novoSetor: string) {
+    return from(
+      this.supabaseService.supabase
+        .from('membros')
+        .update({ setor_responsavel: novoSetor })
+        .eq('id', id),
+    );
+  }
 }
