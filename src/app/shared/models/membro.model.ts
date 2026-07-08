@@ -1,3 +1,5 @@
+import { NivelAcesso, StatusMembro } from './consts';
+
 export interface Membro {
   id: string;
   nome: string;
@@ -5,8 +7,8 @@ export interface Membro {
   email: string;
   telefone: string;
   cargo: string;
-  nivel: 'Admin' | 'User';
-  status: 'ATIVO' | 'INATIVO';
+  nivel_acesso: NivelAcesso;
+  status: StatusMembro;
   data_nascimento: string;
   foto_url?: string;
   setor_responsavel?: string;
@@ -16,6 +18,23 @@ export interface UsuarioLogado {
   id: string;
   nome: string;
   email: string;
-  nivel: 'Admin' | 'User';
+  nivel: NivelAcesso;
   setorResponsavel?: string;
+}
+
+export interface UsuarioCadastro {
+  nome: string;
+  sobrenome: string;
+  email: string;
+  senha: string;
+  telefone: string;
+  dataNascimento?: string;
+  foto?: File | null;
+}
+
+export interface UsuarioAtualizacao {
+  nome: string;
+  sobrenome: string;
+  telefone: string;
+  data_nascimento: string;
 }

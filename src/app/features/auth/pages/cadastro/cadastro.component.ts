@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-cadastro',
@@ -28,10 +29,8 @@ export class CadastroComponent {
     dataNascimento: '',
   };
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-  ) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   aoSelecionarFoto(event: any): void {
     const arquivo = event.target.files[0];
@@ -71,7 +70,7 @@ export class CadastroComponent {
       email: f.email.trim().toLowerCase(),
       senha: f.senha,
       telefone: f.telefone.replace(/\D/g, ''),
-      aniversario: dataSupabase,
+      dataNascimento: dataSupabase,
       foto: this.arquivoFotoSelecionado,
     };
 
@@ -79,9 +78,9 @@ export class CadastroComponent {
       next: (res) => {
         if (res.sucesso) {
           this.mensagemSucesso.set('Cadastro realizado com sucesso! Redirecionando...');
-          setTimeout(() => {
+          timer(2500).subscribe(() => {
             this.router.navigate(['/login']);
-          }, 2500);
+          });
         } else {
           this.mensagemErro.set(res.mensagem || 'Erro ao realizar cadastro.');
           this.carregando.set(false);

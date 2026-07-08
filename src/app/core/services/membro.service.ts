@@ -1,17 +1,18 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable, from, map, switchMap } from 'rxjs';
-import { Membro } from '../../shared/models/membro.model';
+import { Membro, UsuarioAtualizacao } from '../../shared/models/membro.model';
 import { SupabaseService } from './supabase';
+import { EStatusMembro } from '../../shared/models/consts';
 
 @Injectable({ providedIn: 'root' })
 export class MembroService {
-  constructor(private supabaseService: SupabaseService) {}
+  private supabaseService = inject(SupabaseService);
 
   buscarTodos(): Observable<Membro[]> {
     const promise = this.supabaseService.supabase
       .from('membros')
       .select('*')
-      .eq('status', 'ATIVO')
+      .eq('status', EStatusMembro.ATIVO)
       .order('nome', { ascending: true });
 
     return from(promise).pipe(map((res) => res.data as Membro[]));
@@ -64,18 +65,16 @@ export class MembroService {
     }
   }
 
-  atualizarPerfil(dados: {
-    nome: string;
-    sobrenome: string;
-    telefone: string;
-    data_nascimento: string;
-  }): Observable<{ sucesso: boolean; mensagem?: string }> {
+  atualizarPerfil(dados: UsuarioAtualizacao): Observable<{ sucesso: boolean; mensagem?: string }> {
     return from(this.executarAtualizacaoPerfil(dados));
   }
 
-  private async executarAtualizacaoPerfil(
-    dados: any,
-  ): Promise<{ sucesso: boolean; mensagem?: string }> {
+  private async executarAtualizacaoPerfil({
+    nome,
+    sobrenome,
+    telefone,
+    data_nascimento,
+  }: UsuarioAtualizacao): Promise<{ sucesso: boolean; mensagem?: string }> {
     try {
       const {
         data: { user },
@@ -85,16 +84,16 @@ export class MembroService {
       const { error } = await this.supabaseService.supabase
         .from('membros')
         .update({
-          nome: dados.nome,
-          sobrenome: dados.sobrenome,
-          telefone: dados.telefone,
-          data_nascimento: dados.data_nascimento,
+          nome,
+          sobrenome,
+          telefone,
+          data_nascimento,
         })
         .eq('id', user.id);
 
       if (error) throw error;
 
-      localStorage.setItem('user_nome', `${dados.nome} ${dados.sobrenome}`);
+      localStorage.setItem('user_nome', `${nome} ${sobrenome}`);
 
       return { sucesso: true };
     } catch (error: any) {

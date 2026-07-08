@@ -6,9 +6,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   const usuarioLogado = localStorage.getItem('user_email');
 
-  if (usuarioLogado) {
-    return true;
-  }
+  if (usuarioLogado) return true;
 
   router.navigate(['/login']);
   return false;
@@ -22,7 +20,6 @@ export const loginGuard: CanActivateFn = (route, state) => {
     router.navigate(['/dashboard/home']);
     return false;
   }
-  ('');
 
   return true;
 };

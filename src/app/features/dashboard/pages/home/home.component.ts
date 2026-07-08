@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AvisoService } from '../../../../core/services/aviso.service';
 import { EscalaService } from '../../../../core/services/escala.service';
@@ -50,12 +50,9 @@ export class HomeComponent implements OnInit {
     });
   });
 
-  constructor(
-    private avisoService: AvisoService,
-    private escalaService: EscalaService,
-    private membroService: MembroService,
-    private router: Router,
-  ) {}
+  private avisoService = inject(AvisoService);
+  private escalaService = inject(EscalaService);
+  private membroService = inject(MembroService);
 
   ngOnInit(): void {
     this.carregarTodosOsDados();

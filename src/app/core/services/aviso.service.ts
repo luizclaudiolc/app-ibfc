@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable, from, map } from 'rxjs';
 import { Aviso } from '../../shared/models/aviso.model';
 import { SupabaseService } from './supabase';
 
 @Injectable({ providedIn: 'root' })
 export class AvisoService {
-  constructor(private supabaseService: SupabaseService) {}
+  private supabaseService = inject(SupabaseService);
 
   buscarTodos(): Observable<Aviso[]> {
     const promise = this.supabaseService.supabase

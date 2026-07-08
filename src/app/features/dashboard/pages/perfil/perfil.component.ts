@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MembroService } from '../../../../core/services/membro.service';
@@ -26,10 +26,8 @@ export class PerfilComponent implements OnInit {
     data_nascimento: '',
   };
 
-  constructor(
-    private membroService: MembroService,
-    private router: Router,
-  ) {}
+  private membroService = inject(MembroService);
+  private router = inject(Router);
 
   async ngOnInit(): Promise<void> {
     await this.carregarDadosPerfil();

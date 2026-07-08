@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable, from, map } from 'rxjs';
 import { Escala } from '../../shared/models/escala.model';
 import { SupabaseService } from './supabase';
 
 @Injectable({ providedIn: 'root' })
 export class EscalaService {
-  constructor(private supabaseService: SupabaseService) {}
+  private supabaseService = inject(SupabaseService);
 
   buscarTodas(): Observable<Escala[]> {
     const promise = this.supabaseService.supabase

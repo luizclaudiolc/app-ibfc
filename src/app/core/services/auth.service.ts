@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, from } from 'rxjs';
-import { UsuarioLogado } from '../../shared/models/membro.model';
+import { Membro, UsuarioCadastro, UsuarioLogado } from '../../shared/models/membro.model';
 import { SupabaseService } from './supabase';
+import { ECargos, ENiveisAcesso, EStatusMembro } from '../../shared/models/consts';
 
 export interface RespostaLogin {
   sucesso: boolean;
-  usuario?: UsuarioLogado | any;
+  usuario?: UsuarioLogado;
   mensagem?: string;
 }
 
@@ -14,10 +15,8 @@ export interface RespostaLogin {
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(
-    private supabaseService: SupabaseService,
-    private router: Router,
-  ) {}
+  private supabaseService = inject(SupabaseService);
+  private router = inject(Router);
 
   login(email: string, senha: string): Observable<RespostaLogin> {
     return from(this.executarLoginSupabase(email, senha));
@@ -49,7 +48,9 @@ export class AuthService {
     }
   }
 
-  private atualizarLocalStorage(perfil: any): void {
+  private atualizarLocalStorage(perfil: Membro): void {
+    console.log({ perfil });
+
     localStorage.setItem('user_email', perfil.email);
     localStorage.setItem('user_nome', `${perfil.nome} ${perfil.sobrenome}`);
     localStorage.setItem('user_nivel', perfil.nivel_acesso);
@@ -57,19 +58,12 @@ export class AuthService {
     if (perfil.foto_url) localStorage.setItem('user_foto', perfil.foto_url);
   }
 
-  cadastrar(membro: {
-    nome: string;
-    sobrenome: string;
-    email: string;
-    senha: string;
-    telefone: string;
-    aniversario: string;
-  }): Observable<{ sucesso: boolean; mensagem: string }> {
+  cadastrar(membro: UsuarioCadastro): Observable<{ sucesso: boolean; mensagem: string }> {
     return from(this.executarCadastroSupabase(membro));
   }
 
   private async executarCadastroSupabase(
-    membro: any,
+    membro: UsuarioCadastro,
   ): Promise<{ sucesso: boolean; mensagem: string }> {
     try {
       const { data: authData, error: authError } = await this.supabaseService.supabase.auth.signUp({
@@ -111,10 +105,10 @@ export class AuthService {
           sobrenome: membro.sobrenome,
           email: membro.email,
           telefone: membro.telefone,
-          data_nascimento: membro.aniversario || null,
-          cargo: 'Membro',
-          nivel_acesso: 'User',
-          status: 'ATIVO',
+          data_nascimento: membro.dataNascimento || null,
+          cargo: ECargos.Membro,
+          nivel_acesso: ENiveisAcesso.User,
+          status: EStatusMembro.ATIVO,
           foto_url: urlDaFoto,
         },
       ]);
