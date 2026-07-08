@@ -1,28 +1,33 @@
 <footer
   class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50 px-6 py-2 flex justify-around items-center max-w-xl mx-auto"
 >
-  <button (click)="mudarAba('feed')" class="flex flex-col items-center gap-0.5 focus:outline-none">
-    <span class="text-xl" [class.opacity-50]="abaAtiva() !== 'feed'">🏠</span>
-    <span
-      class="text-[10px] font-bold tracking-wide"
-      [class.text-sky-600]="abaAtiva() === 'feed'"
-      [class.text-slate-400]="abaAtiva() !== 'feed'"
-      >Início</span
-    >
-  </button>
+  <a
+    routerLink="/dashboard/home"
+    routerLinkActive="text-sky-600 opacity-100"
+    [routerLinkActiveOptions]="{ exact: true }"
+    class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
+  >
+    <span class="text-xl">🏠</span>
+    <span class="text-[10px] font-bold tracking-wide">Início</span>
+  </a>
+
+  <a
+    routerLink="/dashboard/perfil"
+    routerLinkActive="text-sky-600 opacity-100"
+    class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
+  >
+    <span class="text-xl">👤</span>
+    <span class="text-[10px] font-bold tracking-wide">Perfil</span>
+  </a>
 
   @if (isAdmin()) {
-    <button
-      (click)="mudarAba('admin')"
-      class="flex flex-col items-center gap-0.5 focus:outline-none"
+    <a
+      routerLink="/dashboard/admin"
+      routerLinkActive="text-sky-600 opacity-100"
+      class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
     >
-      <span class="text-xl" [class.opacity-50]="abaAtiva() !== 'admin'">🛠️</span>
-      <span
-        class="text-[10px] font-bold tracking-wide"
-        [class.text-sky-600]="abaAtiva() === 'admin'"
-        [class.text-slate-400]="abaAtiva() !== 'admin'"
-        >Painel</span
-      >
-    </button>
+      <span class="text-xl">🛠️</span>
+      <span class="text-[10px] font-bold tracking-wide">Painel</span>
+    </a>
   }
 </footer>

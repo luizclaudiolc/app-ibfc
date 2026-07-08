@@ -9,15 +9,20 @@ import { FooterComponent } from '../../../../shared/components/footer/footer.com
 import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { MembroService } from '../../../../core/services/membro.service';
 import { Router, RouterModule } from '@angular/router';
+import { MaterialModule } from '../../../../core/modules/material.module';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterModule, HeaderComponent, FooterComponent, MaterialModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit {
+  private avisoService = inject(AvisoService);
+  private escalaService = inject(EscalaService);
+  private membroService = inject(MembroService);
+
   nomeUsuario = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
   emailUsuario = signal<string>(localStorage.getItem('user_email') || '');
   fotoUsuario = signal<string>(localStorage.getItem('user_foto') || '');
@@ -49,10 +54,6 @@ export class HomeComponent implements OnInit {
       return nomeCompleto.includes(busca);
     });
   });
-
-  private avisoService = inject(AvisoService);
-  private escalaService = inject(EscalaService);
-  private membroService = inject(MembroService);
 
   ngOnInit(): void {
     this.carregarTodosOsDados();
