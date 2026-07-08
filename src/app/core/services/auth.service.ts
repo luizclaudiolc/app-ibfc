@@ -54,8 +54,18 @@ export class AuthService {
     localStorage.setItem('user_email', perfil.email);
     localStorage.setItem('user_nome', `${perfil.nome} ${perfil.sobrenome}`);
     localStorage.setItem('user_nivel', perfil.nivel_acesso);
-    if (perfil.setor_responsavel) localStorage.setItem('user_setor', perfil.setor_responsavel);
-    if (perfil.foto_url) localStorage.setItem('user_foto', perfil.foto_url);
+
+    if (perfil.setor_responsavel) {
+      localStorage.setItem('user_setor', perfil.setor_responsavel);
+    } else {
+      localStorage.removeItem('user_setor');
+    }
+
+    if (perfil.foto_url) {
+      localStorage.setItem('user_foto', perfil.foto_url);
+    } else {
+      localStorage.removeItem('user_foto');
+    }
   }
 
   cadastrar(membro: UsuarioCadastro): Observable<{ sucesso: boolean; mensagem: string }> {

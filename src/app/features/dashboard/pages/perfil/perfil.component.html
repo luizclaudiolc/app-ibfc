@@ -6,106 +6,120 @@
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
       <div class="flex flex-col items-center mb-8">
         <div
-          class="relative w-28 h-28 rounded-full border-4 border-slate-50 shadow-inner overflow-hidden mb-4"
+          class="w-28 h-28 rounded-full border-4 border-slate-50 shadow-inner overflow-hidden mb-4 bg-slate-100 flex items-center justify-center"
         >
-          <img
-            [src]="previewFoto() || 'assets/default-avatar.png'"
-            class="w-full h-full object-cover"
-          />
+          @if (previewFoto()) {
+            <img [src]="previewFoto()" class="w-full h-full object-cover" />
+          } @else {
+            <span class="text-5xl text-slate-300">👤</span>
+          }
+        </div>
+
+        <div class="flex items-center gap-3">
           <label
-            class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 cursor-pointer text-white transition-opacity"
+            class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-full text-xs font-bold transition-all"
           >
-            📸 Alterar
+            Alterar Foto
             <input
               type="file"
               class="hidden"
+              accept="image/*"
               (change)="aoSelecionarFoto($event)"
               [disabled]="carregando()"
             />
           </label>
+
+          @if (previewFoto()) {
+            <button
+              (click)="removerFoto()"
+              class="text-red-500 hover:text-red-600 text-xs font-bold px-2 py-2 transition-all"
+            >
+              Remover
+            </button>
+          }
         </div>
 
         @if (carregando()) {
-          <div class="text-xs text-sky-600 font-bold mb-4 animate-pulse">Atualizando foto...</div>
-        }
-
-        @if (!carregandoDados()) {
-          <form (ngSubmit)="salvarAlteracoes()" class="w-full space-y-4">
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Nome</label>
-                <input
-                  [(ngModel)]="formPerfil.nome"
-                  name="nome"
-                  class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
-                />
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Sobrenome</label>
-                <input
-                  [(ngModel)]="formPerfil.sobrenome"
-                  name="sobrenome"
-                  class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">WhatsApp</label>
-              <input
-                [(ngModel)]="formPerfil.telefone"
-                name="telefone"
-                class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Data de Nascimento</label>
-              <input
-                type="date"
-                [(ngModel)]="formPerfil.data_nascimento"
-                name="nasc"
-                class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
-              />
-            </div>
-
-            <div class="flex gap-3 pt-4">
-              <button
-                type="button"
-                (click)="cancelar()"
-                class="w-full bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-all"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                [disabled]="carregando()"
-                class="w-full bg-sky-600 text-white font-bold py-3 rounded-xl hover:bg-sky-700 transition-all disabled:opacity-50"
-              >
-                {{ carregando() ? 'Salvando...' : 'Salvar Alterações' }}
-              </button>
-            </div>
-          </form>
-        } @else {
-          <div class="text-center py-10 text-slate-400 text-sm">Carregando seus dados...</div>
-        }
-
-        @if (mensagemSucesso()) {
-          <div
-            class="w-full mt-5 bg-emerald-50 text-emerald-600 text-center py-2.5 px-3 text-xs font-medium rounded-xl border border-emerald-100/60"
-          >
-            🎉 {{ mensagemSucesso() }}
-          </div>
-        }
-
-        @if (mensagemErro()) {
-          <div
-            class="w-full mt-5 bg-red-50 text-red-600 text-center py-2.5 px-3 text-xs font-medium rounded-xl border border-red-100/60"
-          >
-            ⚠️ {{ mensagemErro() }}
-          </div>
+          <div class="text-[10px] text-sky-600 font-bold mt-2 animate-pulse">Processando...</div>
         }
       </div>
+
+      @if (!carregandoDados()) {
+        <form (ngSubmit)="salvarAlteracoes()" class="w-full space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Nome</label>
+              <input
+                [(ngModel)]="formPerfil.nome"
+                name="nome"
+                class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Sobrenome</label>
+              <input
+                [(ngModel)]="formPerfil.sobrenome"
+                name="sobrenome"
+                class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">WhatsApp</label>
+            <input
+              [(ngModel)]="formPerfil.telefone"
+              name="telefone"
+              class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Data de Nascimento</label>
+            <input
+              type="date"
+              [(ngModel)]="formPerfil.data_nascimento"
+              name="nasc"
+              class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
+            />
+          </div>
+
+          <div class="flex gap-3 pt-4">
+            <button
+              type="button"
+              (click)="cancelar()"
+              class="w-full bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="carregando()"
+              class="w-full bg-sky-600 text-white font-bold py-3 rounded-xl hover:bg-sky-700 transition-all disabled:opacity-50"
+            >
+              {{ carregando() ? 'Salvando...' : 'Salvar Alterações' }}
+            </button>
+          </div>
+        </form>
+      } @else {
+        <div class="text-center py-10 text-slate-400 text-sm">Carregando seus dados...</div>
+      }
+
+      @if (mensagemSucesso()) {
+        <div
+          class="w-full mt-5 bg-emerald-50 text-emerald-600 text-center py-2.5 px-3 text-xs font-medium rounded-xl border border-emerald-100/60"
+        >
+          🎉 {{ mensagemSucesso() }}
+        </div>
+      }
+
+      @if (mensagemErro()) {
+        <div
+          class="w-full mt-5 bg-red-50 text-red-600 text-center py-2.5 px-3 text-xs font-medium rounded-xl border border-red-100/60"
+        >
+          ⚠️ {{ mensagemErro() }}
+        </div>
+      }
     </div>
   </main>
 

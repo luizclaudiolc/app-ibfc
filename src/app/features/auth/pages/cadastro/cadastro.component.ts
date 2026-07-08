@@ -20,14 +20,25 @@ export class CadastroComponent {
   previewFoto = signal<string>('');
   arquivoFotoSelecionado: File | null = null;
 
-  formCadastro = {
+  formCadastro = signal({
     nome: '',
     sobrenome: '',
     email: '',
     senha: '',
     telefone: '',
     dataNascimento: '',
-  };
+    cargo: 'membro',
+  });
+
+  cargosDisponiveis = [
+    { label: 'Membro', value: 'membro' },
+    { label: 'Pastor', value: 'pastor' },
+    { label: 'Presbítero', value: 'presbitero' },
+    { label: 'Diácono', value: 'diacono' },
+    { label: 'Evangelista', value: 'evangelista' },
+    { label: 'Missionário', value: 'missionario' },
+    { label: 'Líder de Ministério', value: 'lider_de_ministerio' },
+  ];
 
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -52,7 +63,7 @@ export class CadastroComponent {
   }
 
   submeterCadastro(): void {
-    const f = this.formCadastro;
+    const f = this.formCadastro();
     this.carregando.set(true);
     this.mensagemErro.set('');
 
@@ -71,6 +82,7 @@ export class CadastroComponent {
       senha: f.senha,
       telefone: f.telefone.replace(/\D/g, ''),
       dataNascimento: dataSupabase,
+      cargo: f.cargo,
       foto: this.arquivoFotoSelecionado,
     };
 
@@ -92,5 +104,9 @@ export class CadastroComponent {
         console.error(err);
       },
     });
+  }
+
+  atualizarForm(campo: string, valor: any) {
+    this.formCadastro.update((form) => ({ ...form, [campo]: valor }));
   }
 }

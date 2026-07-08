@@ -8,8 +8,9 @@ import { Membro } from '../../../../shared/models/membro.model';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { MembroService } from '../../../../core/services/membro.service';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { MaterialModule } from '../../../../core/modules/material.module';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -22,6 +23,7 @@ export class HomeComponent implements OnInit {
   private avisoService = inject(AvisoService);
   private escalaService = inject(EscalaService);
   private membroService = inject(MembroService);
+  private router = inject(Router);
 
   nomeUsuario = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
   emailUsuario = signal<string>(localStorage.getItem('user_email') || '');
@@ -38,8 +40,8 @@ export class HomeComponent implements OnInit {
     const email = this.emailUsuario().toLowerCase();
     const nome = this.nomeUsuario().toLowerCase();
 
-    return this.escalas().find((e) => {
-      const vol = e.voluntarios ? e.voluntarios.toLowerCase() : '';
+    return this.escalas().find(({ voluntarios }) => {
+      const vol = voluntarios.toLowerCase() || '';
       return vol.includes(nome) || vol.includes(email);
     });
   });
@@ -47,16 +49,22 @@ export class HomeComponent implements OnInit {
   membrosFiltrados = computed(() => {
     const busca = this.termoBusca().toLowerCase().trim();
     const lista = this.membrosRaw();
+    console.log({ lista });
+
     if (!busca) return lista;
 
-    return lista.filter((m) => {
-      const nomeCompleto = `${m.nome} ${m.sobrenome}`.toLowerCase();
+    return lista.filter(({ nome, sobrenome }) => {
+      const nomeCompleto = `${nome} ${sobrenome}`.toLowerCase();
       return nomeCompleto.includes(busca);
     });
   });
 
   ngOnInit(): void {
     this.carregarTodosOsDados();
+
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+      this.carregarTodosOsDados();
+    });
   }
 
   carregarTodosOsDados(): void {

@@ -33,9 +33,8 @@ export class MembroService {
       if (authError || !authData.user) throw new Error('Usuário não autenticado.');
 
       const userId = authData.user.id;
-      const extensao = arquivo.name.split('.').pop();
 
-      const nomeArquivo = `${userId}-perfil-${Date.now()}.${extensao}`;
+      const nomeArquivo = `${userId}-perfil`;
 
       const { error: uploadError } = await this.supabaseService.supabase.storage
         .from('fotos_membros')
@@ -44,13 +43,16 @@ export class MembroService {
           upsert: true,
         });
 
-      if (uploadError) throw new Error('Erro ao fazer upload da imagem.');
+      if (uploadError) {
+        console.error('Erro de upload:', uploadError);
+        throw new Error('Erro ao fazer upload da imagem no Storage.');
+      }
 
       const { data: urlData } = this.supabaseService.supabase.storage
         .from('fotos_membros')
         .getPublicUrl(nomeArquivo);
 
-      const fotoUrl = urlData.publicUrl;
+      const fotoUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
       const { error: updateError } = await this.supabaseService.supabase
         .from('membros')
@@ -110,12 +112,55 @@ export class MembroService {
     );
   }
 
-  atualizarSetor(id: string, novoSetor: string) {
+  atualizarSetor(id: string, novoSetor: string): Observable<any> {
+    console.log(novoSetor);
+
     return from(
       this.supabaseService.supabase
         .from('membros')
         .update({ setor_responsavel: novoSetor })
         .eq('id', id),
+    ).pipe(
+      map((res) => {
+        if (res.error) throw res.error;
+        return res;
+      }),
+    );
+  }
+
+  removerFotoPerfil(): Observable<any> {
+    return from(this.supabaseService.supabase.auth.getUser()).pipe(
+      switchMap(async ({ data: { user } }) => {
+        if (!user) throw new Error('Usuário não autenticado');
+
+        const { data: perfil } = await this.supabaseService.supabase
+          .from('membros')
+          .select('foto_url')
+          .eq('id', user.id)
+          .single();
+
+        if (perfil?.foto_url) {
+          const urlParts = perfil.foto_url.split('/');
+          const nomeArquivo = urlParts[urlParts.length - 1].split('?')[0];
+
+          const { data, error: removeError } = await this.supabaseService.supabase.storage
+            .from('fotos_membros')
+            .remove([nomeArquivo]);
+
+          if (removeError || !data || data.length === 0) {
+            console.error('Falha ao deletar do Storage. Arquivos removidos:', data);
+            throw new Error('Sem permissão para excluir a imagem física do banco.');
+          }
+        }
+
+        const { error: updateError } = await this.supabaseService.supabase
+          .from('membros')
+          .update({ foto_url: null })
+          .eq('id', user.id);
+
+        if (updateError) throw updateError;
+        return { sucesso: true };
+      }),
     );
   }
 }

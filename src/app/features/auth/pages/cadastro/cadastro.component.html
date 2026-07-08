@@ -5,19 +5,17 @@
       <p class="text-slate-500 text-sm mt-0.5">Faça parte da nossa rede interna</p>
     </div>
 
-    @if (mensagemErro()) {
+    @if (mensagemErro() || mensagemSucesso()) {
       <div
-        class="bg-red-50 text-red-600 text-center py-2.5 px-3 text-sm mb-5 rounded-xl border border-red-100/60 animate-fade-in"
+        class="mb-5 p-3 text-center text-sm rounded-xl border animate-fade-in"
+        [class.bg-red-50]="mensagemErro()"
+        [class.text-red-600]="mensagemErro()"
+        [class.border-red-100]="mensagemErro()"
+        [class.bg-emerald-50]="mensagemSucesso()"
+        [class.text-emerald-600]="mensagemSucesso()"
+        [class.border-emerald-100]="mensagemSucesso()"
       >
-        {{ mensagemErro() }}
-      </div>
-    }
-
-    @if (mensagemSucesso()) {
-      <div
-        class="bg-emerald-50 text-emerald-600 text-center py-2.5 px-3 text-sm mb-5 rounded-xl border border-emerald-100/60 animate-fade-in"
-      >
-        {{ mensagemSucesso() }}
+        {{ mensagemErro() || mensagemSucesso() }}
       </div>
     }
 
@@ -27,178 +25,144 @@
       class="space-y-4"
       novalidate
     >
-      <div class="flex flex-col items-center justify-center mb-2">
+      <div class="flex flex-col items-center mb-2">
         <div
-          class="relative w-24 h-24 bg-slate-100 rounded-full border-4 border-white shadow-sm flex items-center justify-center overflow-hidden group transition-transform active:scale-95"
+          class="relative w-24 h-24 bg-slate-100 rounded-full border-4 border-white shadow-sm flex items-center justify-center overflow-hidden group"
         >
           @if (previewFoto()) {
-            <img [src]="previewFoto()" class="w-full h-full object-cover" alt="Sua Foto" />
+            <img [src]="previewFoto()" class="w-full h-full object-cover" />
           } @else {
             <span class="text-4xl text-slate-300">👤</span>
           }
-
           <label
-            class="absolute inset-0 bg-black/40 text-white text-[10px] font-bold uppercase flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-200"
+            class="absolute inset-0 bg-black/40 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
           >
-            <span class="text-lg mb-0.5">📸</span>
-            Foto
+            <span class="text-lg">📸</span>
+            <span class="text-[10px] font-bold uppercase">Foto</span>
             <input
               type="file"
-              accept="image/*"
               class="hidden"
+              accept="image/*"
               (change)="aoSelecionarFoto($event)"
               [disabled]="carregando()"
             />
           </label>
         </div>
-        <p class="text-[10px] text-slate-400 mt-2 uppercase tracking-wider font-semibold">
-          Foto de Perfil (Opcional)
-        </p>
       </div>
 
       <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label
-            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-1"
-            >Nome</label
-          >
+        <div class="space-y-1">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">Nome</label>
           <input
             type="text"
             name="nome"
             #nome="ngModel"
-            [(ngModel)]="formCadastro.nome"
-            [class.border-red-400]="nome.invalid && (nome.touched || formCad.submitted)"
-            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-xl focus:outline-none focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 transition-all placeholder-slate-400"
-            placeholder="Seu nome"
-            [disabled]="carregando()"
+            [(ngModel)]="formCadastro().nome"
             required
+            [class.border-red-400]="nome.invalid && (nome.touched || formCad.submitted)"
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 outline-none transition-all"
+            placeholder="Nome"
+            [disabled]="carregando()"
           />
         </div>
-
-        <div>
-          <label
-            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-1"
-            >Sobrenome</label
-          >
+        <div class="space-y-1">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">Sobrenome</label>
           <input
             type="text"
             name="sobrenome"
             #sobrenome="ngModel"
-            [(ngModel)]="formCadastro.sobrenome"
+            [(ngModel)]="formCadastro().sobrenome"
+            required
             [class.border-red-400]="sobrenome.invalid && (sobrenome.touched || formCad.submitted)"
-            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-xl focus:outline-none focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 transition-all placeholder-slate-400"
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 outline-none transition-all"
             placeholder="Sobrenome"
             [disabled]="carregando()"
-            required
           />
         </div>
       </div>
 
-      @if (
-        (nome.invalid && (nome.touched || formCad.submitted)) ||
-        (sobrenome.invalid && (sobrenome.touched || formCad.submitted))
-      ) {
-        <span class="text-xs text-red-500 block -mt-2 px-1">⚠️ Preencha seu nome e sobrenome.</span>
-      }
-
-      <div>
-        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-1"
-          >E-mail</label
-        >
+      <div class="space-y-1">
+        <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">E-mail</label>
         <input
           type="email"
           name="email"
           #email="ngModel"
-          [(ngModel)]="formCadastro.email"
-          [class.border-red-400]="email.invalid && (email.touched || formCad.submitted)"
-          class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-xl focus:outline-none focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 transition-all placeholder-slate-400"
-          placeholder="exemplo@email.com"
-          [disabled]="carregando()"
+          [(ngModel)]="formCadastro().email"
           required
           email
+          [class.border-red-400]="email.invalid && (email.touched || formCad.submitted)"
+          class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 outline-none transition-all"
+          placeholder="exemplo@email.com"
+          [disabled]="carregando()"
         />
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label
-            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-1"
-            >WhatsApp</label
-          >
+      <div class="grid grid-cols-3 gap-3">
+        <div class="col-span-2 space-y-1">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">WhatsApp</label>
           <input
             type="tel"
             name="telefone"
             #telefone="ngModel"
-            [(ngModel)]="formCadastro.telefone"
-            [class.border-red-400]="telefone.invalid && (telefone.touched || formCad.submitted)"
-            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-xl focus:outline-none focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 transition-all placeholder-slate-400"
-            placeholder="24 99999-9999"
-            [disabled]="carregando()"
+            [(ngModel)]="formCadastro().telefone"
             required
             pattern="[0-9]{10,11}"
+            [class.border-red-400]="telefone.invalid && (telefone.touched || formCad.submitted)"
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none transition-all"
+            placeholder="24 999999999"
+            [disabled]="carregando()"
           />
         </div>
+        <div class="space-y-1">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">Cargo</label>
+          <select
+            name="cargo"
+            [ngModel]="formCadastro().cargo"
+            (ngModelChange)="atualizarForm('cargo', $event)"
+            class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none transition-all"
+          >
+            @for (item of cargosDisponiveis; track item.value) {
+              <option [value]="item.value">{{ item.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
 
-        <div>
-          <label
-            class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-1"
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1"
             >Nascimento</label
           >
           <input
             type="date"
             name="dataNascimento"
-            #dataNascimento="ngModel"
-            [(ngModel)]="formCadastro.dataNascimento"
-            [class.border-red-400]="
-              dataNascimento.invalid && (dataNascimento.touched || formCad.submitted)
-            "
-            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-xl focus:outline-none focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 transition-all text-slate-600"
-            [disabled]="carregando()"
+            [(ngModel)]="formCadastro().dataNascimento"
             required
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none transition-all"
+          />
+        </div>
+        <div class="space-y-1">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">Senha</label>
+          <input
+            type="password"
+            name="senha"
+            #senha="ngModel"
+            [(ngModel)]="formCadastro().senha"
+            required
+            minlength="6"
+            [class.border-red-400]="senha.invalid && (senha.touched || formCad.submitted)"
+            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none transition-all"
+            placeholder="••••••"
+            [disabled]="carregando()"
           />
         </div>
       </div>
 
-      <div>
-        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 px-1"
-          >Crie uma Senha</label
-        >
-        <input
-          type="password"
-          name="senha"
-          #senha="ngModel"
-          [(ngModel)]="formCadastro.senha"
-          [class.border-red-400]="senha.invalid && (senha.touched || formCad.submitted)"
-          class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-xl focus:outline-none focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 transition-all placeholder-slate-400"
-          placeholder="Mínimo 6 caracteres"
-          [disabled]="carregando()"
-          required
-          minlength="6"
-        />
-      </div>
-
       <button
         type="submit"
-        class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:pointer-events-none mt-6 active:scale-[0.98]"
         [disabled]="carregando() || formCad.invalid"
+        class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl shadow-sm transition-all disabled:opacity-50 mt-2"
       >
-        @if (carregando()) {
-          <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-        }
         {{ carregando() ? 'Processando...' : 'Finalizar Cadastro' }}
       </button>
     </form>
@@ -206,6 +170,7 @@
     <div class="text-center mt-6 pt-5 border-t border-slate-100">
       <p class="text-sm text-slate-500 font-medium">
         Já tem uma conta?
+
         <a routerLink="/login" class="text-sky-600 hover:text-sky-700 font-bold transition-colors"
           >Fazer Login</a
         >

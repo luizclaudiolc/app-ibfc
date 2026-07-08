@@ -85,6 +85,24 @@ export class PerfilComponent implements OnInit {
     });
   }
 
+  removerFoto(): void {
+    if (!confirm('Deseja realmente remover sua foto de perfil?')) return;
+
+    this.carregando.set(true);
+    this.membroService.removerFotoPerfil().subscribe({
+      next: () => {
+        this.previewFoto.set('');
+        localStorage.removeItem('user_foto');
+        this.carregando.set(false);
+        this.mensagemSucesso.set('Foto removida com sucesso!');
+      },
+      error: (err) => {
+        this.carregando.set(false);
+        this.mensagemErro.set('Erro ao remover arquivo: ' + err.message);
+      },
+    });
+  }
+
   cancelar(): void {
     this.router.navigate(['dashboard/home']);
   }

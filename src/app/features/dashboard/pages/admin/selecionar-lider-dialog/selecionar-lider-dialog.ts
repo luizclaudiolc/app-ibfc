@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../../core/modules/material.module';
 import { MembroService } from '../../../../../core/services/membro.service';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { Membro } from '../../../../../shared/models/membro.model';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-selecionar-lider-dialog',
@@ -24,9 +26,9 @@ export class SelecionarLiderDialogComponent {
     { label: 'Homens', value: 'homens' },
     { label: 'Missões', value: 'missoes' },
   ];
-  membrosAtivos: any[] = [];
-  membrosFiltrados: any[] = [];
-  membrosSelecionados: any[] = [];
+  membrosAtivos: Membro[] = [];
+  membrosFiltrados: Membro[] = [];
+  membrosSelecionados: Membro[] = [];
   setorSelecionado: string = '';
 
   constructor(
@@ -53,14 +55,25 @@ export class SelecionarLiderDialogComponent {
     }
   }
 
-  remover(membro: any) {
+  remover(membro: Membro) {
     this.membrosSelecionados = this.membrosSelecionados.filter((m) => m.id !== membro.id);
   }
 
   confirmar() {
-    this.membrosSelecionados.forEach((m) => {
-      this.membroService.atualizarSetor(m.id, this.setorSelecionado).subscribe();
-    });
-    this.dialogRef.close(true);
+    if (this.setorSelecionado && this.membrosSelecionados.length > 0) {
+      const requests = this.membrosSelecionados.map((m) =>
+        this.membroService.atualizarSetor(m.id, this.setorSelecionado),
+      );
+
+      forkJoin(requests).subscribe({
+        next: () => {
+          this.dialogRef.close(true);
+        },
+        error: (err) => {
+          console.error('Erro ao atualizar membros:', err);
+          alert('Erro ao salvar no banco. Verifique as permissões de administrador.');
+        },
+      });
+    }
   }
 }
