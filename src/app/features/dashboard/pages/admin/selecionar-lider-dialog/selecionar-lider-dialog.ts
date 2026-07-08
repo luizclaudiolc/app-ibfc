@@ -14,7 +14,7 @@ import { forkJoin } from 'rxjs';
   templateUrl: './selecionar-lider-dialog.html',
 })
 export class SelecionarLiderDialogComponent {
-  setores = [
+  departamentos = [
     { label: 'Ministério de Louvor', value: 'ministerio_louvor' },
     { label: 'Recepção', value: 'recepcao' },
     { label: 'Mídia', value: 'midia' },

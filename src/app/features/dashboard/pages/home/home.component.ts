@@ -36,6 +36,19 @@ export class HomeComponent implements OnInit {
 
   termoBusca = signal<string>('');
 
+  departamentos: Record<string, string> = {
+    ministerio_louvor: 'Líder Ministério de Louvor',
+    recepcao: 'Líder Recepção',
+    midia: 'Líder Mídia',
+    infantil: 'Líder Infantil',
+    jovens: 'Líder Jovens',
+    adultos: 'Líder Adultos',
+    casais: 'Líder Casais',
+    mulheres: 'Líder Mulheres',
+    homens: 'Líder Homens',
+    missoes: 'Líder Missões',
+  };
+
   escalaPessoal = computed(() => {
     const email = this.emailUsuario().toLowerCase();
     const nome = this.nomeUsuario().toLowerCase();
@@ -53,9 +66,12 @@ export class HomeComponent implements OnInit {
 
     if (!busca) return lista;
 
-    return lista.filter(({ nome, sobrenome }) => {
+    return lista.filter(({ nome, sobrenome, setor_responsavel, cargo }) => {
       const nomeCompleto = `${nome} ${sobrenome}`.toLowerCase();
-      return nomeCompleto.includes(busca);
+      const setor = setor_responsavel ? this.departamentos[setor_responsavel] : '';
+      const cargoLower = cargo?.toLowerCase() || '';
+
+      return nomeCompleto.includes(busca) || setor.includes(busca) || cargoLower.includes(busca);
     });
   });
 

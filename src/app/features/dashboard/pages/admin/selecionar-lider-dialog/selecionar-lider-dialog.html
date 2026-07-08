@@ -3,7 +3,7 @@
   <mat-form-field appearance="outline" class="w-full">
     <mat-label>Setor</mat-label>
     <mat-select [(ngModel)]="setorSelecionado">
-      @for (setor of setores; track setor.value) {
+      @for (setor of departamentos; track setor.value) {
         <mat-option [value]="setor.value">{{ setor.label }}</mat-option>
       }
     </mat-select>
