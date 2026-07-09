@@ -2,7 +2,7 @@
   <div class="w-full max-w-md bg-white rounded-2xl shadow-md p-6 border-0">
     <div class="text-center mb-6">
       <div
-        class="inline-flex items-center justify-center w-16 height-16 h-16 bg-sky-100 text-sky-600 rounded-full mb-3 text-3xl"
+        class="inline-flex items-center justify-center w-16 h-16 bg-sky-100 text-sky-600 rounded-full mb-3 text-3xl"
       >
         ⛪
       </div>
@@ -18,83 +18,51 @@
       </div>
     }
 
-    <form
-      (ngSubmit)="loginForm.valid && submeterLogin()"
-      #loginForm="ngForm"
-      class="space-y-4"
-      novalidate
-    >
-      <div>
-        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5"
-          >E-mail</label
-        >
+    <form [formGroup]="loginForm" (ngSubmit)="submeterLogin()" class="flex flex-col gap-2">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>E-mail</mat-label>
         <input
+          matInput
           type="email"
-          name="email"
-          #emailModel="ngModel"
-          [(ngModel)]="email"
-          [class.border-red-400]="emailModel.invalid && (emailModel.touched || loginForm.submitted)"
-          class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-xl focus:outline-none focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 transition-all disabled:opacity-60"
+          formControlName="email"
           placeholder="exemplo@email.com"
-          [disabled]="carregando()"
-          required
-          email
+          [readonly]="carregando()"
         />
-        @if (emailModel.invalid && (emailModel.touched || loginForm.submitted)) {
-          <span class="text-xs text-red-500 block mt-1 px-1">
-            @if (emailModel.errors?.['required']) {
-              ⚠️ O e-mail é obrigatório.
-            } @else if (emailModel.errors?.['email']) {
-              ⚠️ Digite um formato de e-mail válido.
-            }
-          </span>
-        }
-      </div>
 
-      <div>
-        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5"
-          >Senha</label
-        >
-        <input
-          type="password"
-          name="senha"
-          #senhaModel="ngModel"
-          [(ngModel)]="senha"
-          [class.border-red-400]="senhaModel.invalid && (senhaModel.touched || loginForm.submitted)"
-          class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-xl focus:outline-none focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 transition-all disabled:opacity-60"
-          placeholder="••••••••"
-          [disabled]="carregando()"
-          required
-        />
-        @if (senhaModel.invalid && (senhaModel.touched || loginForm.submitted)) {
-          <span class="text-xs text-red-500 block mt-1 px-1">⚠️ A senha é obrigatória.</span>
+        @if (loginForm.controls.email.hasError('required')) {
+          <mat-error>O e-mail é obrigatório.</mat-error>
+        } @else if (loginForm.controls.email.hasError('email')) {
+          <mat-error>Digite um formato de e-mail válido.</mat-error>
         }
-      </div>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Senha</mat-label>
+        <input
+          matInput
+          type="password"
+          formControlName="senha"
+          placeholder="••••••••"
+          [readonly]="carregando()"
+        />
+
+        @if (loginForm.controls.senha.hasError('required')) {
+          <mat-error>A senha é obrigatória.</mat-error>
+        }
+      </mat-form-field>
 
       <button
+        mat-flat-button
         type="submit"
-        class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:pointer-events-none mt-6"
+        class="w-full !rounded-xl !h-12 !text-sm !font-bold !bg-sky-600 hover:!bg-sky-700 !text-white transition-all mt-4"
         [disabled]="carregando() || loginForm.invalid"
       >
-        @if (carregando()) {
-          <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-        }
-
-        {{ carregando() ? 'Verificando...' : 'Entrar' }}
+        <div class="flex items-center justify-center gap-2">
+          @if (carregando()) {
+            <mat-spinner diameter="20" class="stroke-white"></mat-spinner>
+          }
+          {{ carregando() ? 'Verificando...' : 'Entrar' }}
+        </div>
       </button>
 
       <div class="text-center mt-5 pt-4 border-t border-slate-100">
@@ -103,8 +71,9 @@
           <a
             routerLink="/cadastro"
             class="text-sky-600 hover:text-sky-700 font-semibold transition-colors"
-            >Cadastre-se aqui</a
           >
+            Cadastre-se aqui
+          </a>
         </p>
       </div>
     </form>

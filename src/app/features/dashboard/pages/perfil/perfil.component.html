@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-slate-50 text-slate-800 pb-24">
-  <app-header [nomeUsuario]="formPerfil.nome || 'Usuário'" [fotoUsuario]="previewFoto()">
+  <app-header [nomeUsuario]="perfilForm.value.nome || 'Usuário'" [fotoUsuario]="previewFoto()">
   </app-header>
 
   <main class="p-4 max-w-xl mx-auto pt-8">
@@ -33,6 +33,7 @@
             <button
               (click)="removerFoto()"
               class="text-red-500 hover:text-red-600 text-xs font-bold px-2 py-2 transition-all"
+              [disabled]="carregando()"
             >
               Remover
             </button>
@@ -45,64 +46,67 @@
       </div>
 
       @if (!carregandoDados()) {
-        <form (ngSubmit)="salvarAlteracoes()" class="w-full space-y-4">
+        <form [formGroup]="perfilForm" (ngSubmit)="salvarAlteracoes()" class="w-full space-y-2">
           <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Nome</label>
-              <input
-                [(ngModel)]="formPerfil.nome"
-                name="nome"
-                class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Sobrenome</label>
-              <input
-                [(ngModel)]="formPerfil.sobrenome"
-                name="sobrenome"
-                class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
-              />
-            </div>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Nome</mat-label>
+              <input matInput formControlName="nome" placeholder="Nome" />
+              @if (perfilForm.controls.nome.hasError('required')) {
+                <mat-error>Obrigatório.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Sobrenome</mat-label>
+              <input matInput formControlName="sobrenome" placeholder="Sobrenome" />
+              @if (perfilForm.controls.sobrenome.hasError('required')) {
+                <mat-error>Obrigatório.</mat-error>
+              }
+            </mat-form-field>
           </div>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">WhatsApp</label>
-            <input
-              [(ngModel)]="formPerfil.telefone"
-              name="telefone"
-              class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
-            />
-          </div>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>WhatsApp</mat-label>
+            <input matInput type="tel" formControlName="telefone" placeholder="24 999999999" />
+            @if (perfilForm.controls.telefone.hasError('required')) {
+              <mat-error>Obrigatório.</mat-error>
+            } @else if (perfilForm.controls.telefone.hasError('pattern')) {
+              <mat-error>Digite 10 ou 11 números.</mat-error>
+            }
+          </mat-form-field>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-1">Data de Nascimento</label>
-            <input
-              type="date"
-              [(ngModel)]="formPerfil.data_nascimento"
-              name="nasc"
-              class="w-full p-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:ring-2 focus:ring-sky-500 outline-none"
-            />
-          </div>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Data de Nascimento</mat-label>
+            <input matInput type="date" formControlName="data_nascimento" />
+            @if (perfilForm.controls.data_nascimento.hasError('required')) {
+              <mat-error>Obrigatório.</mat-error>
+            }
+          </mat-form-field>
 
           <div class="flex gap-3 pt-4">
             <button
+              mat-flat-button
               type="button"
               (click)="cancelar()"
-              class="w-full bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-all"
+              class="w-full !rounded-xl !h-12 !bg-slate-100 hover:!bg-slate-200 !text-slate-600 !font-bold transition-all"
+              [disabled]="carregando()"
             >
               Cancelar
             </button>
             <button
+              mat-flat-button
               type="submit"
-              [disabled]="carregando()"
-              class="w-full bg-sky-600 text-white font-bold py-3 rounded-xl hover:bg-sky-700 transition-all disabled:opacity-50"
+              class="w-full !rounded-xl !h-12 !bg-sky-600 hover:!bg-sky-700 !text-white !font-bold transition-all"
+              [disabled]="carregando() || perfilForm.invalid"
             >
               {{ carregando() ? 'Salvando...' : 'Salvar Alterações' }}
             </button>
           </div>
         </form>
       } @else {
-        <div class="text-center py-10 text-slate-400 text-sm">Carregando seus dados...</div>
+        <div class="flex justify-center py-10">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
       }
 
       @if (mensagemSucesso()) {

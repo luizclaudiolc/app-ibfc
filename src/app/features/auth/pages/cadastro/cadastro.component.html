@@ -19,13 +19,8 @@
       </div>
     }
 
-    <form
-      (ngSubmit)="formCad.valid && submeterCadastro()"
-      #formCad="ngForm"
-      class="space-y-4"
-      novalidate
-    >
-      <div class="flex flex-col items-center mb-2">
+    <form [formGroup]="cadastroForm" (ngSubmit)="submeterCadastro()" class="space-y-2">
+      <div class="flex flex-col items-center mb-4">
         <div
           class="relative w-24 h-24 bg-slate-100 rounded-full border-4 border-white shadow-sm flex items-center justify-center overflow-hidden group"
         >
@@ -51,129 +46,95 @@
       </div>
 
       <div class="grid grid-cols-2 gap-3">
-        <div class="space-y-1">
-          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">Nome</label>
-          <input
-            type="text"
-            name="nome"
-            #nome="ngModel"
-            [(ngModel)]="formCadastro().nome"
-            required
-            [class.border-red-400]="nome.invalid && (nome.touched || formCad.submitted)"
-            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 outline-none transition-all"
-            placeholder="Nome"
-            [disabled]="carregando()"
-          />
-        </div>
-        <div class="space-y-1">
-          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">Sobrenome</label>
-          <input
-            type="text"
-            name="sobrenome"
-            #sobrenome="ngModel"
-            [(ngModel)]="formCadastro().sobrenome"
-            required
-            [class.border-red-400]="sobrenome.invalid && (sobrenome.touched || formCad.submitted)"
-            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 outline-none transition-all"
-            placeholder="Sobrenome"
-            [disabled]="carregando()"
-          />
-        </div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Nome</mat-label>
+          <input matInput formControlName="nome" placeholder="Nome" />
+          @if (cadastroForm.controls.nome.hasError('required')) {
+            <mat-error>Obrigatório.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Sobrenome</mat-label>
+          <input matInput formControlName="sobrenome" placeholder="Sobrenome" />
+          @if (cadastroForm.controls.sobrenome.hasError('required')) {
+            <mat-error>Obrigatório.</mat-error>
+          }
+        </mat-form-field>
       </div>
 
-      <div class="space-y-1">
-        <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">E-mail</label>
-        <input
-          type="email"
-          name="email"
-          #email="ngModel"
-          [(ngModel)]="formCadastro().email"
-          required
-          email
-          [class.border-red-400]="email.invalid && (email.touched || formCad.submitted)"
-          class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 outline-none transition-all"
-          placeholder="exemplo@email.com"
-          [disabled]="carregando()"
-        />
-      </div>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>E-mail</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="exemplo@email.com" />
+        @if (cadastroForm.controls.email.hasError('required')) {
+          <mat-error>O e-mail é obrigatório.</mat-error>
+        } @else if (cadastroForm.controls.email.hasError('email')) {
+          <mat-error>Formato inválido.</mat-error>
+        }
+      </mat-form-field>
 
       <div class="grid grid-cols-3 gap-3">
-        <div class="col-span-2 space-y-1">
-          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">WhatsApp</label>
-          <input
-            type="tel"
-            name="telefone"
-            #telefone="ngModel"
-            [(ngModel)]="formCadastro().telefone"
-            required
-            pattern="[0-9]{10,11}"
-            [class.border-red-400]="telefone.invalid && (telefone.touched || formCad.submitted)"
-            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none transition-all"
-            placeholder="24 999999999"
-            [disabled]="carregando()"
-          />
-        </div>
-        <div class="space-y-1">
-          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">Cargo</label>
-          <select
-            name="cargo"
-            [ngModel]="formCadastro().cargo"
-            (ngModelChange)="atualizarForm('cargo', $event)"
-            class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none transition-all"
-          >
+        <mat-form-field appearance="outline" class="w-full col-span-2">
+          <mat-label>WhatsApp</mat-label>
+          <input matInput type="tel" formControlName="telefone" placeholder="24 999999999" />
+          @if (cadastroForm.controls.telefone.hasError('required')) {
+            <mat-error>Obrigatório.</mat-error>
+          } @else if (cadastroForm.controls.telefone.hasError('pattern')) {
+            <mat-error>Digite 10 ou 11 números.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Cargo</mat-label>
+          <mat-select formControlName="cargo">
             @for (item of cargosDisponiveis; track item.value) {
-              <option [value]="item.value">{{ item.label }}</option>
+              <mat-option [value]="item.value">{{ item.label }}</mat-option>
             }
-          </select>
-        </div>
+          </mat-select>
+        </mat-form-field>
       </div>
 
       <div class="grid grid-cols-2 gap-3">
-        <div class="space-y-1">
-          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1"
-            >Nascimento</label
-          >
-          <input
-            type="date"
-            name="dataNascimento"
-            [(ngModel)]="formCadastro().dataNascimento"
-            required
-            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none transition-all"
-          />
-        </div>
-        <div class="space-y-1">
-          <label class="block text-[11px] font-bold text-slate-500 uppercase px-1">Senha</label>
-          <input
-            type="password"
-            name="senha"
-            #senha="ngModel"
-            [(ngModel)]="formCadastro().senha"
-            required
-            minlength="6"
-            [class.border-red-400]="senha.invalid && (senha.touched || formCad.submitted)"
-            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:border-sky-500 outline-none transition-all"
-            placeholder="••••••"
-            [disabled]="carregando()"
-          />
-        </div>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Nascimento</mat-label>
+          <input matInput type="date" formControlName="dataNascimento" />
+          @if (cadastroForm.controls.dataNascimento.hasError('required')) {
+            <mat-error>Obrigatório.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Senha</mat-label>
+          <input matInput type="password" formControlName="senha" placeholder="••••••" />
+          @if (cadastroForm.controls.senha.hasError('required')) {
+            <mat-error>Obrigatório.</mat-error>
+          } @else if (cadastroForm.controls.senha.hasError('minlength')) {
+            <mat-error>Mínimo 6 caracteres.</mat-error>
+          }
+        </mat-form-field>
       </div>
 
       <button
+        mat-flat-button
         type="submit"
-        [disabled]="carregando() || formCad.invalid"
-        class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl shadow-sm transition-all disabled:opacity-50 mt-2"
+        class="w-full !rounded-xl !h-12 !text-sm !font-bold !bg-sky-600 hover:!bg-sky-700 !text-white transition-all mt-2"
+        [disabled]="carregando() || cadastroForm.invalid"
       >
-        {{ carregando() ? 'Processando...' : 'Finalizar Cadastro' }}
+        <div class="flex items-center justify-center gap-2">
+          @if (carregando()) {
+            <mat-spinner diameter="20" class="!stroke-white"></mat-spinner>
+          }
+          {{ carregando() ? 'Processando...' : 'Finalizar Cadastro' }}
+        </div>
       </button>
     </form>
 
     <div class="text-center mt-6 pt-5 border-t border-slate-100">
       <p class="text-sm text-slate-500 font-medium">
         Já tem uma conta?
-
-        <a routerLink="/login" class="text-sky-600 hover:text-sky-700 font-bold transition-colors"
-          >Fazer Login</a
-        >
+        <a routerLink="/login" class="text-sky-600 hover:text-sky-700 font-bold transition-colors">
+          Fazer Login
+        </a>
       </p>
     </div>
   </div>

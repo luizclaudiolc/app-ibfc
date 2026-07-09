@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   imports: [
@@ -27,6 +28,10 @@ import { MatChipsModule } from '@angular/material/chips';
     MatExpansionModule,
     MatAutocompleteModule,
     MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
   ],
   exports: [
     MatTableModule,
@@ -41,6 +46,10 @@ import { MatChipsModule } from '@angular/material/chips';
     MatExpansionModule,
     MatAutocompleteModule,
     MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
   ],
 })
 export class MaterialModule {}

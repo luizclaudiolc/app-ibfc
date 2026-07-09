@@ -2,6 +2,17 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { ENiveisAcesso } from '../../../shared/models/consts';
 
+export const authGuard: CanActivateFn = (route, state) => {
+  const router = inject(Router);
+
+  const usuarioLogado = localStorage.getItem('user_email');
+
+  if (usuarioLogado) return true;
+
+  router.navigate(['/login']);
+  return false;
+};
+
 export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 

@@ -60,16 +60,22 @@ export class HomeComponent implements OnInit {
   });
 
   membrosFiltrados = computed(() => {
-    const busca = this.termoBusca().toLowerCase().trim();
+    const removerAcentos = (texto: string) => {
+      return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    };
+
+    const termoOriginal = this.termoBusca().toLowerCase().trim();
+    const busca = removerAcentos(termoOriginal);
+
     const lista = this.membrosRaw();
-    console.log({ lista });
 
     if (!busca) return lista;
 
     return lista.filter(({ nome, sobrenome, setor_responsavel, cargo }) => {
-      const nomeCompleto = `${nome} ${sobrenome}`.toLowerCase();
-      const setor = setor_responsavel ? this.departamentos[setor_responsavel] : '';
-      const cargoLower = cargo?.toLowerCase() || '';
+      const nomeCompleto = removerAcentos(`${nome} ${sobrenome}`.toLowerCase());
+      const setorRaw = setor_responsavel ? this.departamentos[setor_responsavel] : '';
+      const setor = removerAcentos(setorRaw.toLowerCase());
+      const cargoLower = removerAcentos((cargo || '').toLowerCase());
 
       return nomeCompleto.includes(busca) || setor.includes(busca) || cargoLower.includes(busca);
     });

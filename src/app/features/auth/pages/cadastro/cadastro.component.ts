@@ -1,14 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { MaterialModule } from '../../../../core/modules/material.module';
 import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-cadastro',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MaterialModule],
   templateUrl: './cadastro.component.html',
   styleUrl: './cadastro.component.css',
 })
@@ -20,15 +21,9 @@ export class CadastroComponent {
   previewFoto = signal<string>('');
   arquivoFotoSelecionado: File | null = null;
 
-  formCadastro = signal({
-    nome: '',
-    sobrenome: '',
-    email: '',
-    senha: '',
-    telefone: '',
-    dataNascimento: '',
-    cargo: 'membro',
-  });
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
 
   cargosDisponiveis = [
     { label: 'Membro', value: 'membro' },
@@ -40,8 +35,15 @@ export class CadastroComponent {
     { label: 'Líder de Ministério', value: 'lider_de_ministerio' },
   ];
 
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  cadastroForm = this.fb.nonNullable.group({
+    nome: ['', [Validators.required]],
+    sobrenome: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
+    cargo: ['membro', [Validators.required]],
+    dataNascimento: ['', [Validators.required]],
+    senha: ['', [Validators.required, Validators.minLength(6)]],
+  });
 
   aoSelecionarFoto(event: any): void {
     const arquivo = event.target.files[0];
@@ -63,26 +65,28 @@ export class CadastroComponent {
   }
 
   submeterCadastro(): void {
-    const f = this.formCadastro();
-    this.carregando.set(true);
-    this.mensagemErro.set('');
-
-    if (!f.nome || !f.sobrenome || !f.email || !f.senha) {
-      this.mensagemErro.set('Preencha todos os campos obrigatórios.');
-      this.carregando.set(false);
+    if (this.cadastroForm.invalid) {
+      this.cadastroForm.markAllAsTouched();
       return;
     }
 
-    const dataSupabase = f.dataNascimento ? f.dataNascimento : '';
+    this.carregando.set(true);
+    this.mensagemErro.set('');
+
+    // Desabilita o formulário inteiro pelo TypeScript
+    this.cadastroForm.disable();
+
+    // getRawValue() garante que os valores sejam lidos mesmo com o form desabilitado
+    const formValues = this.cadastroForm.getRawValue();
 
     const dadosEnvio = {
-      nome: f.nome.trim(),
-      sobrenome: f.sobrenome.trim(),
-      email: f.email.trim().toLowerCase(),
-      senha: f.senha,
-      telefone: f.telefone.replace(/\D/g, ''),
-      dataNascimento: dataSupabase,
-      cargo: f.cargo,
+      nome: formValues.nome.trim(),
+      sobrenome: formValues.sobrenome.trim(),
+      email: formValues.email.trim().toLowerCase(),
+      senha: formValues.senha,
+      telefone: formValues.telefone.replace(/\D/g, ''),
+      dataNascimento: formValues.dataNascimento,
+      cargo: formValues.cargo,
       foto: this.arquivoFotoSelecionado,
     };
 
@@ -96,17 +100,15 @@ export class CadastroComponent {
         } else {
           this.mensagemErro.set(res.mensagem || 'Erro ao realizar cadastro.');
           this.carregando.set(false);
+          this.cadastroForm.enable(); // Rehabilita em caso de erro
         }
       },
       error: (err) => {
         this.mensagemErro.set('Erro ao processar o cadastro. Tente novamente.');
         this.carregando.set(false);
+        this.cadastroForm.enable(); // Rehabilita em caso de erro
         console.error(err);
       },
     });
-  }
-
-  atualizarForm(campo: string, valor: any) {
-    this.formCadastro.update((form) => ({ ...form, [campo]: valor }));
   }
 }
