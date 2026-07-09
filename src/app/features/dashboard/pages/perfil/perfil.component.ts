@@ -7,6 +7,7 @@ import { FooterComponent } from '../../../../shared/components/footer/footer.com
 import { Router } from '@angular/router';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
+import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
 
 @Component({
   selector: 'app-perfil',
@@ -25,17 +26,8 @@ export class PerfilComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
 
-  cargosDisponiveis = [
-    { label: 'Membro', value: 'membro' },
-    { label: 'Pastor', value: 'pastor' },
-    { label: 'Presbítero', value: 'presbitero' },
-    { label: 'Diácono', value: 'diacono' },
-    { label: 'Evangelista', value: 'evangelista' },
-    { label: 'Missionário', value: 'missionario' },
-    { label: 'Líder de Ministério', value: 'lider_de_ministerio' },
-  ];
+  cargosDisponiveis = CARGOS_DISPONIVEIS;
 
-  // Formulário Reativo (E-mail começa desabilitado por segurança de Auth)
   perfilForm = this.fb.nonNullable.group({
     nome: ['', [Validators.required]],
     sobrenome: ['', [Validators.required]],
@@ -90,7 +82,7 @@ export class PerfilComponent implements OnInit {
       next: (res) => {
         this.carregando.set(false);
         this.perfilForm.enable();
-        this.perfilForm.controls.email.disable(); // Mantém o e-mail bloqueado após reabilitar
+        this.perfilForm.controls.email.disable();
 
         if (res.sucesso) {
           this.mensagemSucesso.set('Perfil atualizado com sucesso!');

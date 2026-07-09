@@ -14,10 +14,12 @@
         [src]="fotoUsuario()"
         class="w-10 h-10 rounded-full object-cover border-2 border-sky-400 shadow-sm"
         alt="Perfil"
+        (click)="irParaperfil()"
       />
     } @else {
       <div
         class="w-10 h-10 bg-sky-700 text-white font-bold rounded-full flex items-center justify-center border-2 border-sky-400 shadow-sm text-sm"
+        (click)="irParaperfil()"
       >
         {{ nomeUsuario()[0].toUpperCase() }}
       </div>
@@ -28,20 +30,7 @@
       class="w-9 h-9 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-400 hover:text-red-400 rounded-xl flex items-center justify-center transition-all focus:outline-none border border-slate-700"
       title="Sair do aplicativo"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="2"
-        stroke="currentColor"
-        class="w-5 h-5"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-        />
-      </svg>
+      <mat-icon class="text-lg">logout</mat-icon>
     </button>
   </div>
 </header>

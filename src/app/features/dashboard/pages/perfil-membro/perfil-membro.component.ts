@@ -10,6 +10,8 @@ import {
   DEPARTAMENTOS_DISPONIVEIS_MAP,
   GRADIENTES_PASTEIS,
 } from '../../../../shared/models/consts';
+import { MatDialog } from '@angular/material/dialog';
+import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
 
 @Component({
   selector: 'app-membro-perfil',
@@ -30,6 +32,7 @@ export class PerfilMembroComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private membroService = inject(MembroService);
   private location = inject(Location);
+  private dialog = inject(MatDialog);
 
   departamentos = DEPARTAMENTOS_DISPONIVEIS_MAP;
   gradientesPasteis = GRADIENTES_PASTEIS;
@@ -71,5 +74,15 @@ export class PerfilMembroComponent implements OnInit {
   formatarTelefone(tel: string): string {
     if (!tel) return '';
     return tel.replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3');
+  }
+
+  abrirFoto(url: any, nome: string): void {
+    if (!url) return;
+    this.dialog.open(ImagePreviewDialogComponent, {
+      data: { url, nome },
+      panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+    });
   }
 }
