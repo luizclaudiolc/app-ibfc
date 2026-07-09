@@ -67,10 +67,8 @@ export class CadastroComponent {
     this.carregando.set(true);
     this.mensagemErro.set('');
 
-    // Desabilita o formulário inteiro pelo TypeScript
     this.cadastroForm.disable();
 
-    // getRawValue() garante que os valores sejam lidos mesmo com o form desabilitado
     const formValues = this.cadastroForm.getRawValue();
 
     const dadosEnvio: UsuarioCadastro = {
@@ -94,13 +92,13 @@ export class CadastroComponent {
         } else {
           this.mensagemErro.set(res.mensagem || 'Erro ao realizar cadastro.');
           this.carregando.set(false);
-          this.cadastroForm.enable(); // Rehabilita em caso de erro
+          this.cadastroForm.enable();
         }
       },
       error: (err) => {
         this.mensagemErro.set('Erro ao processar o cadastro. Tente novamente.');
         this.carregando.set(false);
-        this.cadastroForm.enable(); // Rehabilita em caso de erro
+        this.cadastroForm.enable();
         console.error(err);
       },
     });

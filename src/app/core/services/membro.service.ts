@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, from, map, switchMap } from 'rxjs';
+import { Observable, catchError, from, map, of, switchMap } from 'rxjs';
 import { Membro, UsuarioAtualizacao } from '../../shared/models/membro.model';
 import { SupabaseService } from './supabase';
 import { EStatusMembro } from '../../shared/models/consts';
@@ -16,6 +16,18 @@ export class MembroService {
       .order('nome', { ascending: true });
 
     return from(promise).pipe(map((res) => res.data as Membro[]));
+  }
+
+  buscarPorId(id: string): Observable<Membro | null> {
+    return from(
+      this.supabaseService.supabase.from('membros').select('*').eq('id', id).single(),
+    ).pipe(
+      map((res) => res.data as Membro),
+      catchError((erro) => {
+        console.error('Erro ao buscar membro por ID:', erro);
+        return of(null);
+      }),
+    );
   }
 
   atualizarFotoPerfil(

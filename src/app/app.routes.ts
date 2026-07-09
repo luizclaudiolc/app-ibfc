@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminGuard, authGuard, loginGuard } from './core/services/guards/auth.guard';
+import { PerfilMembroComponent } from './features/dashboard/pages/perfil-membro/perfil-membro.component';
 
 export const routes: Routes = [
   {
@@ -30,6 +31,7 @@ export const routes: Routes = [
             (m) => m.PerfilComponent,
           ),
       },
+      { path: 'perfil/:id', component: PerfilMembroComponent },
       {
         path: 'admin',
         canActivate: [adminGuard],

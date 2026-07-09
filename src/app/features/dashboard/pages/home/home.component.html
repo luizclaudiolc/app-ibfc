@@ -100,7 +100,8 @@
         <div class="space-y-2.5">
           @for (membro of membrosFiltrados(); track membro.id) {
             <div
-              class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between gap-3 hover:shadow-md/5 transition-all"
+              [routerLink]="['/dashboard/perfil', membro.id]"
+              class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between gap-3 hover:shadow-md/5 hover:border-sky-200 transition-all cursor-pointer"
             >
               <div class="flex items-center gap-3.5">
                 @if (membro.foto_url) {
@@ -150,26 +151,6 @@
                   </div>
                 </div>
               </div>
-
-              @if (membro.email.toLowerCase() !== emailUsuario().toLowerCase()) {
-                <a
-                  [href]="'https://wa.me/55' + membro.telefone"
-                  target="_blank"
-                  class="w-10 h-10 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl flex items-center justify-center transition-all shadow-sm border border-emerald-100 focus:outline-none active:scale-95"
-                  title="Chamar no WhatsApp"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    class="w-5 h-5"
-                  >
-                    <path
-                      d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.455L0 24zm6.59-4.846c1.66.986 3.288 1.447 4.975 1.448 5.413 0 9.818-4.389 9.822-9.782.002-2.612-1.008-5.067-2.846-6.908-1.838-1.84-4.293-2.85-6.905-2.852-5.418 0-9.823 4.4-9.826 9.792-.001 1.742.476 3.442 1.383 4.954L2.094 22.01l4.553-1.856zM17.02 14.1c-.274-.137-1.62-.8-1.872-.892-.252-.093-.437-.137-.62.137-.183.274-.708.892-.867 1.075-.16.183-.319.206-.593.069-.274-.137-1.157-.426-2.204-1.36-1.15-.157-1.488-1.012-1.761-1.15-.274-.137-.03-.213.125-.369.113-.113.251-.297.377-.446.126-.15.168-.251.252-.419.083-.168.042-.313-.02-.45-.062-.137-.62-1.492-.85-2.04-.223-.538-.45-.465-.62-.473-.16-.008-.343-.01-.527-.01-.183 0-.48.069-.732.343-.252.274-.96 1.393-.96 2.4s1.007 1.988 1.15 2.17c.143.183 1.982 3.026 4.8 4.232.67.287 1.194.458 1.603.588.673.214 1.285.183 1.769.111.539-.08 1.621-.662 1.849-1.27.228-.607.228-1.129.16-1.239-.07-.11-.252-.206-.526-.343z"
-                    />
-                  </svg>
-                </a>
-              }
             </div>
           } @empty {
             <div

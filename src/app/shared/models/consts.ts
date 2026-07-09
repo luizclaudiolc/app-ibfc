@@ -1,7 +1,7 @@
 export type NivelAcesso = 'ADMIN' | 'USER';
 export type StatusMembro = 'ATIVO' | 'INATIVO';
 export enum ECargos {
-  Membro = 'MEMBRO',
+  Membro = 'membro',
 }
 export enum ENiveisAcesso {
   Admin = 'ADMIN',
@@ -23,7 +23,6 @@ export const CARGOS_DISPONIVEIS = [
   { label: 'Evangelista', value: 'evangelista' },
   { label: 'Missionário', value: 'missionario' },
   { label: 'Missionária', value: 'missionaria' },
-  { label: 'Líder de Ministério', value: 'lider_de_ministerio' },
 ];
 
 export const CARGOS_DISPONIVEIS_MAP: Record<string, string> = {
@@ -36,7 +35,6 @@ export const CARGOS_DISPONIVEIS_MAP: Record<string, string> = {
   evangelista: 'Evangelista',
   missionario: 'Missionário',
   missionaria: 'Missionária',
-  lider_de_ministerio: 'Líder de Ministério',
 };
 
 export const DEPARTAMENTOS_DISPONIVEIS = [
@@ -64,3 +62,15 @@ export const DEPARTAMENTOS_DISPONIVEIS_MAP: Record<string, string> = {
   homens: 'Líder Homens',
   missoes: 'Líder Missões',
 };
+
+export const GRADIENTES_PASTEIS = [
+  'bg-gradient-to-r from-red-200 to-orange-200',
+  'bg-gradient-to-r from-orange-200 to-amber-200',
+  'bg-gradient-to-r from-amber-200 to-yellow-200',
+  'bg-gradient-to-r from-green-200 to-emerald-200',
+  'bg-gradient-to-r from-teal-200 to-cyan-200',
+  'bg-gradient-to-r from-sky-200 to-blue-200',
+  'bg-gradient-to-r from-indigo-200 to-violet-200',
+  'bg-gradient-to-r from-purple-200 to-fuchsia-200',
+  'bg-gradient-to-r from-pink-200 to-rose-200',
+];
