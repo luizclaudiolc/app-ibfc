@@ -28,6 +28,7 @@ export interface UsuarioCadastro {
   email: string;
   senha: string;
   telefone: string;
+  cargo: string;
   dataNascimento?: string;
   foto?: File | null;
 }
@@ -36,5 +37,6 @@ export interface UsuarioAtualizacao {
   nome: string;
   sobrenome: string;
   telefone: string;
+  cargo: string;
   data_nascimento: string;
 }

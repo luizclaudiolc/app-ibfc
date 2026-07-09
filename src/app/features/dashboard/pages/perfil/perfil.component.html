@@ -1,5 +1,8 @@
 <div class="min-h-screen bg-slate-50 text-slate-800 pb-24">
-  <app-header [nomeUsuario]="perfilForm.value.nome || 'Usuário'" [fotoUsuario]="previewFoto()">
+  <app-header
+    [nomeUsuario]="perfilForm.get('nome')?.value || 'Usuário'"
+    [fotoUsuario]="previewFoto()"
+  >
   </app-header>
 
   <main class="p-4 max-w-xl mx-auto pt-8">
@@ -66,14 +69,33 @@
           </div>
 
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>WhatsApp</mat-label>
-            <input matInput type="tel" formControlName="telefone" placeholder="24 999999999" />
-            @if (perfilForm.controls.telefone.hasError('required')) {
-              <mat-error>Obrigatório.</mat-error>
-            } @else if (perfilForm.controls.telefone.hasError('pattern')) {
-              <mat-error>Digite 10 ou 11 números.</mat-error>
-            }
+            <mat-label>E-mail</mat-label>
+            <input matInput type="email" formControlName="email" />
+            <mat-hint class="text-[10px]"
+              >O e-mail de acesso não pode ser alterado por aqui.</mat-hint
+            >
           </mat-form-field>
+
+          <div class="grid grid-cols-2 gap-3 mt-2">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>WhatsApp</mat-label>
+              <input matInput type="tel" formControlName="telefone" placeholder="24 999999999" />
+              @if (perfilForm.controls.telefone.hasError('required')) {
+                <mat-error>Obrigatório.</mat-error>
+              } @else if (perfilForm.controls.telefone.hasError('pattern')) {
+                <mat-error>Digite 10 ou 11 números.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Cargo</mat-label>
+              <mat-select formControlName="cargo">
+                @for (item of cargosDisponiveis; track item.value) {
+                  <mat-option [value]="item.value">{{ item.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
 
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Data de Nascimento</mat-label>

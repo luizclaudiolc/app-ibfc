@@ -76,6 +76,7 @@ export class MembroService {
     sobrenome,
     telefone,
     data_nascimento,
+    cargo,
   }: UsuarioAtualizacao): Promise<{ sucesso: boolean; mensagem?: string }> {
     try {
       const {
@@ -89,6 +90,7 @@ export class MembroService {
           nome,
           sobrenome,
           telefone,
+          cargo,
           data_nascimento,
         })
         .eq('id', user.id);

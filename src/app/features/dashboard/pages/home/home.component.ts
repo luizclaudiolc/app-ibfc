@@ -11,6 +11,10 @@ import { MembroService } from '../../../../core/services/membro.service';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { filter } from 'rxjs';
+import {
+  CARGOS_DISPONIVEIS_MAP,
+  DEPARTAMENTOS_DISPONIVEIS_MAP,
+} from '../../../../shared/models/consts';
 
 @Component({
   selector: 'app-home',
@@ -36,18 +40,8 @@ export class HomeComponent implements OnInit {
 
   termoBusca = signal<string>('');
 
-  departamentos: Record<string, string> = {
-    ministerio_louvor: 'Líder Ministério de Louvor',
-    recepcao: 'Líder Recepção',
-    midia: 'Líder Mídia',
-    infantil: 'Líder Infantil',
-    jovens: 'Líder Jovens',
-    adultos: 'Líder Adultos',
-    casais: 'Líder Casais',
-    mulheres: 'Líder Mulheres',
-    homens: 'Líder Homens',
-    missoes: 'Líder Missões',
-  };
+  departamentos = DEPARTAMENTOS_DISPONIVEIS_MAP;
+  cargosDisponiveis = CARGOS_DISPONIVEIS_MAP;
 
   escalaPessoal = computed(() => {
     const email = this.emailUsuario().toLowerCase();

@@ -6,6 +6,7 @@ import { HeaderComponent } from '../../../../shared/components/header/header.com
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { Router } from '@angular/router';
 import { MaterialModule } from '../../../../core/modules/material.module';
+import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
 
 @Component({
   selector: 'app-perfil',
@@ -24,11 +25,23 @@ export class PerfilComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
 
-  // Formulário Reativo
+  cargosDisponiveis = [
+    { label: 'Membro', value: 'membro' },
+    { label: 'Pastor', value: 'pastor' },
+    { label: 'Presbítero', value: 'presbitero' },
+    { label: 'Diácono', value: 'diacono' },
+    { label: 'Evangelista', value: 'evangelista' },
+    { label: 'Missionário', value: 'missionario' },
+    { label: 'Líder de Ministério', value: 'lider_de_ministerio' },
+  ];
+
+  // Formulário Reativo (E-mail começa desabilitado por segurança de Auth)
   perfilForm = this.fb.nonNullable.group({
     nome: ['', [Validators.required]],
     sobrenome: ['', [Validators.required]],
+    email: [{ value: '', disabled: true }],
     telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
+    cargo: ['membro', [Validators.required]],
     data_nascimento: ['', [Validators.required]],
   });
 
@@ -42,11 +55,12 @@ export class PerfilComponent implements OnInit {
     this.membroService.buscarMeuPerfil().subscribe({
       next: (res) => {
         if (res) {
-          // Injeta os dados vindos do Supabase direto nos campos do form
           this.perfilForm.patchValue({
             nome: res.nome || '',
             sobrenome: res.sobrenome || '',
+            email: res.email || '',
             telefone: res.telefone || '',
+            cargo: res.cargo || 'membro',
             data_nascimento: res.data_nascimento || '',
           });
         }
@@ -66,16 +80,17 @@ export class PerfilComponent implements OnInit {
     }
 
     this.carregando.set(true);
-    this.perfilForm.disable(); // Evita duplos cliques e o warning do Angular
+    this.perfilForm.disable();
     this.mensagemSucesso.set('');
     this.mensagemErro.set('');
 
-    const formValues = this.perfilForm.getRawValue();
+    const formValues: UsuarioAtualizacao = this.perfilForm.getRawValue();
 
     this.membroService.atualizarPerfil(formValues).subscribe({
       next: (res) => {
         this.carregando.set(false);
-        this.perfilForm.enable(); // Rehabilita após a conclusão
+        this.perfilForm.enable();
+        this.perfilForm.controls.email.disable(); // Mantém o e-mail bloqueado após reabilitar
 
         if (res.sucesso) {
           this.mensagemSucesso.set('Perfil atualizado com sucesso!');
@@ -86,6 +101,7 @@ export class PerfilComponent implements OnInit {
       error: () => {
         this.carregando.set(false);
         this.perfilForm.enable();
+        this.perfilForm.controls.email.disable();
         this.mensagemErro.set('Erro inesperado ao salvar alterações.');
       },
     });

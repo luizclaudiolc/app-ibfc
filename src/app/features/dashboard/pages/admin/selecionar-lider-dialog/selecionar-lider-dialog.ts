@@ -6,6 +6,7 @@ import { MembroService } from '../../../../../core/services/membro.service';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Membro } from '../../../../../shared/models/membro.model';
 import { forkJoin } from 'rxjs';
+import { DEPARTAMENTOS_DISPONIVEIS } from '../../../../../shared/models/consts';
 
 @Component({
   selector: 'app-selecionar-lider-dialog',
@@ -14,18 +15,7 @@ import { forkJoin } from 'rxjs';
   templateUrl: './selecionar-lider-dialog.html',
 })
 export class SelecionarLiderDialogComponent {
-  departamentos = [
-    { label: 'Ministério de Louvor', value: 'ministerio_louvor' },
-    { label: 'Recepção', value: 'recepcao' },
-    { label: 'Mídia', value: 'midia' },
-    { label: 'Infantil', value: 'infantil' },
-    { label: 'Jovens', value: 'jovens' },
-    { label: 'Adultos', value: 'adultos' },
-    { label: 'Casais', value: 'casais' },
-    { label: 'Mulheres', value: 'mulheres' },
-    { label: 'Homens', value: 'homens' },
-    { label: 'Missões', value: 'missoes' },
-  ];
+  departamentos = DEPARTAMENTOS_DISPONIVEIS;
   membrosAtivos: Membro[] = [];
   membrosFiltrados: Membro[] = [];
   membrosSelecionados: Membro[] = [];

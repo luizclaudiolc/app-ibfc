@@ -116,7 +116,7 @@ export class AuthService {
           email: membro.email,
           telefone: membro.telefone,
           data_nascimento: membro.dataNascimento || null,
-          cargo: ECargos.Membro,
+          cargo: membro.cargo || ECargos.Membro,
           nivel_acesso: ENiveisAcesso.User,
           status: EStatusMembro.ATIVO,
           foto_url: urlDaFoto,

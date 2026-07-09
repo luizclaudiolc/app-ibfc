@@ -5,6 +5,8 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { timer } from 'rxjs';
+import { UsuarioCadastro } from '../../../../shared/models/membro.model';
+import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
 
 @Component({
   selector: 'app-cadastro',
@@ -25,15 +27,7 @@ export class CadastroComponent {
   private router = inject(Router);
   private fb = inject(FormBuilder);
 
-  cargosDisponiveis = [
-    { label: 'Membro', value: 'membro' },
-    { label: 'Pastor', value: 'pastor' },
-    { label: 'Presbítero', value: 'presbitero' },
-    { label: 'Diácono', value: 'diacono' },
-    { label: 'Evangelista', value: 'evangelista' },
-    { label: 'Missionário', value: 'missionario' },
-    { label: 'Líder de Ministério', value: 'lider_de_ministerio' },
-  ];
+  cargosDisponiveis = CARGOS_DISPONIVEIS;
 
   cadastroForm = this.fb.nonNullable.group({
     nome: ['', [Validators.required]],
@@ -79,7 +73,7 @@ export class CadastroComponent {
     // getRawValue() garante que os valores sejam lidos mesmo com o form desabilitado
     const formValues = this.cadastroForm.getRawValue();
 
-    const dadosEnvio = {
+    const dadosEnvio: UsuarioCadastro = {
       nome: formValues.nome.trim(),
       sobrenome: formValues.sobrenome.trim(),
       email: formValues.email.trim().toLowerCase(),
