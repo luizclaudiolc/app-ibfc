@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
 import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-perfil',
@@ -25,6 +27,7 @@ export class PerfilComponent implements OnInit {
   private membroService = inject(MembroService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
 
   cargosDisponiveis = CARGOS_DISPONIVEIS;
 
@@ -119,20 +122,35 @@ export class PerfilComponent implements OnInit {
   }
 
   removerFoto(): void {
-    if (!confirm('Deseja realmente remover sua foto de perfil?')) return;
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        titulo: 'Remover Foto',
+        mensagem:
+          'Tem certeza que deseja remover sua foto de perfil? Essa ação não pode ser desfeita.',
+        textoConfirmar: 'Sim, remover',
+        tipo: 'perigo',
+      },
+      panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+      width: '90%',
+      maxWidth: '400px',
+    });
 
-    this.carregando.set(true);
-    this.membroService.removerFotoPerfil().subscribe({
-      next: () => {
-        this.previewFoto.set('');
-        localStorage.removeItem('user_foto');
-        this.carregando.set(false);
-        this.mensagemSucesso.set('Foto removida com sucesso!');
-      },
-      error: (err) => {
-        this.carregando.set(false);
-        this.mensagemErro.set('Erro ao remover arquivo: ' + err.message);
-      },
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado) {
+        this.carregando.set(true);
+        this.membroService.removerFotoPerfil().subscribe({
+          next: () => {
+            this.previewFoto.set('');
+            localStorage.removeItem('user_foto');
+            this.carregando.set(false);
+            this.mensagemSucesso.set('Foto removida com sucesso!');
+          },
+          error: (err) => {
+            this.carregando.set(false);
+            this.mensagemErro.set('Erro ao remover arquivo: ' + err.message);
+          },
+        });
+      }
     });
   }
 
