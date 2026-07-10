@@ -40,6 +40,11 @@ export class AuthService {
 
       if (perfilError || !perfil) throw new Error('Perfil não encontrado.');
 
+      if (perfil.status === EStatusMembro.INATIVO) {
+        await this.supabaseService.supabase.auth.signOut();
+        throw new Error('Sua conta está inativa. Entre em contato com a administração.');
+      }
+
       this.atualizarLocalStorage(perfil);
 
       return { sucesso: true, usuario: perfil };

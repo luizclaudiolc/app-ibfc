@@ -42,26 +42,55 @@
         <mat-label>Senha</mat-label>
         <input
           matInput
-          type="password"
+          [type]="esconderSenha() ? 'password' : 'text'"
           formControlName="senha"
           placeholder="••••••••"
           [readonly]="carregando()"
         />
+
+        <button
+          type="button"
+          mat-icon-button
+          matSuffix
+          (click)="esconderSenha.set(!esconderSenha())"
+          class="text-slate-400"
+          [disabled]="carregando()"
+        >
+          @if (esconderSenha()) {
+            <mat-icon>visibility_off</mat-icon>
+          } @else {
+            <mat-icon>visibility</mat-icon>
+          }
+        </button>
 
         @if (loginForm.controls.senha.hasError('required')) {
           <mat-error>A senha é obrigatória.</mat-error>
         }
       </mat-form-field>
 
+      <div class="flex justify-end -mt-2 mb-2">
+        <a
+          routerLink="/recuperar-senha"
+          class="text-xs font-semibold text-sky-600 hover:text-sky-700 transition-colors"
+        >
+          Esqueceu a senha?
+        </a>
+      </div>
+
       <button
         mat-flat-button
         type="submit"
-        class="w-full !rounded-xl !h-12 !text-sm !font-bold !bg-sky-600 hover:!bg-sky-700 !text-white transition-all mt-4"
+        class="w-full !rounded-xl !h-12 !text-sm !font-bold transition-all"
+        [ngClass]="
+          carregando() || loginForm.invalid
+            ? '!bg-slate-200 !text-slate-400'
+            : '!bg-sky-600 hover:!bg-sky-700 !text-white'
+        "
         [disabled]="carregando() || loginForm.invalid"
       >
         <div class="flex items-center justify-center gap-2">
           @if (carregando()) {
-            <mat-spinner diameter="20" class="stroke-white"></mat-spinner>
+            <mat-spinner diameter="20" class="stroke-slate-400"></mat-spinner>
           }
           {{ carregando() ? 'Verificando...' : 'Entrar' }}
         </div>

@@ -8,7 +8,7 @@ import { MaterialModule } from '../../../../core/modules/material.module';
 @Component({
   selector: 'app-login',
   standalone: true,
-  // 1. Trocamos FormsModule por ReactiveFormsModule
+
   imports: [CommonModule, ReactiveFormsModule, RouterLink, MaterialModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
@@ -16,19 +16,18 @@ import { MaterialModule } from '../../../../core/modules/material.module';
 export class LoginComponent {
   carregando = signal(false);
   mensagemErro = signal('');
+  esconderSenha = signal(true);
 
   private authService = inject(AuthService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
 
-  // 2. Criação do formulário reativo tipado
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     senha: ['', [Validators.required]],
   });
 
   submeterLogin(): void {
-    // 3. Validação de segurança: se o form for inválido, marca tudo para exibir os erros e para a função
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -36,7 +35,6 @@ export class LoginComponent {
 
     this.carregando.set(true);
 
-    // 4. Extrai os valores direto do form com segurança de tipo
     const { email, senha } = this.loginForm.getRawValue();
 
     this.authService.login(email.trim(), senha).subscribe({

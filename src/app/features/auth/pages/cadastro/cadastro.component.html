@@ -105,7 +105,28 @@
 
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Senha</mat-label>
-          <input matInput type="password" formControlName="senha" placeholder="••••••" />
+          <input
+            matInput
+            [type]="esconderSenha() ? 'password' : 'text'"
+            formControlName="senha"
+            placeholder="••••••"
+          />
+
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="esconderSenha.set(!esconderSenha())"
+            class="text-slate-400"
+            [disabled]="carregando()"
+          >
+            @if (esconderSenha()) {
+              <mat-icon>visibility_off</mat-icon>
+            } @else {
+              <mat-icon>visibility</mat-icon>
+            }
+          </button>
+
           @if (cadastroForm.controls.senha.hasError('required')) {
             <mat-error>Obrigatório.</mat-error>
           } @else if (cadastroForm.controls.senha.hasError('minlength')) {
@@ -117,12 +138,17 @@
       <button
         mat-flat-button
         type="submit"
-        class="w-full !rounded-xl !h-12 !text-sm !font-bold !bg-sky-600 hover:!bg-sky-700 !text-white transition-all mt-2"
+        class="w-full !rounded-xl !h-12 !text-sm !font-bold transition-all mt-2"
+        [ngClass]="
+          carregando() || cadastroForm.invalid
+            ? '!bg-slate-200 !text-slate-400'
+            : '!bg-sky-600 hover:!bg-sky-700 !text-white'
+        "
         [disabled]="carregando() || cadastroForm.invalid"
       >
         <div class="flex items-center justify-center gap-2">
           @if (carregando()) {
-            <mat-spinner diameter="20" class="!stroke-white"></mat-spinner>
+            <mat-spinner diameter="20" class="stroke-slate-400"></mat-spinner>
           }
           {{ carregando() ? 'Processando...' : 'Finalizar Cadastro' }}
         </div>

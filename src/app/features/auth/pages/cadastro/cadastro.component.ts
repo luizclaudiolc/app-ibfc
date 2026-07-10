@@ -19,6 +19,7 @@ export class CadastroComponent {
   carregando = signal<boolean>(false);
   mensagemErro = signal<string>('');
   mensagemSucesso = signal<string>('');
+  esconderSenha = signal(true);
 
   previewFoto = signal<string>('');
   arquivoFotoSelecionado: File | null = null;
