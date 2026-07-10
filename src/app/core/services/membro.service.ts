@@ -1,6 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable, catchError, from, map, of, switchMap } from 'rxjs';
-import { Membro, UsuarioAtualizacao } from '../../shared/models/membro.model';
+import {
+  Membro,
+  MembroAtualizacaoAdmin,
+  UsuarioAtualizacao,
+} from '../../shared/models/membro.model';
 import { SupabaseService } from './supabase';
 import { EStatusMembro } from '../../shared/models/consts';
 
@@ -176,5 +180,45 @@ export class MembroService {
         return { sucesso: true };
       }),
     );
+  }
+
+  atualizarMembroAdmin(
+    membro: MembroAtualizacaoAdmin & { id: string; foto_url?: string },
+  ): Observable<any> {
+    return from(this.executarAtualizacaoMembroAdmin(membro));
+  }
+
+  private async executarAtualizacaoMembroAdmin(
+    membro: MembroAtualizacaoAdmin & { id: string; foto_url?: string },
+  ) {
+    const { id, remover_foto, foto_url, ...dadosSalvar } = membro;
+
+    if (remover_foto && foto_url) {
+      try {
+        const urlParts = foto_url.split('/');
+        const nomeArquivo = urlParts[urlParts.length - 1].split('?')[0];
+
+        const { error: removeError } = await this.supabaseService.supabase.storage
+          .from('fotos_membros')
+          .remove([nomeArquivo]);
+
+        if (removeError) {
+          console.error('Falha ao deletar arquivo físico no Storage:', removeError);
+        } else {
+          (dadosSalvar as any).foto_url = null;
+        }
+      } catch (err) {
+        console.error('Erro no processamento da exclusão da foto:', err);
+      }
+    }
+
+    const { data, error } = await this.supabaseService.supabase
+      .from('membros')
+      .update(dadosSalvar)
+      .eq('id', id);
+
+    if (error) throw error;
+
+    return data;
   }
 }

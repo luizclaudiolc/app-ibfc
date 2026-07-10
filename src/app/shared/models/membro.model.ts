@@ -14,6 +14,10 @@ export interface Membro {
   setor_responsavel?: string;
 }
 
+export interface MembroAtualizacaoAdmin extends Omit<Membro, 'email' | 'foto_url'> {
+  remover_foto?: boolean;
+}
+
 export interface UsuarioLogado {
   id: string;
   nome: string;
