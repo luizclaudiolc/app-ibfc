@@ -12,12 +12,15 @@ import { EStatusMembro } from '../../shared/models/consts';
 export class MembroService {
   private supabaseService = inject(SupabaseService);
 
-  buscarTodos(): Observable<Membro[]> {
+  buscarTodos(todosStatus = false): Observable<Membro[]> {
     const promise = this.supabaseService.supabase
       .from('membros')
       .select('*')
-      .eq('status', EStatusMembro.ATIVO)
       .order('nome', { ascending: true });
+
+    if (!todosStatus) {
+      promise.eq('status', EStatusMembro.ATIVO);
+    }
 
     return from(promise).pipe(map((res) => res.data as Membro[]));
   }

@@ -44,7 +44,15 @@ export class AdminComponent implements OnInit {
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '');
       const email = membro.email.toLowerCase();
-      return nomeCompleto.includes(busca) || email.includes(busca);
+      const setor = membro.setor_responsavel?.toLowerCase();
+      const cargo = membro.cargo?.toLowerCase();
+
+      return (
+        nomeCompleto.includes(busca) ||
+        email.includes(busca) ||
+        setor?.includes(busca) ||
+        cargo?.includes(busca)
+      );
     });
   });
 
@@ -56,7 +64,7 @@ export class AdminComponent implements OnInit {
     this.carregando.set(true);
     this.erroMembros.set('');
 
-    this.membroService.buscarTodos().subscribe({
+    this.membroService.buscarTodos(true).subscribe({
       next: (dados) => {
         this.membrosRaw.set(dados);
         this.carregando.set(false);
