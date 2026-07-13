@@ -36,23 +36,32 @@ export class AdminComponent implements OnInit {
       .replace(/[\u0300-\u036f]/g, '');
     const lista = this.membrosRaw();
 
-    if (!busca) return lista;
+    let resultadoBusca = lista;
 
-    return lista.filter((membro) => {
-      const nomeCompleto = `${membro.nome} ${membro.sobrenome}`
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '');
-      const email = membro.email.toLowerCase();
-      const setor = membro.setor_responsavel?.toLowerCase();
-      const cargo = membro.cargo?.toLowerCase();
+    if (busca) {
+      resultadoBusca = lista.filter((membro) => {
+        const nomeCompleto = `${membro.nome} ${membro.sobrenome}`
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+        const email = membro.email.toLowerCase();
+        const setor = membro.setor_responsavel?.toLowerCase();
+        const cargo = membro.cargo?.toLowerCase();
 
-      return (
-        nomeCompleto.includes(busca) ||
-        email.includes(busca) ||
-        setor?.includes(busca) ||
-        cargo?.includes(busca)
-      );
+        return (
+          nomeCompleto.includes(busca) ||
+          email.includes(busca) ||
+          setor?.includes(busca) ||
+          cargo?.includes(busca)
+        );
+      });
+    }
+
+    return [...resultadoBusca].sort((a, b) => {
+      if (a.status === 'ATIVO' && b.status === 'INATIVO') return -1;
+      if (a.status === 'INATIVO' && b.status === 'ATIVO') return 1;
+
+      return a.nome.localeCompare(b.nome);
     });
   });
 
