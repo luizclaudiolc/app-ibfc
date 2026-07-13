@@ -48,6 +48,7 @@ export const DEPARTAMENTOS_DISPONIVEIS = [
   { label: 'Mulheres', value: 'mulheres' },
   { label: 'Homens', value: 'homens' },
   { label: 'Missões', value: 'missoes' },
+  { label: 'Membro', value: 'membro' },
 ];
 
 export const DEPARTAMENTOS_DISPONIVEIS_MAP: Record<string, string> = {
@@ -61,6 +62,7 @@ export const DEPARTAMENTOS_DISPONIVEIS_MAP: Record<string, string> = {
   mulheres: 'Líder Mulheres',
   homens: 'Líder Homens',
   missoes: 'Líder Missões',
+  membro: 'membro',
 };
 
 export const GRADIENTES_PASTEIS = [
