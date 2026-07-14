@@ -1,4 +1,4 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../core/modules/material.module';
@@ -18,10 +18,25 @@ export class EscalasComponent implements OnInit {
   nomeUsuario = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
   fotoUsuario = signal<string>(localStorage.getItem('user_foto') || '');
   nivelUsuario = localStorage.getItem('user_nivel') || 'MEMBRO';
-  setorUsuario = localStorage.getItem('user_setor');
+
+  getSetorValido(): string | null {
+    const setor = localStorage.getItem('user_setor');
+    return setor === 'null' || setor === 'undefined' || !setor ? null : setor;
+  }
+  setorUsuario = this.getSetorValido();
 
   isAdmin = computed(() => this.nivelUsuario === ENiveisAcesso.Admin);
-  podeGerenciarEscala = computed(() => this.isAdmin() || !!this.setorUsuario);
+
+  podeEditar(escala?: any): boolean {
+    if (this.isAdmin()) return true;
+    if (!this.setorUsuario) return false;
+
+    if (escala) {
+      return escala.departamento === this.setorUsuario;
+    }
+
+    return true;
+  }
 
   dataAtual = signal(new Date());
   diasDoMes = signal<{ data: Date; escalas: any[]; isMesAtual: boolean; isHoje: boolean }[]>([]);
@@ -103,7 +118,7 @@ export class EscalasComponent implements OnInit {
   }
 
   abrirModalEscala(dia: Date, escalaExistente?: any) {
-    if (!this.podeGerenciarEscala()) return;
+    if (!this.podeEditar(escalaExistente)) return;
 
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);

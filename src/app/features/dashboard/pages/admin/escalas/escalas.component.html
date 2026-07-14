@@ -4,25 +4,27 @@
   <main class="p-4 max-w-4xl mx-auto pt-4">
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Escalas e Eventos</h1>
+        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Escalas</h1>
         <p class="text-slate-500 text-sm mt-0.5">Acompanhe a programação dos departamentos.</p>
       </div>
 
       <div
-        class="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm shrink-0"
+        class="flex items-center justify-between w-full sm:w-auto sm:justify-center gap-2 sm:gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm shrink-0"
       >
         <button
           (click)="mudarMes(-1)"
-          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-all text-slate-600"
+          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-all text-slate-600 shrink-0"
         >
           <mat-icon>chevron_left</mat-icon>
         </button>
-        <h2 class="text-base font-bold text-slate-800 capitalize min-w-[120px] text-center">
+
+        <h2 class="text-base font-bold text-slate-800 capitalize flex-1 text-center min-w-[120px]">
           {{ mesFormatado() }}
         </h2>
+
         <button
           (click)="mudarMes(1)"
-          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-all text-slate-600"
+          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-all text-slate-600 shrink-0"
         >
           <mat-icon>chevron_right</mat-icon>
         </button>
@@ -47,7 +49,7 @@
             class="border-b border-r border-slate-100 p-2 transition-colors relative group"
             [ngClass]="{
               'bg-slate-50/50 opacity-60': !dia.isMesAtual,
-              'cursor-pointer hover:bg-sky-50/30': podeGerenciarEscala(),
+              'cursor-pointer hover:bg-sky-50/30': podeEditar(),
             }"
           >
             <div class="flex justify-between items-start">
@@ -58,7 +60,7 @@
                 {{ dia.data.getDate() }}
               </span>
 
-              @if (podeGerenciarEscala()) {
+              @if (podeEditar()) {
                 <mat-icon
                   class="!w-4 !h-4 !text-[16px] text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity"
                   >add_circle</mat-icon
@@ -70,11 +72,11 @@
               @for (escala of dia.escalas; track escala.id) {
                 <div
                   (click)="abrirModalEscala(dia.data, escala); $event.stopPropagation()"
-                  class="text-[10px] bg-slate-50 text-slate-700 px-2 py-1.5 rounded-lg border border-slate-200 truncate"
+                  class="text-[10px] px-2 py-1.5 rounded-lg border truncate transition-all"
                   [ngClass]="
-                    podeGerenciarEscala()
-                      ? 'hover:bg-slate-100 hover:border-slate-300 cursor-pointer'
-                      : ''
+                    podeEditar(escala)
+                      ? 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300 cursor-pointer'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 cursor-default opacity-80'
                   "
                 >
                   <span class="font-bold block text-slate-800">{{ escala.departamento }}</span>

@@ -7,108 +7,133 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MembroService } from '../../../../../core/services/membro.service';
 import { Membro } from '../../../../../shared/models/membro.model';
 import { EscalaService } from '../../../../../core/services/escala.service';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-escala-dialog',
   standalone: true,
   imports: [ReactiveFormsModule, MaterialModule, DatePipe, CommonModule],
   template: `
-    <div class="bg-white px-6 py-4 border-b flex justify-between items-center">
-      <h2 class="font-bold text-slate-800">
-        {{ data.escala ? 'Editar Escala' : 'Nova Escala' }}
-      </h2>
-      <button mat-dialog-close class="text-slate-400 hover:text-slate-600">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-
-    <form [formGroup]="form" (ngSubmit)="salvar()" class="p-6 space-y-4">
+    <div class="bg-slate-50 flex flex-col h-full max-h-[90vh]">
       <div
-        class="bg-sky-50 text-sky-800 p-3 rounded-xl text-sm font-medium mb-2 flex items-center gap-2"
+        class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between shrink-0"
       >
-        <mat-icon class="text-sky-600">calendar_today</mat-icon>
-        Data selecionada: {{ data.data_escala | date: 'dd/MM/yyyy' }}
+        <div class="flex items-center gap-3">
+          <div
+            class="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 shrink-0"
+          >
+            <mat-icon class="!w-6 !h-6 text-[24px]">event_available</mat-icon>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-800 leading-tight">
+              {{ data.escala ? 'Editar Escala' : 'Nova Escala' }}
+            </h2>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <mat-icon class="text-[12px] w-[12px] h-[12px] text-slate-400"
+                >calendar_month</mat-icon
+              >
+              <p class="text-[11px] text-slate-500 font-medium uppercase tracking-wide">
+                {{ data.data_escala | date: 'dd/MM/yyyy' }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <button
+          mat-dialog-close
+          class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+        >
+          <mat-icon class="text-[16px] w-[16px] h-[16px]">close</mat-icon>
+        </button>
       </div>
 
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Departamento</mat-label>
-        <mat-select formControlName="departamento">
-          @for (dept of departamentosPermitidos; track dept.value) {
-            <mat-option [value]="dept.value">{{ dept.label }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
+      <div class="p-6 overflow-y-auto flex-1">
+        <form [formGroup]="form" class="space-y-5">
+          <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-1">
+              Detalhes
+            </h3>
+            <div class="grid grid-cols-1 gap-3">
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Departamento</mat-label>
+                <mat-select formControlName="departamento">
+                  @for (dept of departamentosPermitidos; track dept.value) {
+                    <mat-option [value]="dept.value">{{ dept.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Título / Evento</mat-label>
+                <input matInput formControlName="evento" placeholder="Ex: Culto de Celebração" />
+              </mat-form-field>
+            </div>
+          </div>
 
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Título / Evento (Ex: Culto da Família)</mat-label>
-        <input matInput formControlName="evento" placeholder="Ex: Culto da Família" />
-      </mat-form-field>
+          <div class="p-4 bg-sky-50/50 rounded-2xl border border-sky-100">
+            <h3 class="text-[10px] font-bold text-sky-800 uppercase tracking-wider mb-3 px-1">
+              Equipe Escalada
+            </h3>
 
-      <!-- NOVO: Campo de Voluntários com Seleção Múltipla e Chips em Tailwind -->
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Voluntários Escalados</mat-label>
-        <mat-select formControlName="voluntarios" multiple placeholder="Selecione os membros...">
-          <mat-select-trigger class="flex flex-wrap gap-1.5 py-1">
-            @for (vol of form.controls.voluntarios.value || []; track vol) {
-              <span
-                class="bg-sky-100 text-sky-700 text-[11px] px-2.5 py-1 rounded-full font-bold shadow-sm border border-sky-200"
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Adicionar Voluntários</mat-label>
+              <mat-chip-grid #chipGrid formControlName="voluntarios">
+                @for (vol of form.controls.voluntarios.value || []; track vol) {
+                  <mat-chip-row (removed)="removerVoluntario(vol)">
+                    {{ vol }}
+                    <button matChipRemove><mat-icon>cancel</mat-icon></button>
+                  </mat-chip-row>
+                }
+                <input
+                  placeholder="Digite o nome..."
+                  [matChipInputFor]="chipGrid"
+                  [matAutocomplete]="auto"
+                  (input)="filtrarMembros($event)"
+                />
+              </mat-chip-grid>
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                (optionSelected)="adicionarVoluntario($event)"
               >
-                {{ vol }}
-              </span>
-            }
-          </mat-select-trigger>
+                @for (membro of membrosFiltrados(); track membro.id) {
+                  <mat-option [value]="membro.nome + ' ' + membro.sobrenome">
+                    {{ membro.nome }} {{ membro.sobrenome }}
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+        </form>
+      </div>
 
-          <!-- Lista os membros buscados do banco -->
-          @for (membro of membrosAtivos(); track membro.id) {
-            <mat-option [value]="membro.nome + ' ' + membro.sobrenome">
-              {{ membro.nome }} {{ membro.sobrenome }}
-            </mat-option>
-          }
-        </mat-select>
-        @if (carregandoMembros()) {
-          <mat-hint>Carregando membros...</mat-hint>
-        }
-      </mat-form-field>
-
-      <!-- Ações do Formulário -->
-      <div
-        class="flex items-center mt-4 pt-4 border-t border-slate-100"
-        [ngClass]="data.escala?.id ? 'justify-between' : 'justify-end'"
-      >
-        <!-- Botão Excluir (só aparece se estiver editando uma escala existente) -->
+      <div class="bg-white border-t border-slate-100 p-4 shrink-0 flex gap-3">
         @if (data.escala?.id) {
           <button
             type="button"
             (click)="excluir()"
-            class="text-red-500 hover:bg-red-50 p-2 flex items-center justify-center rounded-xl transition-colors disabled:opacity-50"
             [disabled]="carregandoEnvio"
+            class="w-12 h-12 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-100 border border-red-100 text-red-500 transition-colors"
           >
-            <mat-icon class="text-[20px] w-[20px] h-[20px]">delete_outline</mat-icon>
+            <mat-icon class="text-[20px]">delete_outline</mat-icon>
           </button>
         }
-
-        <!-- Botões Cancelar e Salvar -->
-        <div class="flex gap-3">
-          <button
-            mat-button
-            type="button"
-            mat-dialog-close
-            class="!rounded-xl"
-            [disabled]="carregandoEnvio"
-          >
-            Cancelar
-          </button>
-          <button
-            mat-flat-button
-            type="submit"
-            class="!bg-sky-600 hover:!bg-sky-700 !text-white !rounded-xl transition-colors"
-            [disabled]="form.invalid || carregandoEnvio"
-          >
-            {{ carregandoEnvio ? 'Processando...' : 'Salvar Escala' }}
-          </button>
-        </div>
+        <button
+          mat-dialog-close
+          [disabled]="carregandoEnvio"
+          class="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="salvar()"
+          [disabled]="form.invalid || carregandoEnvio"
+          class="flex-[1.5] py-3 rounded-xl font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-sm flex justify-center items-center gap-2"
+        >
+          @if (carregandoEnvio) {
+            <mat-spinner diameter="20" class="!stroke-white"></mat-spinner>
+          }
+          {{ carregandoEnvio ? 'Salvando...' : 'Salvar' }}
+        </button>
       </div>
-    </form>
+    </div>
   `,
 })
 export class EscalaDialogComponent implements OnInit {
@@ -118,15 +143,13 @@ export class EscalaDialogComponent implements OnInit {
   membroService = inject(MembroService);
   private escalaService = inject(EscalaService);
 
-  carregandoMembros = signal<boolean>(true);
-  membrosAtivos = signal<Membro[]>([]);
   carregandoEnvio = false;
+  membrosAtivos = signal<Membro[]>([]);
+  membrosFiltrados = signal<Membro[]>([]);
 
   departamentosPermitidos = this.data.isAdmin
     ? DEPARTAMENTOS_DISPONIVEIS
     : DEPARTAMENTOS_DISPONIVEIS.filter((d) => d.value === this.data.setorUsuario);
-
-  voluntariosIniciais: string[] = [];
 
   form = this.fb.group({
     data_escala: [this.data.data_escala.toISOString().split('T')[0]],
@@ -138,75 +161,63 @@ export class EscalaDialogComponent implements OnInit {
       Validators.required,
     ],
     evento: [this.data.escala?.evento || '', Validators.required],
-
     voluntarios: [[] as string[], Validators.required],
   });
 
   ngOnInit() {
     if (this.data.escala?.voluntarios) {
-      this.voluntariosIniciais = this.data.escala.voluntarios
-        .split(',')
-        .map((nome: string) => nome.trim());
-
-      this.form.controls.voluntarios.setValue(this.voluntariosIniciais);
+      this.form.controls.voluntarios.setValue(
+        this.data.escala.voluntarios.split(',').map((n: string) => n.trim()),
+      );
     }
-
-    this.membroService.buscarTodos(true).subscribe({
-      next: (membros) => {
-        const apenasAtivos = membros.filter((m) => m.status === 'ATIVO');
-        this.membrosAtivos.set(apenasAtivos);
-        this.carregandoMembros.set(false);
-      },
-      error: () => {
-        console.error('Erro ao buscar membros');
-        this.carregandoMembros.set(false);
-      },
+    this.membroService.buscarTodos(true).subscribe((membros) => {
+      const ativos = membros.filter((m) => m.status === 'ATIVO');
+      this.membrosAtivos.set(ativos);
+      this.membrosFiltrados.set(ativos);
     });
+  }
+
+  filtrarMembros(event: Event) {
+    const input = (event.target as HTMLInputElement).value.toLowerCase();
+    this.membrosFiltrados.set(
+      this.membrosAtivos().filter((m) =>
+        (m.nome + ' ' + m.sobrenome).toLowerCase().includes(input),
+      ),
+    );
+  }
+
+  adicionarVoluntario(event: MatAutocompleteSelectedEvent): void {
+    const nome = event.option.value;
+    const atuais = this.form.controls.voluntarios.value || [];
+    if (!atuais.includes(nome)) this.form.controls.voluntarios.setValue([...atuais, nome]);
+  }
+
+  removerVoluntario(nome: string): void {
+    this.form.controls.voluntarios.setValue(
+      (this.form.controls.voluntarios.value || []).filter((v) => v !== nome),
+    );
   }
 
   salvar() {
     if (this.form.invalid) return;
     this.carregandoEnvio = true;
-
     const formValues = this.form.getRawValue();
-    const vols = formValues.voluntarios || [];
-
     const dadosParaSalvar: any = {
-      data_escala: formValues.data_escala,
-      departamento: formValues.departamento,
-      evento: formValues.evento,
-      voluntarios: vols.join(', '),
+      ...formValues,
+      voluntarios: (formValues.voluntarios as string[]).join(', '),
     };
-
-    if (this.data.escala?.id) {
-      dadosParaSalvar.id = this.data.escala.id;
-    }
+    if (this.data.escala?.id) dadosParaSalvar.id = this.data.escala.id;
 
     this.escalaService.salvar(dadosParaSalvar).subscribe({
-      next: (escalaSalva) => {
-        this.dialogRef.close({ sucesso: true, dados: escalaSalva });
-      },
-      error: (err) => {
-        console.error('Erro ao salvar escala no Supabase', err);
-        this.carregandoEnvio = false;
-      },
+      next: () => this.dialogRef.close({ sucesso: true }),
+      error: () => (this.carregandoEnvio = false),
     });
   }
 
   excluir() {
-    if (!this.data.escala?.id) return;
-
-    if (!confirm(`Tem certeza que deseja excluir o evento "${this.data.escala.evento}"?`)) return;
-
-    this.carregandoEnvio = true;
-    this.escalaService.excluir(this.data.escala.id).subscribe({
-      next: () => {
-        this.dialogRef.close({ sucesso: true, excluido: true });
-      },
-      error: (err) => {
-        console.error('Erro ao excluir escala', err);
-        this.carregandoEnvio = false;
-      },
-    });
+    if (!this.data.escala?.id || !confirm('Confirmar exclusão?')) return;
+    this.escalaService
+      .excluir(this.data.escala.id)
+      .subscribe(() => this.dialogRef.close({ sucesso: true, excluido: true }));
   }
 }
