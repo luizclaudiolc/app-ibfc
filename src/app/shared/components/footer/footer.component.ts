@@ -13,6 +13,7 @@ export class FooterComponent implements OnInit {
   isAdmin = signal<boolean>(false);
 
   ngOnInit(): void {
-    this.isAdmin.set(localStorage.getItem('user_nivel') === ENiveisAcesso.Admin);
+    const nivel = localStorage.getItem('user_nivel');
+    this.isAdmin.set(nivel === ENiveisAcesso.Admin);
   }
 }

@@ -1,0 +1,92 @@
+<div class="min-h-screen bg-slate-50 text-slate-800 pb-24">
+  <app-header [nomeUsuario]="nomeUsuario()" [fotoUsuario]="fotoUsuario()"></app-header>
+
+  <main class="p-4 max-w-4xl mx-auto pt-4">
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Escalas e Eventos</h1>
+        <p class="text-slate-500 text-sm mt-0.5">Acompanhe a programação dos departamentos.</p>
+      </div>
+
+      <div
+        class="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm shrink-0"
+      >
+        <button
+          (click)="mudarMes(-1)"
+          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-all text-slate-600"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <h2 class="text-base font-bold text-slate-800 capitalize min-w-[120px] text-center">
+          {{ mesFormatado() }}
+        </h2>
+        <button
+          (click)="mudarMes(1)"
+          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-all text-slate-600"
+        >
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="border border-slate-200 rounded-3xl overflow-hidden bg-white shadow-sm">
+      <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
+        @for (dia of ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']; track dia) {
+          <div
+            class="py-3 text-center text-[11px] font-bold text-slate-500 uppercase tracking-wider"
+          >
+            {{ dia }}
+          </div>
+        }
+      </div>
+
+      <div class="grid grid-cols-7 auto-rows-[120px]">
+        @for (dia of diasDoMes(); track dia.data.toISOString()) {
+          <div
+            (click)="abrirModalEscala(dia.data)"
+            class="border-b border-r border-slate-100 p-2 transition-colors relative group"
+            [ngClass]="{
+              'bg-slate-50/50 opacity-60': !dia.isMesAtual,
+              'cursor-pointer hover:bg-sky-50/30': podeGerenciarEscala(),
+            }"
+          >
+            <div class="flex justify-between items-start">
+              <span
+                class="text-xs font-semibold rounded-full w-7 h-7 flex items-center justify-center transition-all"
+                [ngClass]="dia.isHoje ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-600'"
+              >
+                {{ dia.data.getDate() }}
+              </span>
+
+              @if (podeGerenciarEscala()) {
+                <mat-icon
+                  class="!w-4 !h-4 !text-[16px] text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >add_circle</mat-icon
+                >
+              }
+            </div>
+
+            <div class="mt-2 space-y-1.5 overflow-y-auto max-h-[75px] no-scrollbar">
+              @for (escala of dia.escalas; track escala.id) {
+                <div
+                  (click)="abrirModalEscala(dia.data, escala); $event.stopPropagation()"
+                  class="text-[10px] bg-slate-50 text-slate-700 px-2 py-1.5 rounded-lg border border-slate-200 truncate"
+                  [ngClass]="
+                    podeGerenciarEscala()
+                      ? 'hover:bg-slate-100 hover:border-slate-300 cursor-pointer'
+                      : ''
+                  "
+                >
+                  <span class="font-bold block text-slate-800">{{ escala.departamento }}</span>
+                  <span class="text-slate-500">{{ escala.evento }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </main>
+
+  <app-footer></app-footer>
+</div>

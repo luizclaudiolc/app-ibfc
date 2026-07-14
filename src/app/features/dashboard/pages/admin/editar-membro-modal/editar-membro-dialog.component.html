@@ -1,11 +1,8 @@
 <div class="bg-slate-50 flex flex-col h-full max-h-[90vh]">
-  <!-- Header Fixo -->
   <div
     class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between shrink-0"
   >
     <div class="flex items-center gap-3">
-      <!-- Lógica Visual da Foto -->
-      <!-- Lógica Visual da Foto -->
       <div class="relative">
         @if (data.foto_url && !fotoParaRemover()) {
           <img
@@ -13,28 +10,17 @@
             class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100"
           />
 
-          <!-- Botão Fixo de Lixeira (Mobile First) -->
           <button
             (click)="marcarFotoParaRemocao()"
             class="absolute -bottom-1 -right-1 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-red-500 shadow-sm active:bg-red-50 transition-colors"
             title="Remover Foto"
             type="button"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              class="w-3.5 h-3.5"
+            <mat-icon class="!text-[14px] !w-[14px] !h-[14px] flex items-center justify-center"
+              >delete</mat-icon
             >
-              <path
-                fill-rule="evenodd"
-                d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z"
-                clip-rule="evenodd"
-              />
-            </svg>
           </button>
         } @else {
-          <!-- Fallback das Iniciais -->
           <div
             class="w-12 h-12 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center border border-slate-200"
           >
@@ -43,13 +29,11 @@
         }
       </div>
 
-      <!-- Informações de Texto e Desfazer -->
       <div>
         <h2 class="text-base font-bold text-slate-800 leading-tight">Editar Membro</h2>
         <div class="flex items-center gap-2">
           <p class="text-[11px] text-slate-500 font-medium">{{ data.email }}</p>
 
-          <!-- Alerta de Foto Removida + Botão Desfazer -->
           @if (data.foto_url && fotoParaRemover()) {
             <span
               class="text-[9px] bg-red-50 text-red-600 font-bold px-1.5 py-0.5 rounded border border-red-100 flex items-center gap-1"
@@ -68,25 +52,14 @@
       mat-dialog-close
       class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="2"
-        stroke="currentColor"
-        class="w-4 h-4"
+      <mat-icon class="text-[16px] w-[16px] h-[16px] flex items-center justify-center"
+        >close</mat-icon
       >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-      </svg>
     </button>
   </div>
 
-  <!-- Mantenha o resto do modal (Corpo Rolável e Rodapé) exatamente como estava -->
-
-  <!-- Corpo Rolável do Formulário -->
   <div class="p-6 overflow-y-auto">
     <form [formGroup]="editForm" class="space-y-4">
-      <!-- Bloco de Configurações do Sistema (Acesso e Status) -->
       <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/60">
         <h3 class="text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-3">
           Controle de Acesso
@@ -117,7 +90,6 @@
         </div>
       </div>
 
-      <!-- Hierarquia Eclesiástica -->
       <div class="p-4 bg-sky-50/50 rounded-2xl border border-sky-100">
         <h3 class="text-[10px] font-bold text-sky-800 uppercase tracking-wider mb-3">
           Atribuições na Igreja
@@ -144,7 +116,6 @@
         </div>
       </div>
 
-      <!-- Dados Pessoais -->
       <div class="pt-2">
         <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">
           Dados Pessoais

@@ -33,18 +33,17 @@ export const routes: Routes = [
       },
       { path: 'perfil/:id', component: PerfilMembroComponent },
       {
+        path: 'escala',
+        loadComponent: () =>
+          import('./features/dashboard/pages/admin/escalas/escalas.component').then(
+            (c) => c.EscalasComponent,
+          ),
+      },
+      {
         path: 'admin',
         canActivate: [adminGuard],
         loadComponent: () =>
           import('./features/dashboard/pages/admin/admin').then((m) => m.AdminComponent),
-      },
-      {
-        path: 'membros-gestao',
-        canActivate: [adminGuard],
-        loadComponent: () =>
-          import('./features/dashboard/pages/admin/membros-gestao/membros-gestao').then(
-            (m) => m.MembrosGestaoComponent,
-          ),
       },
     ],
   },
