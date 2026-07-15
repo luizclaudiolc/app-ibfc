@@ -118,6 +118,7 @@ export class EscalasComponent implements OnInit {
   }
 
   abrirModalEscala(dia: Date, escalaExistente?: any) {
+    if (this.setorUsuario === 'membro') return;
     if (!this.podeEditar(escalaExistente)) return;
 
     const hoje = new Date();
