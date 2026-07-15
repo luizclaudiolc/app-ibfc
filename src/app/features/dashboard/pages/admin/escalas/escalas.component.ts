@@ -7,6 +7,7 @@ import { FooterComponent } from '../../../../../shared/components/footer/footer.
 import { ENiveisAcesso } from '../../../../../shared/models/consts';
 import { EscalaDialogComponent } from '../criar-escala-modal/escala-dialog.component';
 import { EscalaService } from '../../../../../core/services/escala.service';
+import { Escala } from '../../../../../shared/models/escala.model';
 
 @Component({
   selector: 'app-escalas',
@@ -99,6 +100,8 @@ export class EscalasComponent implements OnInit {
   carregarEscalasMes(data: Date) {
     this.escalaService.buscarTodas().subscribe({
       next: (escalasDoBanco) => {
+        console.log(escalasDoBanco);
+
         this.escalasRaw.set(escalasDoBanco);
         this.distribuirEscalasNosDias(escalasDoBanco);
       },
@@ -108,7 +111,7 @@ export class EscalasComponent implements OnInit {
     });
   }
 
-  distribuirEscalasNosDias(escalas: any[]) {
+  distribuirEscalasNosDias(escalas: Escala[]) {
     const dias = this.diasDoMes().map((diaGrid) => {
       const dataStr = diaGrid.data.toISOString().split('T')[0];
       const escalasDoDia = escalas.filter((e) => e.data_escala === dataStr);
@@ -117,8 +120,22 @@ export class EscalasComponent implements OnInit {
     this.diasDoMes.set(dias);
   }
 
-  abrirModalEscala(dia: Date, escalaExistente?: any) {
-    if (this.setorUsuario === 'membro') return;
+  abrirModalEscala(dia: Date, escalaExistente?: Escala) {
+    console.log({ escalaExistente });
+
+    if (this.setorUsuario === 'membro') {
+      const escalasNoDia =
+        this.diasDoMes().find((d) => d.data.toDateString() === dia.toDateString())?.escalas || [];
+      if (escalasNoDia.length > 0) {
+        this.dialog.open(EscalaDialogComponent, {
+          width: '90%',
+          maxWidth: '450px',
+          data: { data_escala: dia, escalas: escalasNoDia, isReadOnly: true },
+        });
+      }
+      return;
+    }
+
     if (!this.podeEditar(escalaExistente)) return;
 
     const hoje = new Date();
