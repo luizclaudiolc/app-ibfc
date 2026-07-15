@@ -1,19 +1,24 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { filter, forkJoin, finalize } from 'rxjs';
+
 import { AvisoService } from '../../../../core/services/aviso.service';
 import { EscalaService } from '../../../../core/services/escala.service';
+import { MembroService } from '../../../../core/services/membro.service';
+
 import { Aviso } from '../../../../shared/models/aviso.model';
 import { Escala } from '../../../../shared/models/escala.model';
 import { Membro } from '../../../../shared/models/membro.model';
+
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { HeaderComponent } from '../../../../shared/components/header/header.component';
-import { MembroService } from '../../../../core/services/membro.service';
-import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { MaterialModule } from '../../../../core/modules/material.module';
-import { filter } from 'rxjs';
+
 import {
   CARGOS_DISPONIVEIS_MAP,
   DEPARTAMENTOS_DISPONIVEIS_MAP,
+  EVENTOS_MAP,
 } from '../../../../shared/models/consts';
 
 @Component({
@@ -41,16 +46,32 @@ export class HomeComponent implements OnInit {
   termoBusca = signal<string>('');
 
   departamentos = DEPARTAMENTOS_DISPONIVEIS_MAP;
+  departamentosMap = DEPARTAMENTOS_DISPONIVEIS_MAP;
   cargosDisponiveis = CARGOS_DISPONIVEIS_MAP;
+  eventosMap = EVENTOS_MAP;
 
   escalaPessoal = computed(() => {
     const email = this.emailUsuario().toLowerCase();
     const nome = this.nomeUsuario().toLowerCase();
+    const hoje = new Date().toISOString().split('T')[0];
 
-    return this.escalas().find(({ voluntarios }) => {
-      const vol = voluntarios.toLowerCase() || '';
+    const escalasFuturas = this.escalas()
+      .filter((e) => e.data_escala >= hoje)
+      .sort((a, b) => a.data_escala.localeCompare(b.data_escala));
+
+    const escala = escalasFuturas.find(({ voluntarios }) => {
+      const vol = (voluntarios || '').toLowerCase();
       return vol.includes(nome) || vol.includes(email);
     });
+
+    if (!escala) return null;
+
+    const [ano, mes, dia] = escala.data_escala.split('-');
+
+    return {
+      ...escala,
+      data: `${dia}/${mes}/${ano}`,
+    };
   });
 
   membrosFiltrados = computed(() => {
@@ -86,26 +107,22 @@ export class HomeComponent implements OnInit {
   carregarTodosOsDados(): void {
     this.carregando.set(true);
 
-    this.avisoService.buscarTodos().subscribe({
-      next: (dados) => this.avisos.set(dados),
-      error: (err) => console.error('Erro ao buscar avisos', err),
-    });
-
-    this.escalaService.buscarTodas().subscribe({
-      next: (dados) => this.escalas.set(dados),
-      error: (err) => console.error('Erro ao buscar escalas', err),
-    });
-
-    this.membroService.buscarTodos().subscribe({
-      next: (dados) => {
-        this.membrosRaw.set(dados);
-        this.carregando.set(false);
-      },
-      error: (err) => {
-        console.error('Erro ao buscar membros', err);
-        this.carregando.set(false);
-      },
-    });
+    forkJoin({
+      avisos: this.avisoService.buscarTodos(),
+      escalas: this.escalaService.buscarTodas(),
+      membros: this.membroService.buscarTodos(),
+    })
+      .pipe(finalize(() => this.carregando.set(false)))
+      .subscribe({
+        next: (resultados) => {
+          this.avisos.set(resultados.avisos);
+          this.escalas.set(resultados.escalas);
+          this.membrosRaw.set(resultados.membros);
+        },
+        error: (err) => {
+          console.error('Erro ao carregar os dados do Dashboard', err);
+        },
+      });
   }
 
   converterVoluntarios(lista: string): string[] {

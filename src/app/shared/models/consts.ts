@@ -65,6 +65,30 @@ export const DEPARTAMENTOS_DISPONIVEIS_MAP: Record<string, string> = {
   membro: 'membro',
 };
 
+export const EVENTOS_OPCOES = [
+  { value: 'QUINTA_PROFETICA', label: 'Quinta Profetica do Clamor' },
+  { value: 'CULTO_DOMINGO_MANHA', label: 'Culto de Celebração Domingo Manhã' },
+  { value: 'CULTO_DOMINGO_NOITE', label: 'Culto de Celebração Domingo Noite' },
+  { value: 'ESCOLA_BIBLICA', label: 'Escola Bíblica - Terça-feira' },
+  { value: 'CULTO_JOVENS', label: 'Culto de Jovens' },
+  { value: 'CULTO_MULHERES', label: 'Culto de Mulheres' },
+  { value: 'CULTO_HOMENS', label: 'Culto de Homens' },
+  { value: 'REUNIAO_LIDERANCA', label: 'Reunião de Liderança' },
+  { value: 'OUTRO', label: 'Outro' },
+];
+
+export const EVENTOS_MAP: Record<string, string> = {
+  QUINTA_PROFETICA: 'Quinta Profetica do Clamor',
+  CULTO_DOMINGO_MANHA: 'Culto de Celebração Domingo Manhã',
+  CULTO_DOMINGO_NOITE: 'Culto de Celebração Domingo Noite',
+  ESCOLA_BIBLICA: 'Escola Bíblica - Terça-feira',
+  CULTO_JOVENS: 'Culto de Jovens',
+  CULTO_MULHERES: 'Culto de Mulheres',
+  CULTO_HOMENS: 'Culto de Homens',
+  REUNIAO_LIDERANCA: 'Reunião de Liderança',
+  OUTRO: 'Outro',
+};
+
 export const GRADIENTES_PASTEIS = [
   'bg-gradient-to-r from-red-200 to-orange-200',
   'bg-gradient-to-r from-orange-200 to-amber-200',

@@ -79,8 +79,12 @@
                       : 'bg-slate-50 text-slate-700 border-slate-200 cursor-default opacity-80'
                   "
                 >
-                  <span class="font-bold block text-slate-800">{{ escala.departamento }}</span>
-                  <span class="text-slate-500">{{ escala.evento }}</span>
+                  <span class="font-bold block text-slate-800">{{
+                    obterNomeDepartamento(escala.departamento)
+                  }}</span>
+                  <span class="text-slate-500 text-[9px] sm:text-[10px]">{{
+                    obterNomeEvento(escala.evento)
+                  }}</span>
                 </div>
               }
             </div>

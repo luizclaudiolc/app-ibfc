@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../core/modules/material.module';
-import { DEPARTAMENTOS_DISPONIVEIS } from '../../../../../shared/models/consts';
+import { DEPARTAMENTOS_DISPONIVEIS, EVENTOS_OPCOES } from '../../../../../shared/models/consts';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MembroService } from '../../../../../core/services/membro.service';
 import { Membro } from '../../../../../shared/models/membro.model';
@@ -109,7 +109,11 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Título / Evento</mat-label>
-                  <input matInput formControlName="evento" placeholder="Ex: Culto de Celebração" />
+                  <mat-select formControlName="evento" placeholder="Selecione o evento">
+                    @for (evento of eventosPreDefinidos; track evento) {
+                      <mat-option [value]="evento.value">{{ evento.label }}</mat-option>
+                    }
+                  </mat-select>
                 </mat-form-field>
               </div>
             </div>
@@ -202,6 +206,8 @@ export class EscalaDialogComponent implements OnInit {
   carregandoEnvio = false;
   membrosAtivos = signal<Membro[]>([]);
   membrosFiltrados = signal<Membro[]>([]);
+
+  eventosPreDefinidos = EVENTOS_OPCOES;
 
   departamentosPermitidos = this.data.isAdmin
     ? DEPARTAMENTOS_DISPONIVEIS

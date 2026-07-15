@@ -4,7 +4,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../core/modules/material.module';
 import { HeaderComponent } from '../../../../../shared/components/header/header.component';
 import { FooterComponent } from '../../../../../shared/components/footer/footer.component';
-import { ENiveisAcesso } from '../../../../../shared/models/consts';
+import {
+  DEPARTAMENTOS_DISPONIVEIS,
+  ENiveisAcesso,
+  EVENTOS_MAP,
+} from '../../../../../shared/models/consts';
 import { EscalaDialogComponent } from '../criar-escala-modal/escala-dialog.component';
 import { EscalaService } from '../../../../../core/services/escala.service';
 import { Escala } from '../../../../../shared/models/escala.model';
@@ -53,6 +57,17 @@ export class EscalasComponent implements OnInit {
   ngOnInit() {
     this.gerarCalendario(this.dataAtual());
     this.carregarEscalasMes(this.dataAtual());
+  }
+
+  obterNomeDepartamento(valor: string): string {
+    const depto = DEPARTAMENTOS_DISPONIVEIS.find((d) => d.value === valor);
+    console.log({ depto });
+
+    return depto ? depto.label : valor;
+  }
+
+  obterNomeEvento(valor: string): string {
+    return EVENTOS_MAP[valor] || valor;
   }
 
   gerarCalendario(dataBase: Date) {
