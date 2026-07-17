@@ -15,7 +15,86 @@
         mat-align-tabs="center"
       >
         <mat-tab label="Avisos">
-          <div class="p-4 pt-6"></div>
+          <div class="p-4 pt-6 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 class="text-base font-bold text-slate-800 tracking-tight">
+                  Banners da Tela Inicial
+                </h2>
+                <p class="text-slate-500 text-xs mt-0.5">Adicione ou remova imagens (máx. 5MB).</p>
+              </div>
+
+              <button
+                (click)="fileInput.click()"
+                [disabled]="carregandoUpload()"
+                class="w-full sm:w-auto px-5 py-2.5 bg-sky-600 text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-sky-700 hover:shadow-md transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                @if (carregandoUpload()) {
+                  <mat-spinner diameter="18" class="!stroke-white"></mat-spinner>
+                  <span>Enviando...</span>
+                } @else {
+                  <mat-icon class="!w-5 !h-5 !text-[20px] !leading-[20px]"
+                    >add_photo_alternate</mat-icon
+                  >
+                  <span>Novo Banner</span>
+                }
+              </button>
+              <input
+                #fileInput
+                type="file"
+                accept="image/*"
+                class="hidden"
+                (change)="onFileSelected($event)"
+              />
+            </div>
+
+            @if (carregandoAvisos()) {
+              <div class="flex justify-center py-12">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else {
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @for (aviso of avisos(); track aviso.id) {
+                  <div
+                    class="relative group bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md"
+                  >
+                    <div class="relative aspect-video">
+                      <img
+                        [src]="aviso.foto_url"
+                        class="w-full h-full object-cover"
+                        alt="Banner de Aviso"
+                      />
+
+                      <button
+                        (click)="excluirAviso(aviso)"
+                        class="absolute top-2 right-2 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md text-red-600 font-bold text-[11px] rounded-lg shadow-sm border border-white/20 active:bg-red-500 active:text-white transition-all"
+                      >
+                        <mat-icon class="!w-4 !h-4 !text-[16px] !leading-[16px] !block"
+                          >delete_outline</mat-icon
+                        >
+                        <span>Remover</span>
+                      </button>
+                    </div>
+
+                    <div class="px-4 py-3 bg-slate-50/50">
+                      <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                        Banner de Destaque
+                      </p>
+                    </div>
+                  </div>
+                } @empty {
+                  <div
+                    class="col-span-full text-center py-16 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200"
+                  >
+                    <mat-icon class="text-slate-300 !w-12 !h-12 text-[48px] mb-2"
+                      >collections</mat-icon
+                    >
+                    <p class="text-sm font-medium text-slate-500">Nenhum banner cadastrado</p>
+                  </div>
+                }
+              </div>
+            }
+          </div>
         </mat-tab>
 
         <mat-tab label="Membros">

@@ -1,8 +1,6 @@
 export interface Aviso {
   id?: string;
-  data_publicacao: string;
-  titulo: string;
-  conteudo: string;
-  categoria: string;
-  fotoUrl?: string;
+  foto_url: string;
+  autor_id: string;
+  created_at?: string;
 }

@@ -47,35 +47,89 @@
         </section>
       }
 
-      <section class="space-y-2.5">
-        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">
-          Avisos Importantes
-        </h2>
-        <div class="space-y-3">
-          @for (aviso of avisos(); track aviso.id) {
-            <div
-              class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:border-slate-200 transition-colors"
-            >
-              <div class="flex items-center justify-between mb-2">
-                <span
-                  class="text-[10px] px-2.5 py-0.5 bg-sky-50 text-sky-600 font-bold rounded-full uppercase tracking-wide"
-                  >{{ aviso.categoria }}</span
-                >
-                <span class="text-xs text-slate-400">{{
-                  aviso.data_publicacao | date: 'dd/MM/yyyy' : 'UTC'
-                }}</span>
-              </div>
-              <h3 class="font-bold text-slate-800 text-base mb-1">{{ aviso.titulo }}</h3>
-              <p class="text-slate-600 text-sm leading-relaxed">{{ aviso.conteudo }}</p>
-            </div>
-          } @empty {
-            <div
-              class="text-center py-6 bg-white rounded-2xl text-slate-400 text-xs border border-slate-100"
-            >
-              Nenhum comunicado esta semana.
-            </div>
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+              Quadro de Avisos
+            </h2>
+
+            <p class="text-sm text-slate-500 mt-1">
+              Fique por dentro dos próximos eventos da igreja.
+            </p>
+          </div>
+
+          @if (avisos().length > 1) {
+            <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
+              {{ currentIndex() + 1 }}/{{ avisos().length }}
+            </span>
           }
         </div>
+
+        @if (avisos().length > 0) {
+          <div
+            #carousel
+            class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-2"
+            (touchstart)="restartAutoScroll()"
+            (mousedown)="restartAutoScroll()"
+          >
+            @for (aviso of avisos(); track aviso.id; let i = $index) {
+              <div class="snap-center shrink-0 w-[90%]">
+                <button
+                  type="button"
+                  (click)="abrirFoto(aviso.foto_url, 'Aviso')"
+                  class="group relative w-full overflow-hidden rounded-3xl bg-slate-900 shadow-lg ring-1 ring-slate-200 transition-all duration-300 active:scale-[0.98]"
+                >
+                  <img
+                    [src]="aviso.foto_url"
+                    loading="lazy"
+                    alt="Aviso"
+                    class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  />
+
+                  <div
+                    class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none"
+                  ></div>
+
+                  <div
+                    class="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-3 py-1.5 shadow-sm"
+                  >
+                    <mat-icon class="!text-[18px] !w-[18px] !h-[18px] text-slate-700">
+                      zoom_in
+                    </mat-icon>
+
+                    <span class="text-xs font-semibold text-slate-700"> Ampliar </span>
+                  </div>
+                </button>
+              </div>
+            }
+          </div>
+
+          @if (avisos().length > 1) {
+            <div class="flex justify-center items-center gap-2 mt-2">
+              @for (aviso of avisos(); track aviso.id; let i = $index) {
+                <div
+                  class="rounded-full transition-all duration-300"
+                  [ngClass]="
+                    i === currentIndex() % avisos().length
+                      ? 'w-8 h-2 bg-sky-600'
+                      : 'w-2 h-2 bg-slate-300'
+                  "
+                ></div>
+              }
+            </div>
+          }
+        } @else {
+          <div
+            class="rounded-3xl border border-dashed border-slate-200 bg-white py-12 flex flex-col items-center justify-center"
+          >
+            <mat-icon class="!w-12 !h-12 !text-[48px] text-slate-300 mb-3"> campaign </mat-icon>
+
+            <p class="font-semibold text-slate-500">Nenhum aviso disponível</p>
+
+            <p class="text-sm text-slate-400 mt-1">Novos avisos aparecerão aqui.</p>
+          </div>
+        }
       </section>
 
       <section class="space-y-3">
