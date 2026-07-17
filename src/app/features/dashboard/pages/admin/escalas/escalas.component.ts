@@ -32,20 +32,21 @@ export class EscalasComponent implements OnInit {
 
   isAdmin = computed(() => this.nivelUsuario === ENiveisAcesso.Admin);
 
-  podeEditar(escala?: any): boolean {
+  podeEditar(escala?: Escala): boolean {
+    console.log(escala);
+
     if (this.isAdmin()) return true;
-    if (!this.setorUsuario) return false;
+    if (!this.setorUsuario || this.setorUsuario === 'membro') return false;
 
     if (escala) {
       return escala.departamento === this.setorUsuario;
     }
-
     return true;
   }
 
   dataAtual = signal(new Date());
-  diasDoMes = signal<{ data: Date; escalas: any[]; isMesAtual: boolean; isHoje: boolean }[]>([]);
-  escalasRaw = signal<any[]>([]);
+  diasDoMes = signal<{ data: Date; escalas: Escala[]; isMesAtual: boolean; isHoje: boolean }[]>([]);
+  escalasRaw = signal<Escala[]>([]);
 
   mesFormatado = computed(() => {
     return this.dataAtual().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
@@ -61,8 +62,6 @@ export class EscalasComponent implements OnInit {
 
   obterNomeDepartamento(valor: string): string {
     const depto = DEPARTAMENTOS_DISPONIVEIS.find((d) => d.value === valor);
-    console.log({ depto });
-
     return depto ? depto.label : valor;
   }
 
@@ -115,10 +114,12 @@ export class EscalasComponent implements OnInit {
   carregarEscalasMes(data: Date) {
     this.escalaService.buscarTodas().subscribe({
       next: (escalasDoBanco) => {
-        console.log(escalasDoBanco);
+        const escalasVisiveis = this.isAdmin()
+          ? escalasDoBanco
+          : escalasDoBanco.filter(({ departamento }) => departamento === this.setorUsuario);
 
-        this.escalasRaw.set(escalasDoBanco);
-        this.distribuirEscalasNosDias(escalasDoBanco);
+        this.escalasRaw.set(escalasVisiveis);
+        this.distribuirEscalasNosDias(escalasVisiveis);
       },
       error: (err) => {
         console.error('Erro ao buscar escalas do Supabase:', err);
@@ -136,21 +137,6 @@ export class EscalasComponent implements OnInit {
   }
 
   abrirModalEscala(dia: Date, escalaExistente?: Escala) {
-    console.log({ escalaExistente });
-
-    if (this.setorUsuario === 'membro') {
-      const escalasNoDia =
-        this.diasDoMes().find((d) => d.data.toDateString() === dia.toDateString())?.escalas || [];
-      if (escalasNoDia.length > 0) {
-        this.dialog.open(EscalaDialogComponent, {
-          width: '90%',
-          maxWidth: '450px',
-          data: { data_escala: dia, escalas: escalasNoDia, isReadOnly: true },
-        });
-      }
-      return;
-    }
-
     if (!this.podeEditar(escalaExistente)) return;
 
     const hoje = new Date();

@@ -26,7 +26,7 @@ export class PerfilMembroComponent implements OnInit {
 
   corFundoCard = signal<string>('');
 
-  nomeUsuarioLogado = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
+  nomeUsuarioLogado = signal<string>(localStorage.getItem('user_nome') || '');
   fotoUsuarioLogado = signal<string>(localStorage.getItem('user_foto') || '');
 
   private route = inject(ActivatedRoute);

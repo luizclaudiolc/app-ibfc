@@ -11,14 +11,16 @@
     <span class="text-[10px] font-bold tracking-wide">Início</span>
   </a>
 
-  <a
-    routerLink="/dashboard/escala"
-    routerLinkActive="text-sky-600 opacity-100"
-    class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
-  >
-    <span class="text-xl">📅</span>
-    <span class="text-[10px] font-bold tracking-wide">Escalas</span>
-  </a>
+  @if (podeAcessarEscalas()) {
+    <a
+      routerLink="/dashboard/escala"
+      routerLinkActive="text-sky-600 opacity-100"
+      class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
+    >
+      <span class="text-xl">📅</span>
+      <span class="text-[10px] font-bold tracking-wide">Escalas</span>
+    </a>
+  }
 
   <a
     routerLink="/dashboard/perfil"
