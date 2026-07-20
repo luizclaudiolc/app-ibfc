@@ -40,6 +40,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'avisos',
+        loadComponent: () =>
+          import('./features/dashboard/pages/avisos/avisos-admin.component').then(
+            (c) => c.AvisosAdminComponent,
+          ),
+      },
+      {
         path: 'admin',
         canActivate: [adminGuard],
         loadComponent: () =>

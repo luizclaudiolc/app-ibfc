@@ -12,6 +12,7 @@ import { ENiveisAcesso } from '../../models/consts';
 export class FooterComponent implements OnInit {
   isAdmin = signal<boolean>(false);
   podeAcessarEscalas = signal<boolean>(false);
+  podeAcessarAvisos = signal<boolean>(false);
 
   ngOnInit(): void {
     const nivel = localStorage.getItem('user_nivel');
@@ -21,6 +22,9 @@ export class FooterComponent implements OnInit {
 
     const isLider = setor && setor !== 'null' && setor !== 'undefined' && setor !== 'membro';
 
+    const isLiderMidia = isLider && setor === 'midia';
+
     this.podeAcessarEscalas.set(this.isAdmin() || !!isLider);
+    this.podeAcessarAvisos.set(this.isAdmin() || !!isLiderMidia);
   }
 }
