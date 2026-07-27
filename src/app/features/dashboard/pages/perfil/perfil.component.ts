@@ -9,6 +9,7 @@ import { MaterialModule } from '../../../../core/modules/material.module';
 import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
 import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
 import { MatDialog } from '@angular/material/dialog';
+import imageCompression from 'browser-image-compression';
 import { ConfirmDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
 
 @Component({
@@ -102,23 +103,46 @@ export class PerfilComponent implements OnInit {
     });
   }
 
-  aoSelecionarFoto(event: any): void {
-    const arquivo = event.target.files[0];
-    if (!arquivo) return;
+  async aoSelecionarFoto(event: any): Promise<void> {
+    const arquivoOriginal = event.target.files[0];
+    if (!arquivoOriginal) return;
 
     this.carregando.set(true);
-    this.membroService.atualizarFotoPerfil(arquivo).subscribe({
-      next: (res) => {
-        this.carregando.set(false);
-        if (res.sucesso && res.fotoUrl) {
-          this.previewFoto.set(res.fotoUrl);
-          localStorage.setItem('user_foto', res.fotoUrl);
-          this.mensagemSucesso.set('Foto atualizada!');
-        } else {
-          this.mensagemErro.set(res.mensagem || 'Erro ao atualizar foto.');
-        }
-      },
-    });
+    this.mensagemErro.set('');
+    this.mensagemSucesso.set('');
+
+    try {
+      const opcoes = {
+        maxSizeMB: 0.15,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+        initialQuality: 0.8,
+      };
+
+      const arquivoComprimido = await imageCompression(arquivoOriginal, opcoes);
+
+      this.membroService.atualizarFotoPerfil(arquivoComprimido).subscribe({
+        next: (res) => {
+          this.carregando.set(false);
+          if (res.sucesso && res.fotoUrl) {
+            this.previewFoto.set(res.fotoUrl);
+            localStorage.setItem('user_foto', res.fotoUrl);
+            this.mensagemSucesso.set('Foto atualizada com sucesso!');
+          } else {
+            this.mensagemErro.set(res.mensagem || 'Erro ao atualizar foto.');
+          }
+        },
+        error: (err) => {
+          this.carregando.set(false);
+          console.error(err);
+          this.mensagemErro.set('Erro ao fazer upload da imagem.');
+        },
+      });
+    } catch (error) {
+      console.error('Erro na compressão:', error);
+      this.carregando.set(false);
+      this.mensagemErro.set('Não foi possível processar a imagem. Tente outra.');
+    }
   }
 
   removerFoto(): void {

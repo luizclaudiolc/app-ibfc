@@ -5,6 +5,7 @@ import { AvisoService } from '../../../../core/services/aviso.service';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { Aviso } from '../../../../shared/models/aviso.model';
+import imageCompression from 'browser-image-compression';
 
 @Component({
   selector: 'app-avisos-admin',
@@ -47,18 +48,28 @@ export class AvisosAdminComponent implements OnInit {
     const file = input.files[0];
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('A imagem deve ter no máximo 5MB.');
+      alert('A imagem original deve ter no máximo 5MB.');
       input.value = '';
       return;
     }
 
     try {
       this.carregandoUpload.set(true);
-      const novoAviso = await this.avisoService.criar(file);
+
+      const opcoes = {
+        maxSizeMB: 0.4,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        initialQuality: 0.85,
+      };
+
+      const arquivoComprimido = await imageCompression(file, opcoes);
+
+      const novoAviso = await this.avisoService.criar(arquivoComprimido);
       this.avisos.update((atual) => [novoAviso, ...atual]);
     } catch (error) {
-      console.error('Erro no upload', error);
-      alert('Falha ao enviar a imagem. Tente novamente.');
+      console.error('Erro no upload ou compressão', error);
+      alert('Falha ao processar e enviar a imagem. Tente novamente.');
     } finally {
       this.carregandoUpload.set(false);
       input.value = '';
