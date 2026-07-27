@@ -54,6 +54,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   escalas = signal<Escala[]>([]);
   membrosRaw = signal<Membro[]>([]);
   termoBusca = signal('');
+  currentBirthdayIndex = signal<number>(0);
 
   currentIndex = signal(0);
   @ViewChild('carousel') carousel!: ElementRef;
@@ -180,4 +181,54 @@ export class HomeComponent implements OnInit, OnDestroy {
         .includes(busca),
     );
   });
+
+  aniversariantesDoMes = computed(() => {
+    const membros = this.membrosRaw();
+    const mesAtual = new Date().getMonth() + 1;
+
+    return membros
+      .filter((m) => {
+        if (!m.data_nascimento || m.status === 'INATIVO') return false;
+
+        const partesData = m.data_nascimento.split('-');
+        if (partesData.length !== 3) return false;
+
+        const mesNascimento = parseInt(partesData[1], 10);
+        return mesNascimento === mesAtual;
+      })
+      .sort((a, b) => {
+        const diaA = parseInt(a.data_nascimento.split('-')[2], 10);
+        const diaB = parseInt(b.data_nascimento.split('-')[2], 10);
+        return diaA - diaB;
+      });
+  });
+
+  abrirWhatsApp(telefone: string | undefined, nome: string): void {
+    if (!telefone) {
+      alert('Este membro não possui um número de telefone cadastrado.');
+      return;
+    }
+
+    let numeroLimpo = telefone.replace(/\D/g, '');
+
+    if (numeroLimpo.length === 11) {
+      numeroLimpo = `55${numeroLimpo}`;
+    }
+
+    const mensagem = encodeURIComponent(
+      `A paz do Senhor, ${nome}! Passando para te desejar um feliz aniversário! 🎉 Deus abençoe muito a sua vida!`,
+    );
+    window.open(`https://wa.me/${numeroLimpo}?text=${mensagem}`, '_blank');
+  }
+
+  onBirthdayScroll(event: Event): void {
+    const container = event.target as HTMLElement;
+
+    if (!container || container.children.length === 0) return;
+
+    const cardWidth = container.children[0].clientWidth + 16;
+    const scrollLeft = container.scrollLeft;
+
+    this.currentBirthdayIndex.set(Math.round(scrollLeft / cardWidth));
+  }
 }
