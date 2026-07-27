@@ -1,21 +1,21 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MembroService } from '../../../../core/services/membro.service';
-import { HeaderComponent } from '../../../../shared/components/header/header.component';
-import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { Router } from '@angular/router';
-import { MaterialModule } from '../../../../core/modules/material.module';
-import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
-import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
 import { MatDialog } from '@angular/material/dialog';
 import imageCompression from 'browser-image-compression';
+
+import { MembroService } from '../../../../core/services/membro.service';
+import { MaterialModule } from '../../../../core/modules/material.module';
 import { ConfirmDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
+import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
+import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
+import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HeaderComponent, FooterComponent, MaterialModule],
+  imports: [CommonModule, ReactiveFormsModule, PageLayoutComponent, MaterialModule],
   templateUrl: './perfil.component.html',
 })
 export class PerfilComponent implements OnInit {
@@ -90,6 +90,10 @@ export class PerfilComponent implements OnInit {
 
         if (res.sucesso) {
           this.mensagemSucesso.set('Perfil atualizado com sucesso!');
+
+          if (formValues.nome) {
+            localStorage.setItem('user_nome', formValues.nome);
+          }
         } else {
           this.mensagemErro.set(res.mensagem || 'Erro ao salvar.');
         }

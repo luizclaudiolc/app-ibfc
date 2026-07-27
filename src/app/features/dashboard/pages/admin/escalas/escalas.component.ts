@@ -2,8 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../core/modules/material.module';
-import { HeaderComponent } from '../../../../../shared/components/header/header.component';
-import { FooterComponent } from '../../../../../shared/components/footer/footer.component';
 import {
   DEPARTAMENTOS_DISPONIVEIS,
   ENiveisAcesso,
@@ -12,16 +10,16 @@ import {
 import { EscalaDialogComponent } from '../criar-escala-modal/escala-dialog.component';
 import { EscalaService } from '../../../../../core/services/escala.service';
 import { Escala } from '../../../../../shared/models/escala.model';
+import { PageLayoutComponent } from '../../../../../shared/components/page-layout/page-layout.component';
 
 @Component({
   selector: 'app-escalas',
   standalone: true,
-  imports: [CommonModule, MaterialModule, HeaderComponent, FooterComponent],
+
+  imports: [CommonModule, MaterialModule, PageLayoutComponent],
   templateUrl: './escalas.component.html',
 })
 export class EscalasComponent implements OnInit {
-  nomeUsuario = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
-  fotoUsuario = signal<string>(localStorage.getItem('user_foto') || '');
   nivelUsuario = localStorage.getItem('user_nivel') || 'MEMBRO';
 
   getSetorValido(): string | null {

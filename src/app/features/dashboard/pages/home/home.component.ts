@@ -20,8 +20,6 @@ import { Aviso } from '../../../../shared/models/aviso.model';
 import { Escala } from '../../../../shared/models/escala.model';
 import { Membro } from '../../../../shared/models/membro.model';
 
-import { FooterComponent } from '../../../../shared/components/footer/footer.component';
-import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
 import { MaterialModule } from '../../../../core/modules/material.module';
 
@@ -30,11 +28,12 @@ import {
   DEPARTAMENTOS_DISPONIVEIS_MAP,
   EVENTOS_MAP,
 } from '../../../../shared/models/consts';
+import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, HeaderComponent, FooterComponent, MaterialModule],
+  imports: [CommonModule, RouterModule, MaterialModule, PageLayoutComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -47,7 +46,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   nomeUsuario = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
   emailUsuario = signal<string>(localStorage.getItem('user_email') || '');
-  fotoUsuario = signal<string>(localStorage.getItem('user_foto') || '');
   carregando = signal(true);
 
   avisos = signal<Aviso[]>([]);
@@ -117,8 +115,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
       maxWidth: '100vw',
       maxHeight: '100vh',
-      width: '100%',
-      height: '100%',
+      width: '90%',
+      height: '90%',
     });
   }
 

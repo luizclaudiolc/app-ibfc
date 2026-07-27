@@ -3,8 +3,6 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MembroService } from '../../../../core/services/membro.service';
 import { Membro } from '../../../../shared/models/membro.model';
-import { HeaderComponent } from '../../../../shared/components/header/header.component';
-import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import {
   DEPARTAMENTOS_DISPONIVEIS_MAP,
@@ -12,11 +10,12 @@ import {
 } from '../../../../shared/models/consts';
 import { MatDialog } from '@angular/material/dialog';
 import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
+import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 
 @Component({
   selector: 'app-membro-perfil',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, FooterComponent, MaterialModule],
+  imports: [CommonModule, MaterialModule, PageLayoutComponent],
   templateUrl: './perfil-membro.component.html',
 })
 export class PerfilMembroComponent implements OnInit {
@@ -25,9 +24,6 @@ export class PerfilMembroComponent implements OnInit {
   erro = signal<boolean>(false);
 
   corFundoCard = signal<string>('');
-
-  nomeUsuarioLogado = signal<string>(localStorage.getItem('user_nome') || '');
-  fotoUsuarioLogado = signal<string>(localStorage.getItem('user_foto') || '');
 
   private route = inject(ActivatedRoute);
   private membroService = inject(MembroService);

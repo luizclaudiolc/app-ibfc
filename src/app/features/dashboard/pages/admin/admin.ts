@@ -3,23 +3,18 @@ import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { MembroService } from '../../../../core/services/membro.service';
-import { FooterComponent } from '../../../../shared/components/footer/footer.component';
-import { HeaderComponent } from '../../../../shared/components/header/header.component';
-import { SelecionarLiderDialogComponent } from './selecionar-lider-dialog/selecionar-lider-dialog';
 import { EditarMembroDialogComponent } from './editar-membro-modal/editar-membro-dialog.component';
 import { Membro } from '../../../../shared/models/membro.model';
+import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, MaterialModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, MaterialModule, PageLayoutComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
 export class AdminComponent implements OnInit {
-  nomeUsuario = signal<string>(localStorage.getItem('user_nome') || 'Admin');
-  fotoUsuario = signal<string>(localStorage.getItem('user_foto') || '');
-
   membrosRaw = signal<Membro[]>([]);
   termoBusca = signal<string>('');
   carregando = signal<boolean>(true);

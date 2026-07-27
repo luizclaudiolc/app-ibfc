@@ -6,17 +6,15 @@ import { FooterComponent } from '../../../../shared/components/footer/footer.com
 import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { Aviso } from '../../../../shared/models/aviso.model';
 import imageCompression from 'browser-image-compression';
+import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 
 @Component({
   selector: 'app-avisos-admin',
   standalone: true,
-  imports: [CommonModule, MaterialModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, MaterialModule, PageLayoutComponent],
   templateUrl: './avisos-admin.component.html',
 })
 export class AvisosAdminComponent implements OnInit {
-  nomeUsuario = signal<string>(localStorage.getItem('user_nome') || 'Líder');
-  fotoUsuario = signal<string>(localStorage.getItem('user_foto') || '');
-
   avisos = signal<Aviso[]>([]);
   carregandoAvisos = signal<boolean>(true);
   carregandoUpload = signal<boolean>(false);
