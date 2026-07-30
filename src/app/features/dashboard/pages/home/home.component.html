@@ -7,44 +7,85 @@
         <div class="h-28 bg-slate-200 rounded-2xl"></div>
       </div>
     } @else {
-      @if (escalaPessoal(); as escala) {
-        <section
-          class="bg-gradient-to-br from-sky-600 via-sky-600 to-indigo-700 text-white p-5 rounded-2xl shadow-sm relative overflow-hidden"
-        >
-          <div
-            class="absolute -right-6 -bottom-6 text-white/5 text-7xl font-bold select-none pointer-events-none"
-          >
-            ⛪
-          </div>
-
-          <div class="flex items-center gap-2 mb-4 relative z-10">
-            <span
-              class="text-[10px] bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full font-bold uppercase tracking-wider"
-            >
-              Sua Escala
+      @if (escalasPessoais().length > 0) {
+        <section class="space-y-4">
+          <div class="flex items-center justify-between px-1">
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                🗓️ Suas Escalas
+              </h2>
+              <p class="text-sm text-slate-500 mt-1">Seu(s) próximo(s) dia(s) de servir.</p>
+            </div>
+            <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
+              {{ escalasPessoais().length }}
             </span>
           </div>
 
-          <div class="relative z-10">
-            <h2 class="text-base font-medium text-sky-100 leading-tight mb-0.5">
-              Você está escalado para:
-              <span class="font-bold text-white">{{
-                escala.data_escala | date: 'dd/MM/yyyy'
-              }}</span>
-            </h2>
-            <p class="text-lg font-bold text-white tracking-tight">
-              Evento: {{ eventosMap[escala.evento] || escala.evento }}
-            </p>
+          <div
+            (scroll)="onEscalaScroll($event)"
+            class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-2 px-4 -mx-4"
+          >
+            @for (escala of escalasPessoais(); track escala.id) {
+              <div
+                class="snap-center shrink-0 transition-all duration-300"
+                [ngClass]="escalasPessoais().length === 1 ? 'w-full' : 'w-[92%] sm:w-[70%]'"
+              >
+                <div
+                  class="bg-gradient-to-br from-sky-600 via-sky-600 to-indigo-700 text-white p-5 rounded-3xl shadow-sm relative overflow-hidden h-full"
+                >
+                  <div
+                    class="absolute -right-6 -bottom-6 text-white/5 text-7xl font-bold select-none pointer-events-none"
+                  >
+                    ⛪
+                  </div>
+
+                  <div class="flex items-center gap-2 mb-4 relative z-10">
+                    <span
+                      class="text-[10px] bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full font-bold uppercase tracking-wider"
+                    >
+                      Você está escalado(a)
+                    </span>
+                  </div>
+
+                  <div class="relative z-10">
+                    <h2 class="text-base font-medium text-sky-100 leading-tight mb-0.5">
+                      Data:
+                      <span class="font-bold text-white">{{
+                        escala.data_escala | date: 'dd/MM/yyyy' : 'UTC'
+                      }}</span>
+                    </h2>
+                    <p class="text-lg font-bold text-white tracking-tight">
+                      Evento: {{ eventosMap[escala.evento] || escala.evento }}
+                    </p>
+                  </div>
+
+                  <div
+                    class="text-[11px] bg-white/10 backdrop-blur-sm p-3 rounded-xl mt-4 border border-white/10 leading-relaxed relative z-10"
+                  >
+                    <span
+                      class="opacity-75 block font-semibold uppercase tracking-wider text-[9px] mb-1"
+                    >
+                      Equipe do dia
+                    </span>
+                    {{ escala.voluntarios }}
+                  </div>
+                </div>
+              </div>
+            }
           </div>
 
-          <div
-            class="text-[11px] bg-white/10 backdrop-blur-sm p-3 rounded-xl mt-4 border border-white/10 leading-relaxed relative z-10"
-          >
-            <span class="opacity-75 block font-semibold uppercase tracking-wider text-[9px] mb-1"
-              >Equipe do dia</span
-            >
-            {{ escala.voluntarios }}
-          </div>
+          @if (escalasPessoais().length > 1) {
+            <div class="flex justify-center items-center gap-2 mt-1 mb-2">
+              @for (escala of escalasPessoais(); track escala.id; let i = $index) {
+                <div
+                  class="rounded-full transition-all duration-300"
+                  [ngClass]="
+                    i === currentEscalaIndex() ? 'w-8 h-2 bg-sky-600' : 'w-2 h-2 bg-slate-300'
+                  "
+                ></div>
+              }
+            </div>
+          }
         </section>
       }
 

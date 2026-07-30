@@ -52,9 +52,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   escalas = signal<Escala[]>([]);
   membrosRaw = signal<Membro[]>([]);
   termoBusca = signal('');
-  currentBirthdayIndex = signal<number>(0);
 
+  currentEscalaIndex = signal<number>(0);
+  currentBirthdayIndex = signal<number>(0);
   currentIndex = signal(0);
+
   @ViewChild('carousel') carousel!: ElementRef;
 
   private autoScrollTimeout?: ReturnType<typeof setTimeout>;
@@ -115,8 +117,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
       maxWidth: '100vw',
       maxHeight: '100vh',
-      width: '100%',
-      height: '100%',
+      width: '90%',
+      height: '90%',
     });
   }
 
@@ -157,13 +159,39 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.autoScrollTimeout = setTimeout(() => this.startAutoScroll(), 10000);
   }
 
-  escalaPessoal = computed(() => {
+  escalasPessoais = computed(() => {
     const volTarget = [this.nomeUsuario(), this.emailUsuario()].map((s) => s.toLowerCase());
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const limite = new Date(hoje);
+    limite.setDate(hoje.getDate() + 30);
+
     return this.escalas()
-      .filter((e) => e.data_escala >= new Date().toISOString().split('T')[0])
-      .sort((a, b) => a.data_escala.localeCompare(b.data_escala))
-      .find((e) => volTarget.some((v) => e.voluntarios.toLowerCase().includes(v)));
+      .filter((e) => {
+        const partes = e.data_escala.split('-');
+        const dataEscala = new Date(
+          parseInt(partes[0], 10),
+          parseInt(partes[1], 10) - 1,
+          parseInt(partes[2], 10),
+        );
+        dataEscala.setHours(0, 0, 0, 0);
+
+        return dataEscala >= hoje && dataEscala <= limite;
+      })
+      .filter(({ voluntarios }) => volTarget.some((v) => voluntarios.toLowerCase().includes(v)))
+      .sort((a, b) => a.data_escala.localeCompare(b.data_escala));
   });
+
+  onEscalaScroll(event: Event): void {
+    const container = event.target as HTMLElement;
+    if (!container || container.children.length === 0) return;
+
+    const cardWidth = container.children[0].clientWidth + 16;
+    const scrollLeft = container.scrollLeft;
+
+    this.currentEscalaIndex.set(Math.round(scrollLeft / cardWidth));
+  }
 
   membrosFiltrados = computed(() => {
     const busca = this.termoBusca()
