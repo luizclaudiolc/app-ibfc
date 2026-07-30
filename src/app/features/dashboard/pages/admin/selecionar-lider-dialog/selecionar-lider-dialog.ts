@@ -1,5 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, inject, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../../core/modules/material.module';
 import { MembroService } from '../../../../../core/services/membro.service';
@@ -7,6 +7,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Membro } from '../../../../../shared/models/membro.model';
 import { forkJoin } from 'rxjs';
 import { DEPARTAMENTOS_DISPONIVEIS } from '../../../../../shared/models/consts';
+import { GenericDialogComponent } from '../../../../../shared/modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-selecionar-lider-dialog',
@@ -20,6 +21,8 @@ export class SelecionarLiderDialogComponent {
   membrosFiltrados: Membro[] = [];
   membrosSelecionados: Membro[] = [];
   setorSelecionado: string = '';
+
+  private dialog = inject(MatDialog);
 
   constructor(
     public dialogRef: MatDialogRef<SelecionarLiderDialogComponent>,
@@ -61,7 +64,20 @@ export class SelecionarLiderDialogComponent {
         },
         error: (err) => {
           console.error('Erro ao atualizar membros:', err);
-          alert('Erro ao salvar no banco. Verifique as permissões de administrador.');
+
+          this.dialog.open(GenericDialogComponent, {
+            data: {
+              titulo: 'Acesso Negado',
+              mensagem:
+                'Não foi possível salvar as alterações. Verifique suas permissões de administrador.',
+              textoConfirmar: 'Entendi',
+              tipo: 'perigo',
+              ocultarCancelar: true,
+            },
+            panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+            width: '90%',
+            maxWidth: '400px',
+          });
         },
       });
     }

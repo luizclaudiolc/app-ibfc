@@ -29,6 +29,7 @@ import {
   EVENTOS_MAP,
 } from '../../../../shared/models/consts';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
+import { GenericDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-home',
@@ -264,24 +265,20 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   abrirWhatsApp(telefone: string | undefined, nome: string, dataNascimento: string): void {
     if (!telefone) {
-      alert('Este membro não possui um número de telefone cadastrado.');
+      this.dialog.open(GenericDialogComponent, {
+        data: {
+          titulo: 'Sem Contato',
+          mensagem: 'Não encontramos o número de WhatsApp cadastrado para este membro.',
+          textoConfirmar: 'Entendi',
+          tipo: 'info',
+          ocultarCancelar: true,
+        },
+        panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+        width: '90%',
+        maxWidth: '400px',
+      });
       return;
     }
-
-    let numeroLimpo = telefone.replace(/\D/g, '');
-    if (numeroLimpo.length === 11) {
-      numeroLimpo = `55${numeroLimpo}`;
-    }
-
-    const mensagem = this.ehHoje(dataNascimento)
-      ? encodeURIComponent(
-          `A paz do Senhor, ${nome}! Passando para te desejar um feliz aniversário! 🎉 Deus abençoe muito a sua vida!`,
-        )
-      : encodeURIComponent(
-          `A paz do Senhor, ${nome}! Passando para te desejar uma ótima semana e já deixar os parabéns pelo seu aniversário que está chegando! 🎉`,
-        );
-
-    window.open(`https://wa.me/${numeroLimpo}?text=${mensagem}`, '_blank');
   }
 
   onBirthdayScroll(event: Event): void {

@@ -1,7 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../core/modules/material.module';
 import {
   CARGOS_DISPONIVEIS,
@@ -10,6 +15,7 @@ import {
   StatusMembro,
 } from '../../../../../shared/models/consts';
 import { MembroService } from '../../../../../core/services/membro.service';
+import { GenericDialogComponent } from '../../../../../shared/modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-editar-membro-dialog',
@@ -21,6 +27,7 @@ export class EditarMembroDialogComponent {
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef<EditarMembroDialogComponent>);
   private membroService = inject(MembroService);
+  private dialog = inject(MatDialog);
 
   public data = inject(MAT_DIALOG_DATA);
 
@@ -99,7 +106,18 @@ export class EditarMembroDialogComponent {
         this.carregando.set(false);
         this.editForm.enable();
 
-        alert('Ocorreu um erro ao atualizar o membro.');
+        this.dialog.open(GenericDialogComponent, {
+          data: {
+            titulo: 'Falha na Atualização',
+            mensagem: 'Não foi possível atualizar os dados deste membro. Tente novamente.',
+            textoConfirmar: 'Entendi',
+            tipo: 'perigo',
+            ocultarCancelar: true,
+          },
+          panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+          width: '90%',
+          maxWidth: '400px',
+        });
       },
     });
   }

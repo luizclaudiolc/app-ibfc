@@ -7,7 +7,8 @@ export interface ConfirmDialogData {
   mensagem: string;
   textoCancelar?: string;
   textoConfirmar?: string;
-  tipo?: 'padrao' | 'perigo';
+  tipo?: 'padrao' | 'perigo' | 'info';
+  ocultarCancelar?: boolean;
 }
 
 @Component({
@@ -20,7 +21,11 @@ export interface ConfirmDialogData {
     >
       <div
         class="mx-auto w-16 h-16 mb-4 rounded-full flex items-center justify-center border-4 border-white shadow-sm"
-        [ngClass]="data.tipo === 'perigo' ? 'bg-red-50 text-red-500' : 'bg-sky-50 text-sky-500'"
+        [ngClass]="{
+          'bg-red-50 text-red-500': data.tipo === 'perigo',
+          'bg-sky-50 text-sky-500': data.tipo === 'padrao' || !data.tipo,
+          'bg-amber-50 text-amber-500': data.tipo === 'info',
+        }"
       >
         @if (data.tipo === 'perigo') {
           <svg
@@ -35,6 +40,21 @@ export interface ConfirmDialogData {
               stroke-linecap="round"
               stroke-linejoin="round"
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        } @else if (data.tipo === 'info') {
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-8 h-8"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
             />
           </svg>
         } @else {
@@ -59,18 +79,24 @@ export interface ConfirmDialogData {
       <p class="text-sm text-slate-500 mb-6 leading-relaxed">{{ data.mensagem }}</p>
 
       <div class="flex gap-3">
-        <button
-          mat-dialog-close
-          class="w-full py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
-        >
-          {{ data.textoCancelar || 'Cancelar' }}
-        </button>
+        @if (!data.ocultarCancelar) {
+          <button
+            mat-dialog-close
+            class="w-full py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+          >
+            {{ data.textoCancelar || 'Cancelar' }}
+          </button>
+        }
 
         <button
           [mat-dialog-close]="true"
           class="w-full py-3 rounded-xl font-bold text-white transition-colors shadow-sm"
           [ngClass]="
-            data.tipo === 'perigo' ? 'bg-red-500 hover:bg-red-600' : 'bg-sky-600 hover:bg-sky-700'
+            data.tipo === 'perigo'
+              ? 'bg-red-500 hover:bg-red-600'
+              : data.tipo === 'info'
+                ? 'bg-amber-500 hover:bg-amber-600'
+                : 'bg-sky-600 hover:bg-sky-700'
           "
         >
           {{ data.textoConfirmar || 'Confirmar' }}
@@ -79,6 +105,6 @@ export interface ConfirmDialogData {
     </div>
   `,
 })
-export class ConfirmDialogComponent {
+export class GenericDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData) {}
 }

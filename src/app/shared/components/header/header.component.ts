@@ -3,7 +3,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { MaterialModule } from '../../../core/modules/material.module';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../modal-generico/modal-generico.component';
+import { GenericDialogComponent } from '../../modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-header',
@@ -20,12 +20,12 @@ export class HeaderComponent {
   private dialog = inject(MatDialog);
 
   efetuarLogout(): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    const dialogRef = this.dialog.open(GenericDialogComponent, {
       data: {
         titulo: 'Sair do Aplicativo',
         mensagem: 'Deseja realmente encerrar sua sessão atual?',
-        textoConfirmar: 'Sair',
-        textoCancelar: 'Ficar',
+        textoConfirmar: 'Sim, sair',
+        textoCancelar: 'Cancelar',
         tipo: 'padrao',
       },
       panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],

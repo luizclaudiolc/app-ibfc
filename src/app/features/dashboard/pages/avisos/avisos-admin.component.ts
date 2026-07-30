@@ -7,6 +7,8 @@ import { HeaderComponent } from '../../../../shared/components/header/header.com
 import { Aviso } from '../../../../shared/models/aviso.model';
 import imageCompression from 'browser-image-compression';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
+import { MatDialog } from '@angular/material/dialog';
+import { GenericDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-avisos-admin',
@@ -20,6 +22,7 @@ export class AvisosAdminComponent implements OnInit {
   carregandoUpload = signal<boolean>(false);
 
   private avisoService = inject(AvisoService);
+  private dialog = inject(MatDialog);
 
   ngOnInit() {
     this.carregarAvisos();
@@ -46,7 +49,18 @@ export class AvisosAdminComponent implements OnInit {
     const file = input.files[0];
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('A imagem original deve ter no máximo 5MB.');
+      this.dialog.open(GenericDialogComponent, {
+        data: {
+          titulo: 'Arquivo muito grande',
+          mensagem: 'A imagem original deve ter no máximo 5MB para otimização do sistema.',
+          textoConfirmar: 'Entendi',
+          tipo: 'info',
+          ocultarCancelar: true,
+        },
+        panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+        width: '90%',
+        maxWidth: '400px',
+      });
       input.value = '';
       return;
     }
@@ -67,24 +81,68 @@ export class AvisosAdminComponent implements OnInit {
       this.avisos.update((atual) => [novoAviso, ...atual]);
     } catch (error) {
       console.error('Erro no upload ou compressão', error);
-      alert('Falha ao processar e enviar a imagem. Tente novamente.');
+
+      this.dialog.open(GenericDialogComponent, {
+        data: {
+          titulo: 'Falha no Envio',
+          mensagem: 'Não foi possível processar e enviar a imagem. Tente novamente mais tarde.',
+          textoConfirmar: 'Entendi',
+          tipo: 'perigo',
+          ocultarCancelar: true,
+        },
+        panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+        width: '90%',
+        maxWidth: '400px',
+      });
     } finally {
       this.carregandoUpload.set(false);
       input.value = '';
     }
   }
 
-  async excluirAviso(aviso: Aviso) {
-    if (!aviso.id || !aviso.foto_url || !confirm('Tem certeza que deseja remover este banner?'))
-      return;
+  excluirAviso(aviso: Aviso) {
+    if (!aviso.id || !aviso.foto_url) return;
 
-    try {
-      this.avisos.update((atual) => atual.filter((a) => a.id !== aviso.id));
-      await this.avisoService.excluir(aviso.id, aviso.foto_url);
-    } catch (error) {
-      console.error('Erro ao excluir', error);
-      alert('Erro ao excluir o banner.');
-      this.carregarAvisos();
-    }
+    const avisoId = aviso.id;
+    const avisoFotoUrl = aviso.foto_url;
+
+    const dialogRef = this.dialog.open(GenericDialogComponent, {
+      data: {
+        titulo: 'Excluir Aviso',
+        mensagem:
+          'Tem certeza que deseja remover este banner? Essa ação não pode ser desfeita e ele sumirá para todos os membros.',
+        textoCancelar: 'Cancelar',
+        textoConfirmar: 'Sim, remover',
+        tipo: 'perigo',
+      },
+      panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+      width: '90%',
+      maxWidth: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe(async (confirmado) => {
+      if (confirmado) {
+        try {
+          this.avisos.update((atual) => atual.filter((a) => a.id !== avisoId));
+          await this.avisoService.excluir(avisoId, avisoFotoUrl);
+        } catch (error) {
+          console.error('Erro ao excluir', error);
+
+          this.dialog.open(GenericDialogComponent, {
+            data: {
+              titulo: 'Erro na Exclusão',
+              mensagem: 'Não foi possível excluir o banner. Verifique sua conexão.',
+              textoConfirmar: 'Entendi',
+              tipo: 'perigo',
+              ocultarCancelar: true,
+            },
+            panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+            width: '90%',
+            maxWidth: '400px',
+          });
+          this.carregarAvisos();
+        }
+      }
+    });
   }
 }

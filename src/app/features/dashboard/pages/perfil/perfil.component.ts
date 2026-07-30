@@ -7,7 +7,7 @@ import imageCompression from 'browser-image-compression';
 
 import { MembroService } from '../../../../core/services/membro.service';
 import { MaterialModule } from '../../../../core/modules/material.module';
-import { ConfirmDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
+import { GenericDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
 import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
 import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
@@ -150,12 +150,13 @@ export class PerfilComponent implements OnInit {
   }
 
   removerFoto(): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    const dialogRef = this.dialog.open(GenericDialogComponent, {
       data: {
         titulo: 'Remover Foto',
         mensagem:
           'Tem certeza que deseja remover sua foto de perfil? Essa ação não pode ser desfeita.',
         textoConfirmar: 'Sim, remover',
+        textoCancelar: 'Manter foto',
         tipo: 'perigo',
       },
       panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
