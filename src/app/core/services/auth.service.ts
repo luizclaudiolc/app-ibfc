@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, from } from 'rxjs';
 import { Membro, UsuarioCadastro, UsuarioLogado } from '../../shared/models/membro.model';
@@ -17,6 +17,35 @@ export interface RespostaLogin {
 export class AuthService {
   private supabaseService = inject(SupabaseService);
   private router = inject(Router);
+  private ngZone = inject(NgZone);
+
+  constructor() {
+    this.iniciarObservadorDeSessao();
+  }
+
+  private iniciarObservadorDeSessao() {
+    this.supabaseService.supabase.auth.onAuthStateChange((event, session) => {
+      this.ngZone.run(() => {
+        if (event === 'SIGNED_OUT') {
+          this.limparSessaoLocal();
+          this.router.navigate(['/login']);
+        } else if (event === 'TOKEN_REFRESHED') {
+          const currentUrl = this.router.url;
+          this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+            this.router.navigate([currentUrl]);
+          });
+        }
+      });
+    });
+  }
+
+  private limparSessaoLocal(): void {
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_nome');
+    localStorage.removeItem('user_nivel');
+    localStorage.removeItem('user_setor');
+    localStorage.removeItem('user_foto');
+  }
 
   login(email: string, senha: string): Observable<RespostaLogin> {
     return from(this.executarLoginSupabase(email, senha));
@@ -143,13 +172,7 @@ export class AuthService {
 
   async logout(): Promise<void> {
     await this.supabaseService.supabase.auth.signOut();
-
-    localStorage.removeItem('user_email');
-    localStorage.removeItem('user_nome');
-    localStorage.removeItem('user_nivel');
-    localStorage.removeItem('user_setor');
-    localStorage.removeItem('user_foto');
-
+    this.limparSessaoLocal();
     this.router.navigate(['/login']);
   }
 }
