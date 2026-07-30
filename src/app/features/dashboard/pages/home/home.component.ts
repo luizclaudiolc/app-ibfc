@@ -115,8 +115,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
       maxWidth: '100vw',
       maxHeight: '100vh',
-      width: '90%',
-      height: '90%',
+      width: '100%',
+      height: '100%',
     });
   }
 
@@ -180,42 +180,79 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
   });
 
-  aniversariantesDoMes = computed(() => {
+  aniversariantesDaSemana = computed(() => {
     const membros = this.membrosRaw();
-    const mesAtual = new Date().getMonth() + 1;
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const daquiAte = new Date(hoje);
+    daquiAte.setDate(hoje.getDate() + 7);
+    daquiAte.setHours(23, 59, 59, 999);
+
+    const anoAtual = hoje.getFullYear();
 
     return membros
       .filter((m) => {
         if (!m.data_nascimento || m.status === 'INATIVO') return false;
 
-        const partesData = m.data_nascimento.split('-');
-        if (partesData.length !== 3) return false;
+        const partes = m.data_nascimento.split('-');
+        if (partes.length !== 3) return false;
 
-        const mesNascimento = parseInt(partesData[1], 10);
-        return mesNascimento === mesAtual;
+        const mes = parseInt(partes[1], 10) - 1;
+        const dia = parseInt(partes[2], 10);
+
+        let dataAniversario = new Date(anoAtual, mes, dia);
+        dataAniversario.setHours(0, 0, 0, 0);
+
+        if (dataAniversario < hoje) {
+          dataAniversario.setFullYear(anoAtual + 1);
+        }
+
+        return dataAniversario >= hoje && dataAniversario <= daquiAte;
       })
       .sort((a, b) => {
-        const diaA = parseInt(a.data_nascimento.split('-')[2], 10);
-        const diaB = parseInt(b.data_nascimento.split('-')[2], 10);
-        return diaA - diaB;
+        const getProxNiver = (dataNasc: string) => {
+          const partes = dataNasc.split('-');
+          const mes = parseInt(partes[1], 10) - 1;
+          const dia = parseInt(partes[2], 10);
+          let d = new Date(anoAtual, mes, dia);
+          d.setHours(0, 0, 0, 0);
+          if (d < hoje) d.setFullYear(anoAtual + 1);
+          return d.getTime();
+        };
+        return getProxNiver(a.data_nascimento) - getProxNiver(b.data_nascimento);
       });
   });
 
-  abrirWhatsApp(telefone: string | undefined, nome: string): void {
+  ehHoje(dataNascimento: string): boolean {
+    if (!dataNascimento) return false;
+    const hoje = new Date();
+    const partes = dataNascimento.split('-');
+
+    return (
+      parseInt(partes[1], 10) === hoje.getMonth() + 1 && parseInt(partes[2], 10) === hoje.getDate()
+    );
+  }
+
+  abrirWhatsApp(telefone: string | undefined, nome: string, dataNascimento: string): void {
     if (!telefone) {
       alert('Este membro não possui um número de telefone cadastrado.');
       return;
     }
 
     let numeroLimpo = telefone.replace(/\D/g, '');
-
     if (numeroLimpo.length === 11) {
       numeroLimpo = `55${numeroLimpo}`;
     }
 
-    const mensagem = encodeURIComponent(
-      `A paz do Senhor, ${nome}! Passando para te desejar um feliz aniversário! 🎉 Deus abençoe muito a sua vida!`,
-    );
+    const mensagem = this.ehHoje(dataNascimento)
+      ? encodeURIComponent(
+          `A paz do Senhor, ${nome}! Passando para te desejar um feliz aniversário! 🎉 Deus abençoe muito a sua vida!`,
+        )
+      : encodeURIComponent(
+          `A paz do Senhor, ${nome}! Passando para te desejar uma ótima semana e já deixar os parabéns pelo seu aniversário que está chegando! 🎉`,
+        );
+
     window.open(`https://wa.me/${numeroLimpo}?text=${mensagem}`, '_blank');
   }
 
