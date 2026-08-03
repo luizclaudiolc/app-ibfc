@@ -15,7 +15,7 @@ import {
   StatusMembro,
 } from '../../../../../shared/models/consts';
 import { MembroService } from '../../../../../core/services/membro.service';
-import { GenericDialogComponent } from '../../../../../shared/modal-generico/modal-generico.component';
+import { GenericDialogComponent } from '../../../../../shared/components/modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-editar-membro-dialog',

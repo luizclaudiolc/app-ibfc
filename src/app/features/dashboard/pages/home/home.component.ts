@@ -1,17 +1,17 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
+  computed,
+  ElementRef,
+  inject,
+  OnDestroy,
   OnInit,
   signal,
-  computed,
-  inject,
   ViewChild,
-  ElementRef,
-  OnDestroy,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { filter, forkJoin, finalize, fromEvent, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { filter, finalize, forkJoin, fromEvent, Subscription } from 'rxjs';
 
 import { AvisoService } from '../../../../core/services/aviso.service';
 import { EscalaService } from '../../../../core/services/escala.service';
@@ -20,17 +20,17 @@ import { Aviso } from '../../../../shared/models/aviso.model';
 import { Escala } from '../../../../shared/models/escala.model';
 import { Membro } from '../../../../shared/models/membro.model';
 
-import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
 import { MaterialModule } from '../../../../core/modules/material.module';
+import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
 
+import { AuthService } from '../../../../core/services/auth.service';
+import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
+import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import {
   CARGOS_DISPONIVEIS_MAP,
   DEPARTAMENTOS_DISPONIVEIS_MAP,
   EVENTOS_MAP,
 } from '../../../../shared/models/consts';
-import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
-import { GenericDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
-import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',

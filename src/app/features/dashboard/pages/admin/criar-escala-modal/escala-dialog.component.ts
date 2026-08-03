@@ -8,7 +8,7 @@ import { MembroService } from '../../../../../core/services/membro.service';
 import { Membro } from '../../../../../shared/models/membro.model';
 import { EscalaService } from '../../../../../core/services/escala.service';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { GenericDialogComponent } from '../../../../../shared/modal-generico/modal-generico.component';
+import { GenericDialogComponent } from '../../../../../shared/components/modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-escala-dialog',

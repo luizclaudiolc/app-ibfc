@@ -123,21 +123,5 @@
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     }
-
-    @if (mensagemSucesso()) {
-      <div
-        class="w-full mt-5 bg-emerald-50 text-emerald-600 text-center py-2.5 px-3 text-xs font-medium rounded-xl border border-emerald-100/60"
-      >
-        🎉 {{ mensagemSucesso() }}
-      </div>
-    }
-
-    @if (mensagemErro()) {
-      <div
-        class="w-full mt-5 bg-red-50 text-red-600 text-center py-2.5 px-3 text-xs font-medium rounded-xl border border-red-100/60"
-      >
-        ⚠️ {{ mensagemErro() }}
-      </div>
-    }
   </div>
 </app-page-layout>

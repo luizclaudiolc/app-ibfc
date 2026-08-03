@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
-import { AuthService } from '../../../core/services/auth.service';
-import { MaterialModule } from '../../../core/modules/material.module';
-import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { GenericDialogComponent } from '../../modal-generico/modal-generico.component';
+import { Router } from '@angular/router';
+import { MaterialModule } from '../../../core/modules/material.module';
+import { AuthService } from '../../../core/services/auth.service';
+import { GenericDialogComponent } from '../modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-header',

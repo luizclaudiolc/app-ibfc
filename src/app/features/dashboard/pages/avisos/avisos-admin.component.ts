@@ -1,14 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import imageCompression from 'browser-image-compression';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { AvisoService } from '../../../../core/services/aviso.service';
-import { FooterComponent } from '../../../../shared/components/footer/footer.component';
-import { HeaderComponent } from '../../../../shared/components/header/header.component';
-import { Aviso } from '../../../../shared/models/aviso.model';
-import imageCompression from 'browser-image-compression';
+import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
-import { MatDialog } from '@angular/material/dialog';
-import { GenericDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
+import { Aviso } from '../../../../shared/models/aviso.model';
 
 @Component({
   selector: 'app-avisos-admin',

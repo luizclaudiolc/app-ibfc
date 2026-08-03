@@ -1,13 +1,13 @@
-import { Component, inject, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { forkJoin } from 'rxjs';
 import { MaterialModule } from '../../../../../core/modules/material.module';
 import { MembroService } from '../../../../../core/services/membro.service';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { Membro } from '../../../../../shared/models/membro.model';
-import { forkJoin } from 'rxjs';
+import { GenericDialogComponent } from '../../../../../shared/components/modal-generico/modal-generico.component';
 import { DEPARTAMENTOS_DISPONIVEIS } from '../../../../../shared/models/consts';
-import { GenericDialogComponent } from '../../../../../shared/modal-generico/modal-generico.component';
+import { Membro } from '../../../../../shared/models/membro.model';
 
 @Component({
   selector: 'app-selecionar-lider-dialog',
