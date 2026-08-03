@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../core/modules/material.module';
 import { DEPARTAMENTOS_DISPONIVEIS, EVENTOS_OPCOES } from '../../../../../shared/models/consts';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -8,6 +8,7 @@ import { MembroService } from '../../../../../core/services/membro.service';
 import { Membro } from '../../../../../shared/models/membro.model';
 import { EscalaService } from '../../../../../core/services/escala.service';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { GenericDialogComponent } from '../../../../../shared/modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-escala-dialog',
@@ -202,6 +203,7 @@ export class EscalaDialogComponent implements OnInit {
   fb = inject(FormBuilder);
   membroService = inject(MembroService);
   private escalaService = inject(EscalaService);
+  private dialog = inject(MatDialog);
 
   carregandoEnvio = false;
   membrosAtivos = signal<Membro[]>([]);
@@ -252,6 +254,11 @@ export class EscalaDialogComponent implements OnInit {
     const nome = event.option.value;
     const atuais = this.form.controls.voluntarios.value || [];
     if (!atuais.includes(nome)) this.form.controls.voluntarios.setValue([...atuais, nome]);
+
+    const inputElement = document.querySelector('input[matChipInputFor]') as HTMLInputElement;
+    if (inputElement) inputElement.value = '';
+
+    this.membrosFiltrados.set(this.membrosAtivos());
   }
 
   removerVoluntario(nome: string): void {
@@ -268,18 +275,74 @@ export class EscalaDialogComponent implements OnInit {
       ...formValues,
       voluntarios: (formValues.voluntarios as string[]).join(', '),
     };
-    if (this.data.escala?.id) dadosParaSalvar.id = this.data.escala.id;
+
+    if (this.data.escala?.id) {
+      dadosParaSalvar.id = this.data.escala.id;
+    }
 
     this.escalaService.salvar(dadosParaSalvar).subscribe({
       next: () => this.dialogRef.close({ sucesso: true }),
-      error: () => (this.carregandoEnvio = false),
+      error: (err) => {
+        console.error('Erro ao salvar escala:', err);
+        this.carregandoEnvio = false;
+
+        this.dialog.open(GenericDialogComponent, {
+          data: {
+            titulo: 'Falha ao Salvar',
+            mensagem: 'Não foi possível salvar a escala. Verifique sua conexão e permissões.',
+            textoConfirmar: 'Entendi',
+            tipo: 'perigo',
+            ocultarCancelar: true,
+          },
+          panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+          width: '90%',
+          maxWidth: '400px',
+        });
+      },
     });
   }
 
   excluir() {
-    if (!this.data.escala?.id || !confirm('Confirmar exclusão?')) return;
-    this.escalaService
-      .excluir(this.data.escala.id)
-      .subscribe(() => this.dialogRef.close({ sucesso: true, excluido: true }));
+    if (!this.data.escala?.id) return;
+
+    const dialogConfirmRef = this.dialog.open(GenericDialogComponent, {
+      data: {
+        titulo: 'Excluir Escala',
+        mensagem:
+          'Tem certeza que deseja remover esta escala? Essa ação apagará a data para todos os voluntários envolvidos.',
+        textoCancelar: 'Cancelar',
+        textoConfirmar: 'Sim, excluir',
+        tipo: 'perigo',
+      },
+      panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+      width: '90%',
+      maxWidth: '400px',
+    });
+
+    dialogConfirmRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado) {
+        this.carregandoEnvio = true;
+        this.escalaService.excluir(this.data.escala.id).subscribe({
+          next: () => this.dialogRef.close({ sucesso: true, excluido: true }),
+          error: (err) => {
+            console.error('Erro ao excluir escala:', err);
+            this.carregandoEnvio = false;
+
+            this.dialog.open(GenericDialogComponent, {
+              data: {
+                titulo: 'Erro na Exclusão',
+                mensagem: 'Não foi possível excluir a escala. Tente novamente mais tarde.',
+                textoConfirmar: 'Entendi',
+                tipo: 'perigo',
+                ocultarCancelar: true,
+              },
+              panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+              width: '90%',
+              maxWidth: '400px',
+            });
+          },
+        });
+      }
+    });
   }
 }
