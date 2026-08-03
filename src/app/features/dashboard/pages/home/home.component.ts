@@ -30,6 +30,7 @@ import {
 } from '../../../../shared/models/consts';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import { GenericDialogComponent } from '../../../../shared/modal-generico/modal-generico.component';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -44,8 +45,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly membroService = inject(MembroService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+  private readonly authService = inject(AuthService);
 
-  nomeUsuario = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
+  nomeUsuario = this.authService.nomeUsuario$;
   emailUsuario = signal<string>(localStorage.getItem('user_email') || '');
   carregando = signal(true);
 

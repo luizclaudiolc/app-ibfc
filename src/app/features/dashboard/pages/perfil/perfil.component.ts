@@ -11,6 +11,7 @@ import { GenericDialogComponent } from '../../../../shared/modal-generico/modal-
 import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
 import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-perfil',
@@ -19,16 +20,17 @@ import { PageLayoutComponent } from '../../../../shared/components/page-layout/p
   templateUrl: './perfil.component.html',
 })
 export class PerfilComponent implements OnInit {
-  carregando = signal<boolean>(false);
-  carregandoDados = signal<boolean>(true);
-  mensagemSucesso = signal<string>('');
-  mensagemErro = signal<string>('');
-  previewFoto = signal<string>(localStorage.getItem('user_foto') || '');
-
   private membroService = inject(MembroService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
+  private authService = inject(AuthService);
+
+  carregando = signal<boolean>(false);
+  carregandoDados = signal<boolean>(true);
+  mensagemSucesso = signal<string>('');
+  mensagemErro = signal<string>('');
+  previewFoto = signal<string | null>(this.authService.fotoUsuario$());
 
   cargosDisponiveis = CARGOS_DISPONIVEIS;
 
@@ -91,8 +93,8 @@ export class PerfilComponent implements OnInit {
         if (res.sucesso) {
           this.mensagemSucesso.set('Perfil atualizado com sucesso!');
 
-          if (formValues.nome) {
-            localStorage.setItem('user_nome', formValues.nome);
+          if (formValues.nome && formValues.sobrenome) {
+            this.authService.atualizarNomeGlobal(`${formValues.nome} ${formValues.sobrenome}`);
           }
         } else {
           this.mensagemErro.set(res.mensagem || 'Erro ao salvar.');
@@ -130,7 +132,9 @@ export class PerfilComponent implements OnInit {
           this.carregando.set(false);
           if (res.sucesso && res.fotoUrl) {
             this.previewFoto.set(res.fotoUrl);
-            localStorage.setItem('user_foto', res.fotoUrl);
+
+            this.authService.atualizarFotoGlobal(res.fotoUrl);
+
             this.mensagemSucesso.set('Foto atualizada com sucesso!');
           } else {
             this.mensagemErro.set(res.mensagem || 'Erro ao atualizar foto.');
@@ -170,7 +174,9 @@ export class PerfilComponent implements OnInit {
         this.membroService.removerFotoPerfil().subscribe({
           next: () => {
             this.previewFoto.set('');
-            localStorage.removeItem('user_foto');
+
+            this.authService.atualizarFotoGlobal(null);
+
             this.carregando.set(false);
             this.mensagemSucesso.set('Foto removida com sucesso!');
           },

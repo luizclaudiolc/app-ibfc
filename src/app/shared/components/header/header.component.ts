@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { MaterialModule } from '../../../core/modules/material.module';
 import { Router } from '@angular/router';
@@ -12,12 +12,12 @@ import { GenericDialogComponent } from '../../modal-generico/modal-generico.comp
   templateUrl: './header.component.html',
 })
 export class HeaderComponent {
-  nomeUsuario = input<string>('Irmão(ã)');
-  fotoUsuario = input<string | null>(null);
-
   private authService = inject(AuthService);
   private router = inject(Router);
   private dialog = inject(MatDialog);
+
+  nomeUsuario = this.authService.nomeUsuario$;
+  fotoUsuario = this.authService.fotoUsuario$;
 
   efetuarLogout(): void {
     const dialogRef = this.dialog.open(GenericDialogComponent, {

@@ -9,7 +9,4 @@ import { FooterComponent } from '../footer/footer.component';
   imports: [CommonModule, HeaderComponent, FooterComponent],
   templateUrl: './page-layout.component.html',
 })
-export class PageLayoutComponent {
-  nomeUsuario = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
-  fotoUsuario = signal<string>(localStorage.getItem('user_foto') || '');
-}
+export class PageLayoutComponent {}

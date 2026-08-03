@@ -1,4 +1,4 @@
-import { inject, Injectable, NgZone } from '@angular/core';
+import { inject, Injectable, NgZone, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, from } from 'rxjs';
 import { Membro, UsuarioCadastro, UsuarioLogado } from '../../shared/models/membro.model';
@@ -19,8 +19,25 @@ export class AuthService {
   private router = inject(Router);
   private ngZone = inject(NgZone);
 
+  fotoUsuario$ = signal<string | null>(localStorage.getItem('user_foto'));
+  nomeUsuario$ = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
+
   constructor() {
     this.iniciarObservadorDeSessao();
+  }
+
+  atualizarFotoGlobal(url: string | null): void {
+    this.fotoUsuario$.set(url);
+    if (url) {
+      localStorage.setItem('user_foto', url);
+    } else {
+      localStorage.removeItem('user_foto');
+    }
+  }
+
+  atualizarNomeGlobal(nome: string): void {
+    this.nomeUsuario$.set(nome);
+    localStorage.setItem('user_nome', nome);
   }
 
   private iniciarObservadorDeSessao() {
@@ -45,6 +62,9 @@ export class AuthService {
     localStorage.removeItem('user_nivel');
     localStorage.removeItem('user_setor');
     localStorage.removeItem('user_foto');
+
+    this.fotoUsuario$.set(null);
+    this.nomeUsuario$.set('Irmão(ã)');
   }
 
   login(email: string, senha: string): Observable<RespostaLogin> {
@@ -86,7 +106,6 @@ export class AuthService {
     console.log({ perfil });
 
     localStorage.setItem('user_email', perfil.email);
-    localStorage.setItem('user_nome', `${perfil.nome} ${perfil.sobrenome}`);
     localStorage.setItem('user_nivel', perfil.nivel_acesso);
 
     if (perfil.setor_responsavel) {
@@ -95,11 +114,8 @@ export class AuthService {
       localStorage.removeItem('user_setor');
     }
 
-    if (perfil.foto_url) {
-      localStorage.setItem('user_foto', perfil.foto_url);
-    } else {
-      localStorage.removeItem('user_foto');
-    }
+    this.atualizarNomeGlobal(`${perfil.nome} ${perfil.sobrenome}`);
+    this.atualizarFotoGlobal(perfil.foto_url || null);
   }
 
   cadastrar(membro: UsuarioCadastro): Observable<{ sucesso: boolean; mensagem: string }> {
