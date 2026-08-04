@@ -1,55 +1,41 @@
 <footer
-  class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50 px-4 py-2 flex justify-around items-center max-w-xl mx-auto"
+  class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50 px-2 py-2 flex justify-around items-center max-w-xl mx-auto pb-safe"
 >
-  <a
-    routerLink="/dashboard/home"
-    routerLinkActive="text-sky-600 opacity-100"
-    [routerLinkActiveOptions]="{ exact: true }"
-    class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
+  @for (item of visibleItems(); track item.route) {
+    <a
+      [routerLink]="item.route"
+      routerLinkActive="text-sky-600 opacity-100"
+      [routerLinkActiveOptions]="{ exact: !!item.exact }"
+      class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-all w-16 hover:opacity-80"
+    >
+      <span class="text-[22px] leading-tight">{{ item.icon }}</span>
+      <span class="text-[10px] font-bold tracking-wide">{{ item.label }}</span>
+    </a>
+  }
+
+  <button
+    [matMenuTriggerFor]="footerMenu"
+    class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-all w-16 hover:opacity-100"
   >
-    <span class="text-xl">🏠</span>
-    <span class="text-[10px] font-bold tracking-wide">Início</span>
-  </a>
-
-  @if (podeAcessarEscalas()) {
-    <a
-      routerLink="/dashboard/escala"
-      routerLinkActive="text-sky-600 opacity-100"
-      class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
-    >
-      <span class="text-xl">📅</span>
-      <span class="text-[10px] font-bold tracking-wide">Escalas</span>
-    </a>
-  }
-
-  @if (podeAcessarAvisos()) {
-    <a
-      routerLink="/dashboard/avisos"
-      routerLinkActive="text-sky-600 opacity-100"
-      class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
-    >
-      <span class="text-xl">📢</span>
-      <span class="text-[10px] font-bold tracking-wide">Avisos</span>
-    </a>
-  }
-
-  <a
-    routerLink="/dashboard/perfil"
-    routerLinkActive="text-sky-600 opacity-100"
-    class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
-  >
-    <span class="text-xl">👤</span>
-    <span class="text-[10px] font-bold tracking-wide">Perfil</span>
-  </a>
-
-  @if (isAdmin()) {
-    <a
-      routerLink="/dashboard/admin"
-      routerLinkActive="text-sky-600 opacity-100"
-      class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-opacity"
-    >
-      <span class="text-xl">🛠️</span>
-      <span class="text-[10px] font-bold tracking-wide">Membros</span>
-    </a>
-  }
+    <mat-icon class="!w-6 !h-6 text-[24px]">menu</mat-icon>
+    <span class="text-[10px] font-bold tracking-wide">Menu</span>
+  </button>
 </footer>
+
+<mat-menu #footerMenu="matMenu" yPosition="above" class="rounded-2xl mb-2">
+  @for (overflow of overflowItems(); track overflow.route) {
+    <a mat-menu-item [routerLink]="overflow.route">
+      <span class="mr-3 text-lg">{{ overflow.icon }}</span>
+      <span class="font-medium text-slate-700">{{ overflow.label }}</span>
+    </a>
+  }
+
+  @if (overflowItems().length > 0) {
+    <mat-divider class="my-1"></mat-divider>
+  }
+
+  <button mat-menu-item (click)="efetuarLogout()" class="hover:bg-red-50">
+    <mat-icon class="!text-red-500 mr-2">logout</mat-icon>
+    <span class="font-bold text-red-500">Sair</span>
+  </button>
+</mat-menu>

@@ -15,7 +15,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatMenuModule } from '@angular/material/menu'; // <-- Adicione esta linha
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
   imports: [
@@ -37,6 +38,7 @@ import { MatMenuModule } from '@angular/material/menu'; // <-- Adicione esta lin
     MatProgressSpinnerModule,
     MatTabsModule,
     MatMenuModule,
+    MatDividerModule,
   ],
   exports: [
     MatTableModule,
@@ -57,6 +59,7 @@ import { MatMenuModule } from '@angular/material/menu'; // <-- Adicione esta lin
     MatProgressSpinnerModule,
     MatTabsModule,
     MatMenuModule,
+    MatDividerModule,
   ],
 })
 export class MaterialModule {}
