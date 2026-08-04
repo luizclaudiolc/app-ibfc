@@ -1,59 +1,75 @@
-# AppIbfc
+# ⛪ App IBFC
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.11.
+Um PWA (Progressive Web App) moderno desenvolvido para a gestão interna da igreja. Focado na experiência do usuário e facilidade de acesso via dispositivos móveis, o aplicativo centraliza o gerenciamento de escalas, anúncios, e cadastro de membros, utilizando recursos nativos de aplicativos em uma interface web responsiva e elegante.
 
-## Development server
+## 🚀 Tecnologias Utilizadas
 
-To start a local development server, run:
+Este projeto foi construído utilizando as seguintes tecnologias:
 
-```bash
-ng serve
-```
+*   **Frontend:** [Angular](https://angular.dev/) (Framework principal, versão v16+) com reatividade baseada em Signals.
+*   **Estilização:** [Tailwind CSS](https://tailwindcss.com/) (para um design responsivo, rápido e limpo).
+*   **Componentes de UI:** [Angular Material](https://material.angular.io/) (para modais, snackbars e ícones integrados).
+*   **Backend & Banco de Dados:** [Supabase](https://supabase.com/) (Autenticação, PostgreSQL e Storage).
+*   **Compressão de Imagens:** `browser-image-compression` (Otimização local de imagens antes do upload).
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## ✨ Funcionalidades Principais
 
-## Code scaffolding
+*   **PWA Integrado:** Pode ser instalado diretamente na tela inicial do celular.
+*   **Dashboard Personalizado:** Exibição da saudação do usuário, notificações importantes e avisos globais no formato de carrossel.
+*   **Gestão de Escalas:** 
+    *   Visualização de escalas pessoais diretamente na Home.
+    *   Filtro dinâmico para carregar as escalas dos próximos 30 dias.
+*   **Quadro de Aniversariantes:** Visualização dos aniversariantes da semana, com integração para envio direto de mensagens via WhatsApp.
+*   **Perfil do Usuário:**
+    *   Atualização de dados cadastrais.
+    *   Upload, compressão automática e remoção da foto de perfil.
+*   **Gestão de Membros:** 
+    *   Busca inteligente de membros ativos.
+    *   Visualização de cargos, setores e controle de inatividade.
+*   **Modais e Alertas Nativos:** Sistema de notificações globais (`Snackbars`) e diálogos de confirmação padronizados e animados.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 📦 Estrutura do Projeto
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+O projeto segue uma arquitetura modular focada em escalabilidade:
 
 ```bash
-ng test
+src/
+├── app/
+│   ├── core/              # Serviços globais (AuthService, SupabaseService, NotificationService)
+│   ├── shared/            # Componentes reutilizáveis (Modais, Header, Footer, Custom-Snackbar)
+│   └── dashboard/         # Telas principais da aplicação (Home, Perfil, Escalas, Avisos)
+├── assets/                # Imagens (incluindo logo) e arquivos estáticos
+└── styles.scss            # Estilos globais (Tailwind base e overrides do Angular Material)
 ```
 
-## Running end-to-end tests
+## 🛠️ Como executar o projeto localmente
 
-For end-to-end (e2e) testing, run:
+### 1. Pré-requisitos
+* **Node.js** instalado na máquina.
+* **Angular CLI** instalado globalmente (`npm install -g @angular/cli`).
+* Uma conta no **Supabase** com as tabelas configuradas (Membros, Escalas, Avisos) e Storage para fotos.
 
-```bash
-ng e2e
-```
+### 2. Instalação
+Clone o repositório:
+`git clone https://github.com/SeuUsuario/app-ibfc.git`
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Acesse a pasta do projeto:
+`cd app-ibfc`
 
-## Additional Resources
+Instale as dependências:
+`npm install`
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### 3. Configuração de Ambiente
+Crie o arquivo de ambiente em `src/environments/environment.ts` com as chaves do Supabase:
+
+`export const environment = {`
+`  production: false,`
+`  supabaseUrl: 'SUA_URL_DO_SUPABASE',`
+`  supabaseKey: 'SUA_CHAVE_ANONIMA_DO_SUPABASE'`
+`};`
+
+### 4. Executando a Aplicação
+Inicie o servidor de desenvolvimento:
+`ng serve`
+
+Acesse a aplicação no seu navegador: `http://localhost:4200/`. A página será recarregada automaticamente se houverem mudanças no código.
