@@ -4,7 +4,7 @@ import { Component, input } from '@angular/core';
   selector: 'app-section-header',
   standalone: true,
   template: `
-    <div class="flex items-center justify-between px-1">
+    <div class="flex items-center justify-between px-1 pb-2">
       <div>
         <h2 class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
           {{ title() }}

@@ -21,42 +21,10 @@
                 class="snap-center shrink-0 transition-all duration-300"
                 [ngClass]="escalasPessoais().length === 1 ? 'w-full' : 'w-[92%] sm:w-[70%]'"
               >
-                <div
-                  class="bg-gradient-to-br from-sky-600 via-sky-600 to-indigo-700 text-white p-5 rounded-3xl shadow-sm relative overflow-hidden h-full"
-                >
-                  <div
-                    class="absolute -right-6 -bottom-6 text-white/5 text-7xl font-bold select-none pointer-events-none"
-                  >
-                    ⛪
-                  </div>
-                  <div class="flex items-center gap-2 mb-4 relative z-10">
-                    <span
-                      class="text-[10px] bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full font-bold uppercase tracking-wider"
-                    >
-                      Você está escalado(a)
-                    </span>
-                  </div>
-                  <div class="relative z-10">
-                    <h2 class="text-base font-medium text-sky-100 leading-tight mb-0.5">
-                      Data:
-                      <span class="font-bold text-white">{{
-                        escala.data_escala | date: 'dd/MM/yyyy' : 'UTC'
-                      }}</span>
-                    </h2>
-                    <p class="text-lg font-bold text-white tracking-tight">
-                      Evento: {{ eventosMap[escala.evento] || escala.evento }}
-                    </p>
-                  </div>
-                  <div
-                    class="text-[11px] bg-white/10 backdrop-blur-sm p-3 rounded-xl mt-4 border border-white/10 leading-relaxed relative z-10"
-                  >
-                    <span
-                      class="opacity-75 block font-semibold uppercase tracking-wider text-[9px] mb-1"
-                      >Equipe do dia</span
-                    >
-                    {{ escala.voluntarios }}
-                  </div>
-                </div>
+                <app-escala-card
+                  [escala]="escala"
+                  [nomeEvento]="eventosMap[escala.evento] || escala.evento"
+                />
               </div>
             }
           </app-scrollable-carousel>
@@ -77,74 +45,17 @@
                 class="snap-center shrink-0 transition-all duration-300"
                 [ngClass]="aniversariantesDaSemana().length === 1 ? 'w-full' : 'w-[92%] sm:w-[70%]'"
               >
-                <div
-                  class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col items-center text-center relative overflow-hidden h-full"
-                >
-                  <div
-                    class="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-sky-50 to-transparent"
-                  ></div>
-                  <div class="relative z-10 w-20 h-20 mb-3">
-                    @if (aniversariante.foto_url) {
-                      <img
-                        [src]="aniversariante.foto_url"
-                        class="w-full h-full rounded-full object-cover ring-4 ring-white shadow-sm"
-                        alt="Foto"
-                      />
-                    } @else {
-                      <div
-                        class="w-full h-full rounded-full bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500 font-bold flex items-center justify-center text-2xl ring-4 ring-white shadow-sm border border-slate-200/40"
-                      >
-                        {{ aniversariante.nome[0].toUpperCase() }}
-                      </div>
-                    }
-                    @if (ehHoje(aniversariante.data_nascimento)) {
-                      <div
-                        class="absolute -bottom-2 -right-1 bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full border-2 border-white shadow-md whitespace-nowrap animate-pulse"
-                      >
-                        🎉 É HOJE!
-                      </div>
-                    } @else {
-                      <div
-                        class="absolute -bottom-2 -right-1 bg-sky-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full border-2 border-white shadow-sm whitespace-nowrap"
-                      >
-                        Dia {{ aniversariante.data_nascimento | date: 'dd/MM' : 'UTC' }}
-                      </div>
-                    }
-                  </div>
-                  <h3 class="text-base font-bold text-slate-800 relative z-10 leading-tight">
-                    {{ aniversariante.nome }} {{ aniversariante.sobrenome }}
-                  </h3>
-                  <p class="text-xs text-slate-500 mt-2 mb-5 relative z-10 leading-relaxed">
-                    @if (ehHoje(aniversariante.data_nascimento)) {
-                      Deixe o dia do(a) nosso(a) irmão(ã) mais feliz com uma mensagem!
-                    } @else {
-                      O aniversário está chegando! Mande seus parabéns.
-                    }
-                  </p>
-                  <button
-                    (click)="
-                      abrirWhatsApp(
-                        aniversariante.telefone,
-                        aniversariante.nome,
-                        aniversariante.data_nascimento
-                      )
-                    "
-                    class="mt-auto w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold py-3 px-4 rounded-xl transition-all active:scale-[0.98] shadow-sm relative z-10"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.005-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"
-                      />
-                    </svg>
-                    Enviar Mensagem
-                  </button>
-                </div>
+                <app-birthday-card
+                  [membro]="aniversariante"
+                  [ehHoje]="ehHoje(aniversariante.data_nascimento)"
+                  (enviarMensagem)="
+                    abrirWhatsApp(
+                      aniversariante.telefone,
+                      aniversariante.nome,
+                      aniversariante.data_nascimento
+                    )
+                  "
+                />
               </div>
             }
           </app-scrollable-carousel>
@@ -167,29 +78,7 @@
           >
             @for (aviso of avisos(); track aviso.id; let i = $index) {
               <div class="snap-center shrink-0 w-[90%]">
-                <button
-                  type="button"
-                  (click)="abrirFoto(aviso.foto_url, 'Aviso')"
-                  class="group relative w-full overflow-hidden rounded-3xl bg-slate-900 shadow-lg ring-1 ring-slate-200 transition-all duration-300 active:scale-[0.98]"
-                >
-                  <img
-                    [src]="aviso.foto_url"
-                    loading="lazy"
-                    alt="Aviso"
-                    class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                  />
-                  <div
-                    class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none"
-                  ></div>
-                  <div
-                    class="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-3 py-1.5 shadow-sm"
-                  >
-                    <mat-icon class="!text-[18px] !w-[18px] !h-[18px] text-slate-700"
-                      >zoom_in</mat-icon
-                    >
-                    <span class="text-xs font-semibold text-slate-700"> Ampliar </span>
-                  </div>
-                </button>
+                <app-aviso-card [aviso]="aviso" (ampliar)="abrirFoto(aviso.foto_url, 'Aviso')" />
               </div>
             }
           </div>
@@ -240,55 +129,16 @@
 
         <div class="space-y-2.5">
           @for (membro of membrosFiltrados(); track membro.id) {
-            <div
-              [routerLink]="['/dashboard/perfil', membro.id]"
-              class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between gap-3 hover:shadow-md/5 hover:border-sky-200 transition-all cursor-pointer"
-            >
-              <div class="flex items-center gap-3.5">
-                @if (membro.foto_url) {
-                  <img
-                    [src]="membro.foto_url"
-                    class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100 shadow-inner"
-                    alt="Perfil"
-                  />
-                } @else {
-                  <div
-                    class="w-12 h-12 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 font-bold flex items-center justify-center text-sm border border-slate-200/40 shadow-inner"
-                  >
-                    {{ membro.nome[0].toUpperCase() }}
-                  </div>
-                }
-                <div class="space-y-0.5">
-                  <div class="flex items-center gap-1.5">
-                    <h3 class="font-bold text-slate-800 text-sm tracking-tight leading-none">
-                      {{ membro.nome }} {{ membro.sobrenome }}
-                    </h3>
-                    @if (membro.email.toLowerCase() === emailUsuario().toLowerCase()) {
-                      <span
-                        class="bg-sky-50 text-sky-600 font-bold text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider border border-sky-100"
-                        >Você</span
-                      >
-                    }
-                  </div>
-                  <p class="text-xs text-slate-500 font-medium">
-                    {{ cargosDisponiveis[membro.cargo] || 'Membro' }}
-                    @if (membro.setor_responsavel && membro.setor_responsavel !== 'membro') {
-                      •
-                      <span class="text-sky-600 font-semibold">{{
-                        departamentos[membro.setor_responsavel]
-                      }}</span>
-                    }
-                  </p>
-                  <div
-                    class="flex items-center gap-1 text-[10px] text-slate-400 font-medium pt-0.5"
-                  >
-                    <span
-                      >🎈 Aniversário: {{ membro.data_nascimento | date: 'dd/MM' : 'UTC' }}</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
+            <app-membro-list-item
+              [membro]="membro"
+              [isCurrentUser]="membro.email.toLowerCase() === emailUsuario().toLowerCase()"
+              [cargoNome]="cargosDisponiveis[membro.cargo] || 'Membro'"
+              [departamentoNome]="
+                membro.setor_responsavel && membro.setor_responsavel !== 'membro'
+                  ? departamentos[membro.setor_responsavel]
+                  : undefined
+              "
+            />
           } @empty {
             <div
               class="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm"

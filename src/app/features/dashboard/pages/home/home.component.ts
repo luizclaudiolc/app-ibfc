@@ -16,16 +16,16 @@ import { filter, finalize, forkJoin, fromEvent, Subscription } from 'rxjs';
 import { AvisoService } from '../../../../core/services/aviso.service';
 import { EscalaService } from '../../../../core/services/escala.service';
 import { MembroService } from '../../../../core/services/membro.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { Aviso } from '../../../../shared/models/aviso.model';
 import { Escala } from '../../../../shared/models/escala.model';
 import { Membro } from '../../../../shared/models/membro.model';
 
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
-
-import { AuthService } from '../../../../core/services/auth.service';
 import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
+
 import {
   CARGOS_DISPONIVEIS_MAP,
   DEPARTAMENTOS_DISPONIVEIS_MAP,
@@ -34,6 +34,10 @@ import {
 
 import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
 import { ScrollableCarouselComponent } from '../../../../shared/components/carrossel/scrollable-carousel.component';
+import { EscalaCardComponent } from '../../../../shared/components/card-escala/escala-card.component';
+import { MembroListItemComponent } from '../../../../shared/components/lista-membros/membro-list-item.component';
+import { CardAvisoComponent } from '../../../../shared/components/card-aviso/card-aviso.component';
+import { CardAniversarianteComponent } from '../../../../shared/components/card-aniversariante/card-aniversariante.component';
 
 @Component({
   selector: 'app-home',
@@ -45,6 +49,10 @@ import { ScrollableCarouselComponent } from '../../../../shared/components/carro
     PageLayoutComponent,
     SectionHeaderComponent,
     ScrollableCarouselComponent,
+    EscalaCardComponent,
+    CardAniversarianteComponent,
+    CardAvisoComponent,
+    MembroListItemComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -278,5 +286,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
       return;
     }
+
+    const mensagem = `Olá ${nome}, parabéns pelo seu aniversário! É um prazer tê-lo(a) como parte da nossa Igreja. Que seu dia seja repleto de alegria e bênçãos!`;
+    const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
+    window.open(url, '_blank');
   }
 }
