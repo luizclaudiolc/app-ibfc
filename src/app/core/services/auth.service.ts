@@ -1,4 +1,4 @@
-import { inject, Injectable, NgZone, signal } from '@angular/core';
+import { Injectable, inject, NgZone, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, from } from 'rxjs';
 import { Membro, UsuarioCadastro, UsuarioLogado } from '../../shared/models/membro.model';
@@ -174,6 +174,11 @@ export class AuthService {
       ]);
 
       if (insertError) throw new Error('Erro ao salvar os dados do perfil.');
+
+      // CORREÇÃO: Encerra a sessão automática gerada pelo signUp e limpa o cache local
+      // para evitar que o usuário seja logado automaticamente com dados residuais.
+      await this.supabaseService.supabase.auth.signOut();
+      this.limparSessaoLocal();
 
       return { sucesso: true, mensagem: 'Cadastro realizado com sucesso!' };
     } catch (error: any) {
