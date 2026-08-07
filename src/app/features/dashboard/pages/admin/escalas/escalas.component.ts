@@ -15,7 +15,6 @@ import { PageLayoutComponent } from '../../../../../shared/components/page-layou
 @Component({
   selector: 'app-escalas',
   standalone: true,
-
   imports: [CommonModule, MaterialModule, PageLayoutComponent],
   templateUrl: './escalas.component.html',
 })
@@ -38,6 +37,12 @@ export class EscalasComponent implements OnInit {
       return escala.departamento === this.setorUsuario;
     }
     return true;
+  }
+
+  isPassado(data: Date): boolean {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    return data < hoje;
   }
 
   dataAtual = signal(new Date());
@@ -133,14 +138,17 @@ export class EscalasComponent implements OnInit {
   }
 
   abrirModalEscala(dia: Date, escalaExistente?: Escala) {
-    if (!this.podeEditar(escalaExistente)) return;
+    const passado = this.isPassado(dia);
+    const temPermissaoEdicao = this.podeEditar(escalaExistente);
 
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+    const modoLeitura = passado || !temPermissaoEdicao;
 
-    if (dia < hoje) {
+    if (modoLeitura && !escalaExistente && !passado) {
       return;
     }
+
+    const dataStr = dia.toISOString().split('T')[0];
+    const escalasDoDia = this.escalasRaw().filter((e) => e.data_escala === dataStr);
 
     const dialogRef = this.dialog.open(EscalaDialogComponent, {
       width: '90%',
@@ -149,8 +157,10 @@ export class EscalasComponent implements OnInit {
       data: {
         data_escala: dia,
         escala: escalaExistente,
+        escalas: escalasDoDia,
         isAdmin: this.isAdmin(),
         setorUsuario: this.setorUsuario,
+        isReadOnly: modoLeitura,
       },
     });
 

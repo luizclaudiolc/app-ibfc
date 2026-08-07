@@ -41,10 +41,9 @@
       @for (dia of diasDoMes(); track dia.data.toISOString()) {
         <div
           (click)="abrirModalEscala(dia.data)"
-          class="border-b border-r border-slate-100 p-2 transition-colors relative group"
+          class="border-b border-r border-slate-100 p-2 transition-colors relative group cursor-pointer hover:bg-slate-50"
           [ngClass]="{
             'bg-slate-50/50 opacity-60': !dia.isMesAtual,
-            'cursor-pointer hover:bg-sky-50/30': podeEditar(),
           }"
         >
           <div class="flex justify-between items-start">
@@ -55,7 +54,7 @@
               {{ dia.data.getDate() }}
             </span>
 
-            @if (podeEditar()) {
+            @if (podeEditar() && !isPassado(dia.data)) {
               <mat-icon
                 class="!w-4 !h-4 !text-[16px] text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity"
                 >add_circle</mat-icon
@@ -67,11 +66,11 @@
             @for (escala of dia.escalas; track escala.id) {
               <div
                 (click)="abrirModalEscala(dia.data, escala); $event.stopPropagation()"
-                class="text-[10px] px-2 py-1.5 rounded-lg border truncate transition-all"
+                class="text-[10px] px-2 py-1.5 rounded-lg border truncate transition-all cursor-pointer"
                 [ngClass]="
-                  podeEditar(escala)
-                    ? 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300 cursor-pointer'
-                    : 'bg-slate-50 text-slate-700 border-slate-200 cursor-default opacity-80'
+                  podeEditar(escala) && !isPassado(dia.data)
+                    ? 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                    : 'bg-slate-50/70 text-slate-600 border-slate-100 hover:bg-slate-100'
                 "
               >
                 <span class="font-bold block text-slate-800">{{

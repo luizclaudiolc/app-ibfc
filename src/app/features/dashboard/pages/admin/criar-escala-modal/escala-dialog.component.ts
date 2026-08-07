@@ -2,7 +2,11 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../core/modules/material.module';
-import { DEPARTAMENTOS_DISPONIVEIS, EVENTOS_OPCOES } from '../../../../../shared/models/consts';
+import {
+  DEPARTAMENTOS_DISPONIVEIS,
+  EVENTOS_OPCOES,
+  EVENTOS_MAP,
+} from '../../../../../shared/models/consts';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MembroService } from '../../../../../core/services/membro.service';
 import { Membro } from '../../../../../shared/models/membro.model';
@@ -49,9 +53,12 @@ import { DialogLayoutComponent } from '../../../../../shared/components/layout-m
                   <span
                     class="text-[10px] font-bold text-sky-600 uppercase tracking-wider bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100"
                   >
-                    {{ esc.departamento }}
+                    {{ obterNomeDepartamento(esc.departamento) }}
                   </span>
-                  <h3 class="font-bold text-slate-800 text-sm mt-1.5">{{ esc.evento }}</h3>
+
+                  <h3 class="font-bold text-slate-800 text-sm mt-1.5">
+                    {{ eventosMap[esc.evento] || esc.evento }}
+                  </h3>
                 </div>
 
                 <div class="pt-2 border-t border-slate-100">
@@ -186,6 +193,9 @@ export class EscalaDialogComponent implements OnInit {
   carregandoEnvio = false;
   membrosAtivos = signal<Membro[]>([]);
   membrosFiltrados = signal<Membro[]>([]);
+
+  // Adicionado o mapa de eventos aqui para uso no template
+  eventosMap = EVENTOS_MAP;
   eventosPreDefinidos = EVENTOS_OPCOES;
 
   departamentosPermitidos = this.data.isAdmin
@@ -216,6 +226,12 @@ export class EscalaDialogComponent implements OnInit {
       this.membrosAtivos.set(ativos);
       this.membrosFiltrados.set(ativos);
     });
+  }
+
+  // Helper para buscar o nome do departamento formatado (se necessário)
+  obterNomeDepartamento(valor: string): string {
+    const depto = DEPARTAMENTOS_DISPONIVEIS.find((d) => d.value === valor);
+    return depto ? depto.label : valor;
   }
 
   filtrarMembros(event: Event) {
