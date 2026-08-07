@@ -16,11 +16,18 @@ import {
 } from '../../../../../shared/models/consts';
 import { MembroService } from '../../../../../core/services/membro.service';
 import { GenericDialogComponent } from '../../../../../shared/components/modal-generico/modal-generico.component';
+import { DialogLayoutComponent } from '../../../../../shared/components/layout-modal/dialog-layout.component';
 
 @Component({
   selector: 'app-editar-membro-dialog',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MaterialModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MaterialModule,
+    DialogLayoutComponent,
+  ],
   templateUrl: './editar-membro-dialog.component.html',
 })
 export class EditarMembroDialogComponent {
@@ -40,7 +47,7 @@ export class EditarMembroDialogComponent {
 
   niveisAcesso = [
     { label: 'Administrador (Acesso Total)', value: 'ADMIN' as NivelAcesso },
-    { label: 'Membro Comum', value: 'MEMBRO' as NivelAcesso },
+    { label: 'Membro', value: 'MEMBRO' as NivelAcesso },
   ];
 
   statusOpcoes = [
