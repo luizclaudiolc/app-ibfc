@@ -27,6 +27,8 @@ export class FooterComponent implements OnInit {
   visibleItems = signal<FooterItem[]>([]);
   overflowItems = signal<FooterItem[]>([]);
 
+  menuAberto = signal<boolean>(false);
+
   ngOnInit(): void {
     const nivel = localStorage.getItem('user_nivel');
     const setor = localStorage.getItem('user_setor');

@@ -15,10 +15,19 @@
 
   <button
     [matMenuTriggerFor]="footerMenu"
+    (menuOpened)="menuAberto.set(true)"
+    (menuClosed)="menuAberto.set(false)"
     class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-all w-16 hover:opacity-100"
   >
-    <mat-icon class="!w-6 !h-6 text-[24px]">menu</mat-icon>
-    <span class="text-[10px] font-bold tracking-wide">Menu</span>
+    <mat-icon
+      class="!w-6 !h-6 text-[24px] transition-transform duration-300 transform"
+      [ngClass]="menuAberto() ? 'rotate-90 scale-110 text-sky-600' : 'rotate-0'"
+    >
+      {{ menuAberto() ? 'close' : 'menu' }}
+    </mat-icon>
+    <span class="text-[10px] font-bold tracking-wide" [ngClass]="menuAberto() ? 'text-sky-600' : ''"
+      >Menu</span
+    >
   </button>
 </footer>
 
