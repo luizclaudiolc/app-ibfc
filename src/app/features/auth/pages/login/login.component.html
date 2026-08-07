@@ -2,10 +2,25 @@
   <div class="w-full max-w-md bg-white rounded-2xl shadow-md p-6 border-0">
     <div class="text-center mb-6">
       <div
-        class="inline-flex items-center justify-center w-16 h-16 bg-sky-100 text-sky-600 rounded-full mb-3 text-3xl"
+        class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl mb-4 shadow-sm border border-slate-100 overflow-hidden"
       >
-        ⛪
+        <img
+          src="/img/logo-ibfc-dark.jpg"
+          alt="Logo da Igreja"
+          class="w-full h-full object-cover"
+          (error)="
+            $any($event.target).style.display = 'none';
+            $any($event.target).nextElementSibling.style.display = 'flex'
+          "
+        />
+
+        <div
+          class="w-full h-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white items-center justify-center text-3xl hidden"
+        >
+          ⛪
+        </div>
       </div>
+
       <h3 class="text-2xl font-bold text-slate-800 tracking-tight">
         Igreja Batista Filadélfia Church
       </h3>
@@ -44,7 +59,7 @@
           matInput
           [type]="esconderSenha() ? 'password' : 'text'"
           formControlName="senha"
-          placeholder="••••••••"
+          placeholder="Sua senha"
           [readonly]="carregando()"
         />
 
