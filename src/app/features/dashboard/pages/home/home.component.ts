@@ -32,10 +32,20 @@ import {
   EVENTOS_MAP,
 } from '../../../../shared/models/consts';
 
+import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
+import { ScrollableCarouselComponent } from '../../../../shared/components/carrossel/scrollable-carousel.component';
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, MaterialModule, PageLayoutComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MaterialModule,
+    PageLayoutComponent,
+    SectionHeaderComponent,
+    ScrollableCarouselComponent,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -56,8 +66,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   membrosRaw = signal<Membro[]>([]);
   termoBusca = signal('');
 
-  currentEscalaIndex = signal<number>(0);
-  currentBirthdayIndex = signal<number>(0);
   currentIndex = signal(0);
 
   @ViewChild('carousel') carousel!: ElementRef;
@@ -135,7 +143,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       if (total > 1) {
         const nextIndex = (this.currentIndex() + 1) % total;
-
         const cardWidth = cards[0].offsetWidth + 16;
         const scrollPos = nextIndex * cardWidth;
 
@@ -185,16 +192,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       .filter(({ voluntarios }) => volTarget.some((v) => voluntarios.toLowerCase().includes(v)))
       .sort((a, b) => a.data_escala.localeCompare(b.data_escala));
   });
-
-  onEscalaScroll(event: Event): void {
-    const container = event.target as HTMLElement;
-    if (!container || container.children.length === 0) return;
-
-    const cardWidth = container.children[0].clientWidth + 16;
-    const scrollLeft = container.scrollLeft;
-
-    this.currentEscalaIndex.set(Math.round(scrollLeft / cardWidth));
-  }
 
   membrosFiltrados = computed(() => {
     const busca = this.termoBusca()
@@ -281,16 +278,5 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
       return;
     }
-  }
-
-  onBirthdayScroll(event: Event): void {
-    const container = event.target as HTMLElement;
-
-    if (!container || container.children.length === 0) return;
-
-    const cardWidth = container.children[0].clientWidth + 16;
-    const scrollLeft = container.scrollLeft;
-
-    this.currentBirthdayIndex.set(Math.round(scrollLeft / cardWidth));
   }
 }

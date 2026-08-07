@@ -9,22 +9,13 @@
     } @else {
       @if (escalasPessoais().length > 0) {
         <section class="space-y-4">
-          <div class="flex items-center justify-between px-1">
-            <div>
-              <h2 class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
-                🗓️ Suas Escalas
-              </h2>
-              <p class="text-sm text-slate-500 mt-1">Seu(s) próximo(s) dia(s) de servir.</p>
-            </div>
-            <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
-              {{ escalasPessoais().length }}
-            </span>
-          </div>
+          <app-section-header
+            title="🗓️ Suas Escalas"
+            subtitle="Seu(s) próximo(s) dia(s) de servir."
+            [badgeText]="escalasPessoais().length"
+          />
 
-          <div
-            (scroll)="onEscalaScroll($event)"
-            class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-2 px-4 -mx-4"
-          >
+          <app-scrollable-carousel [itemCount]="escalasPessoais().length">
             @for (escala of escalasPessoais(); track escala.id) {
               <div
                 class="snap-center shrink-0 transition-all duration-300"
@@ -38,7 +29,6 @@
                   >
                     ⛪
                   </div>
-
                   <div class="flex items-center gap-2 mb-4 relative z-10">
                     <span
                       class="text-[10px] bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full font-bold uppercase tracking-wider"
@@ -46,7 +36,6 @@
                       Você está escalado(a)
                     </span>
                   </div>
-
                   <div class="relative z-10">
                     <h2 class="text-base font-medium text-sky-100 leading-tight mb-0.5">
                       Data:
@@ -58,55 +47,31 @@
                       Evento: {{ eventosMap[escala.evento] || escala.evento }}
                     </p>
                   </div>
-
                   <div
                     class="text-[11px] bg-white/10 backdrop-blur-sm p-3 rounded-xl mt-4 border border-white/10 leading-relaxed relative z-10"
                   >
                     <span
                       class="opacity-75 block font-semibold uppercase tracking-wider text-[9px] mb-1"
+                      >Equipe do dia</span
                     >
-                      Equipe do dia
-                    </span>
                     {{ escala.voluntarios }}
                   </div>
                 </div>
               </div>
             }
-          </div>
-
-          @if (escalasPessoais().length > 1) {
-            <div class="flex justify-center items-center gap-2 mt-1 mb-2">
-              @for (escala of escalasPessoais(); track escala.id; let i = $index) {
-                <div
-                  class="rounded-full transition-all duration-300"
-                  [ngClass]="
-                    i === currentEscalaIndex() ? 'w-8 h-2 bg-sky-600' : 'w-2 h-2 bg-slate-300'
-                  "
-                ></div>
-              }
-            </div>
-          }
+          </app-scrollable-carousel>
         </section>
       }
 
       @if (aniversariantesDaSemana().length > 0) {
         <section class="space-y-4">
-          <div class="flex items-center justify-between px-1">
-            <div>
-              <h2 class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
-                🎂 Aniversariantes da Semana
-              </h2>
-              <p class="text-sm text-slate-500 mt-1">Celebre a vida dos nossos irmãos.</p>
-            </div>
-            <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
-              {{ aniversariantesDaSemana().length }}
-            </span>
-          </div>
+          <app-section-header
+            title="🎂 Aniversariantes da Semana"
+            subtitle="Celebre a vida dos nossos irmãos."
+            [badgeText]="aniversariantesDaSemana().length"
+          />
 
-          <div
-            (scroll)="onBirthdayScroll($event)"
-            class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-2 px-4 -mx-4"
-          >
+          <app-scrollable-carousel [itemCount]="aniversariantesDaSemana().length">
             @for (aniversariante of aniversariantesDaSemana(); track aniversariante.id) {
               <div
                 class="snap-center shrink-0 transition-all duration-300"
@@ -118,13 +83,12 @@
                   <div
                     class="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-sky-50 to-transparent"
                   ></div>
-
                   <div class="relative z-10 w-20 h-20 mb-3">
                     @if (aniversariante.foto_url) {
                       <img
                         [src]="aniversariante.foto_url"
                         class="w-full h-full rounded-full object-cover ring-4 ring-white shadow-sm"
-                        alt="Foto do Aniversariante"
+                        alt="Foto"
                       />
                     } @else {
                       <div
@@ -133,7 +97,6 @@
                         {{ aniversariante.nome[0].toUpperCase() }}
                       </div>
                     }
-
                     @if (ehHoje(aniversariante.data_nascimento)) {
                       <div
                         class="absolute -bottom-2 -right-1 bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full border-2 border-white shadow-md whitespace-nowrap animate-pulse"
@@ -148,7 +111,6 @@
                       </div>
                     }
                   </div>
-
                   <h3 class="text-base font-bold text-slate-800 relative z-10 leading-tight">
                     {{ aniversariante.nome }} {{ aniversariante.sobrenome }}
                   </h3>
@@ -159,7 +121,6 @@
                       O aniversário está chegando! Mande seus parabéns.
                     }
                   </p>
-
                   <button
                     (click)="
                       abrirWhatsApp(
@@ -186,45 +147,16 @@
                 </div>
               </div>
             }
-          </div>
-
-          @if (aniversariantesDaSemana().length > 1) {
-            <div class="flex justify-center items-center gap-2 mt-1 mb-2">
-              @for (
-                aniversariante of aniversariantesDaSemana();
-                track aniversariante.id;
-                let i = $index
-              ) {
-                <div
-                  class="rounded-full transition-all duration-300"
-                  [ngClass]="
-                    i === currentBirthdayIndex() ? 'w-8 h-2 bg-sky-600' : 'w-2 h-2 bg-slate-300'
-                  "
-                ></div>
-              }
-            </div>
-          }
+          </app-scrollable-carousel>
         </section>
       }
 
       <section class="space-y-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
-              Quadro de Avisos
-            </h2>
-
-            <p class="text-sm text-slate-500 mt-1">
-              Fique por dentro dos próximos eventos da igreja.
-            </p>
-          </div>
-
-          @if (avisos().length > 1) {
-            <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
-              {{ currentIndex() + 1 }}/{{ avisos().length }}
-            </span>
-          }
-        </div>
+        <app-section-header
+          title="Quadro de Avisos"
+          subtitle="Fique por dentro dos próximos eventos da igreja."
+          [badgeText]="avisos().length > 1 ? currentIndex() + 1 + '/' + avisos().length : undefined"
+        />
 
         @if (avisos().length > 0) {
           <div
@@ -246,18 +178,15 @@
                     alt="Aviso"
                     class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                   />
-
                   <div
                     class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none"
                   ></div>
-
                   <div
                     class="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-3 py-1.5 shadow-sm"
                   >
-                    <mat-icon class="!text-[18px] !w-[18px] !h-[18px] text-slate-700">
-                      zoom_in
-                    </mat-icon>
-
+                    <mat-icon class="!text-[18px] !w-[18px] !h-[18px] text-slate-700"
+                      >zoom_in</mat-icon
+                    >
                     <span class="text-xs font-semibold text-slate-700"> Ampliar </span>
                   </div>
                 </button>
@@ -284,24 +213,17 @@
             class="rounded-3xl border border-dashed border-slate-200 bg-white py-12 flex flex-col items-center justify-center"
           >
             <mat-icon class="!w-12 !h-12 !text-[48px] text-slate-300 mb-3"> campaign </mat-icon>
-
             <p class="font-semibold text-slate-500">Nenhum aviso disponível</p>
-
             <p class="text-sm text-slate-400 mt-1">Novos avisos aparecerão aqui.</p>
           </div>
         }
       </section>
 
       <section class="space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
-            Membros da Família
-          </h2>
-          <span
-            class="text-xs bg-slate-200/60 text-slate-600 font-semibold px-2 py-0.5 rounded-full text-[10px]"
-            >{{ membrosFiltrados().length }} ativos</span
-          >
-        </div>
+        <app-section-header
+          title="Membros da Família"
+          [badgeText]="membrosFiltrados().length + ' ativos'"
+        />
 
         <div class="relative">
           <input
@@ -336,13 +258,11 @@
                     {{ membro.nome[0].toUpperCase() }}
                   </div>
                 }
-
                 <div class="space-y-0.5">
                   <div class="flex items-center gap-1.5">
                     <h3 class="font-bold text-slate-800 text-sm tracking-tight leading-none">
                       {{ membro.nome }} {{ membro.sobrenome }}
                     </h3>
-
                     @if (membro.email.toLowerCase() === emailUsuario().toLowerCase()) {
                       <span
                         class="bg-sky-50 text-sky-600 font-bold text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider border border-sky-100"
@@ -350,7 +270,6 @@
                       >
                     }
                   </div>
-
                   <p class="text-xs text-slate-500 font-medium">
                     {{ cargosDisponiveis[membro.cargo] || 'Membro' }}
                     @if (membro.setor_responsavel && membro.setor_responsavel !== 'membro') {
@@ -360,7 +279,6 @@
                       }}</span>
                     }
                   </p>
-
                   <div
                     class="flex items-center gap-1 text-[10px] text-slate-400 font-medium pt-0.5"
                   >
