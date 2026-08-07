@@ -1,12 +1,19 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { timer } from 'rxjs';
 import { UsuarioCadastro } from '../../../../shared/models/membro.model';
 import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
+import { NotificationService } from '../../../../core/services/notifications.service';
 
 @Component({
   selector: 'app-cadastro',
@@ -17,9 +24,8 @@ import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
 })
 export class CadastroComponent {
   carregando = signal<boolean>(false);
-  mensagemErro = signal<string>('');
-  mensagemSucesso = signal<string>('');
   esconderSenha = signal(true);
+  esconderConfirmarSenha = signal(true);
 
   previewFoto = signal<string>('');
   arquivoFotoSelecionado: File | null = null;
@@ -27,31 +33,53 @@ export class CadastroComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private notification = inject(NotificationService);
 
   cargosDisponiveis = CARGOS_DISPONIVEIS;
 
-  cadastroForm = this.fb.nonNullable.group({
-    nome: ['', [Validators.required]],
-    sobrenome: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
-    telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
-    cargo: ['membro', [Validators.required]],
-    dataNascimento: ['', [Validators.required]],
-    senha: ['', [Validators.required, Validators.minLength(6)]],
-  });
+  cadastroForm = this.fb.nonNullable.group(
+    {
+      nome: ['', [Validators.required]],
+      sobrenome: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
+      cargo: ['membro', [Validators.required]],
+      dataNascimento: ['', [Validators.required]],
+      senha: ['', [Validators.required, Validators.minLength(6)]],
+      confirmarSenha: ['', [Validators.required]],
+    },
+    { validators: this.validarSenhasIguais },
+  );
+
+  validarSenhasIguais(control: AbstractControl): ValidationErrors | null {
+    const senha = control.get('senha')?.value;
+    const confirmarSenha = control.get('confirmarSenha')?.value;
+    const confirmarCtrl = control.get('confirmarSenha');
+
+    if (senha !== confirmarSenha && confirmarCtrl) {
+      confirmarCtrl.setErrors({ ...confirmarCtrl.errors, senhasDiferentes: true });
+      return { senhasDiferentes: true };
+    }
+
+    if (senha === confirmarSenha && confirmarCtrl?.hasError('senhasDiferentes')) {
+      const erros = { ...confirmarCtrl.errors };
+      delete erros['senhasDiferentes'];
+      confirmarCtrl.setErrors(Object.keys(erros).length > 0 ? erros : null);
+    }
+
+    return null;
+  }
 
   aoSelecionarFoto(event: any): void {
     const arquivo = event.target.files[0];
     if (!arquivo) return;
 
     if (arquivo.size > 2 * 1024 * 1024) {
-      this.mensagemErro.set('A imagem deve ter no máximo 2MB.');
+      this.notification.aviso('A imagem selecionada deve ter no máximo 2MB.');
       return;
     }
 
-    this.mensagemErro.set('');
     this.arquivoFotoSelecionado = arquivo;
-
     const reader = new FileReader();
     reader.onload = () => {
       this.previewFoto.set(reader.result as string);
@@ -62,12 +90,11 @@ export class CadastroComponent {
   submeterCadastro(): void {
     if (this.cadastroForm.invalid) {
       this.cadastroForm.markAllAsTouched();
+      this.notification.aviso('Por favor, preencha todos os campos obrigatórios corretamente.');
       return;
     }
 
     this.carregando.set(true);
-    this.mensagemErro.set('');
-
     this.cadastroForm.disable();
 
     const formValues = this.cadastroForm.getRawValue();
@@ -86,21 +113,23 @@ export class CadastroComponent {
     this.authService.cadastrar(dadosEnvio).subscribe({
       next: (res) => {
         if (res.sucesso) {
-          this.mensagemSucesso.set('Cadastro realizado com sucesso! Redirecionando...');
+          this.notification.sucesso(
+            'Cadastro realizado com sucesso! Redirecionando para o login...',
+          );
           timer(2500).subscribe(() => {
             this.router.navigate(['/login']);
           });
         } else {
-          this.mensagemErro.set(res.mensagem || 'Erro ao realizar cadastro.');
+          this.notification.erro(res.mensagem || 'Erro ao realizar cadastro.');
           this.carregando.set(false);
           this.cadastroForm.enable();
         }
       },
       error: (err) => {
-        this.mensagemErro.set('Erro ao processar o cadastro. Tente novamente.');
+        console.error('Erro de cadastro:', err);
+        this.notification.erro('Erro ao processar o cadastro. Tente novamente mais tarde.');
         this.carregando.set(false);
         this.cadastroForm.enable();
-        console.error(err);
       },
     });
   }

@@ -5,20 +5,6 @@
       <p class="text-slate-500 text-sm mt-0.5">Faça parte da nossa rede interna</p>
     </div>
 
-    @if (mensagemErro() || mensagemSucesso()) {
-      <div
-        class="mb-5 p-3 text-center text-sm rounded-xl border animate-fade-in"
-        [class.bg-red-50]="mensagemErro()"
-        [class.text-red-600]="mensagemErro()"
-        [class.border-red-100]="mensagemErro()"
-        [class.bg-emerald-50]="mensagemSucesso()"
-        [class.text-emerald-600]="mensagemSucesso()"
-        [class.border-emerald-100]="mensagemSucesso()"
-      >
-        {{ mensagemErro() || mensagemSucesso() }}
-      </div>
-    }
-
     <form [formGroup]="cadastroForm" (ngSubmit)="submeterCadastro()" class="space-y-2">
       <div class="flex flex-col items-center mb-4">
         <div
@@ -45,23 +31,21 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Nome</mat-label>
-          <input matInput formControlName="nome" placeholder="Nome" />
-          @if (cadastroForm.controls.nome.hasError('required')) {
-            <mat-error>Obrigatório.</mat-error>
-          }
-        </mat-form-field>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" placeholder="Nome" />
+        @if (cadastroForm.controls.nome.hasError('required')) {
+          <mat-error>Obrigatório.</mat-error>
+        }
+      </mat-form-field>
 
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Sobrenome</mat-label>
-          <input matInput formControlName="sobrenome" placeholder="Sobrenome" />
-          @if (cadastroForm.controls.sobrenome.hasError('required')) {
-            <mat-error>Obrigatório.</mat-error>
-          }
-        </mat-form-field>
-      </div>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Sobrenome</mat-label>
+        <input matInput formControlName="sobrenome" placeholder="Sobrenome" />
+        @if (cadastroForm.controls.sobrenome.hasError('required')) {
+          <mat-error>Obrigatório.</mat-error>
+        }
+      </mat-form-field>
 
       <mat-form-field appearance="outline" class="w-full">
         <mat-label>E-mail</mat-label>
@@ -94,46 +78,71 @@
         </mat-form-field>
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Nascimento</mat-label>
-          <input matInput type="date" formControlName="dataNascimento" />
-          @if (cadastroForm.controls.dataNascimento.hasError('required')) {
-            <mat-error>Obrigatório.</mat-error>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Nascimento</mat-label>
+        <input matInput type="date" formControlName="dataNascimento" />
+        @if (cadastroForm.controls.dataNascimento.hasError('required')) {
+          <mat-error>Obrigatório.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Senha</mat-label>
+        <input
+          matInput
+          [type]="esconderSenha() ? 'password' : 'text'"
+          formControlName="senha"
+          placeholder="Sua senha"
+        />
+        <button
+          type="button"
+          mat-icon-button
+          matSuffix
+          (click)="esconderSenha.set(!esconderSenha())"
+          class="text-slate-400"
+          [disabled]="carregando()"
+        >
+          @if (esconderSenha()) {
+            <mat-icon>visibility_off</mat-icon>
+          } @else {
+            <mat-icon>visibility</mat-icon>
           }
-        </mat-form-field>
+        </button>
+        @if (cadastroForm.controls.senha.hasError('required')) {
+          <mat-error>Obrigatório.</mat-error>
+        } @else if (cadastroForm.controls.senha.hasError('minlength')) {
+          <mat-error>Mínimo 6 caracteres.</mat-error>
+        }
+      </mat-form-field>
 
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Senha</mat-label>
-          <input
-            matInput
-            [type]="esconderSenha() ? 'password' : 'text'"
-            formControlName="senha"
-            placeholder="••••••"
-          />
-
-          <button
-            type="button"
-            mat-icon-button
-            matSuffix
-            (click)="esconderSenha.set(!esconderSenha())"
-            class="text-slate-400"
-            [disabled]="carregando()"
-          >
-            @if (esconderSenha()) {
-              <mat-icon>visibility_off</mat-icon>
-            } @else {
-              <mat-icon>visibility</mat-icon>
-            }
-          </button>
-
-          @if (cadastroForm.controls.senha.hasError('required')) {
-            <mat-error>Obrigatório.</mat-error>
-          } @else if (cadastroForm.controls.senha.hasError('minlength')) {
-            <mat-error>Mínimo 6 caracteres.</mat-error>
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Repetir Senha</mat-label>
+        <input
+          matInput
+          [type]="esconderConfirmarSenha() ? 'password' : 'text'"
+          formControlName="confirmarSenha"
+          placeholder="Repita a senha"
+        />
+        <button
+          type="button"
+          mat-icon-button
+          matSuffix
+          (click)="esconderConfirmarSenha.set(!esconderConfirmarSenha())"
+          class="text-slate-400"
+          [disabled]="carregando()"
+        >
+          @if (esconderConfirmarSenha()) {
+            <mat-icon>visibility_off</mat-icon>
+          } @else {
+            <mat-icon>visibility</mat-icon>
           }
-        </mat-form-field>
-      </div>
+        </button>
+        @if (cadastroForm.controls.confirmarSenha.hasError('required')) {
+          <mat-error>Obrigatório.</mat-error>
+        } @else if (cadastroForm.controls.confirmarSenha.hasError('senhasDiferentes')) {
+          <mat-error>Não coincidem.</mat-error>
+        }
+      </mat-form-field>
 
       <button
         mat-flat-button
