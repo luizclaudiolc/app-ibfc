@@ -20,14 +20,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Criar arquivo de environment de produção
+      - name: Criar arquivo de environment de produção seguro
         run: |
           mkdir -p src/environments
-          echo "export const environment = {" > src/environments/environment.prod.ts
-          echo "  production: true," >> src/environments/environment.prod.ts
-          echo "  supabaseUrl: '${{ secrets.SUPABASEURL }}'," >> src/environments/environment.prod.ts
-          echo "  supabaseKey: '${{ secrets.SUPABASEKEY }}'" >> src/environments/environment.prod.ts
-          echo "};" >> src/environments/environment.prod.ts
+          echo "export const environment = {" > src/environments/environments.prod.ts
+          echo "  production: true," >> src/environments/environments.prod.ts
+          echo "  supabaseUrl: '${{ secrets.SUPABASEURL }}'," >> src/environments/environments.prod.ts
+          echo "  supabaseKey: '${{ secrets.SUPABASEKEY }}'" >> src/environments/environments.prod.ts
+          echo "};" >> src/environments/environments.prod.ts
 
       - name: Build Angular App
         run: npx ng build --configuration production --base-href "/app-ibfc/"
