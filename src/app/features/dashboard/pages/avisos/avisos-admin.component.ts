@@ -7,6 +7,8 @@ import { AvisoService } from '../../../../core/services/aviso.service';
 import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import { Aviso } from '../../../../shared/models/aviso.model';
+import { NotificationService } from '../../../../core/services/notifications.service';
+import { AvisoFormDialogComponent } from './modal/aviso-form-dialog.component';
 
 @Component({
   selector: 'app-avisos-admin',
@@ -21,6 +23,7 @@ export class AvisosAdminComponent implements OnInit {
 
   private avisoService = inject(AvisoService);
   private dialog = inject(MatDialog);
+  private notification = inject(NotificationService);
 
   ngOnInit() {
     this.carregarAvisos();
@@ -35,6 +38,7 @@ export class AvisosAdminComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erro ao buscar avisos', err);
+        this.notification.erro('Não foi possível carregar os avisos.');
         this.carregandoAvisos.set(false);
       },
     });
@@ -47,68 +51,70 @@ export class AvisosAdminComponent implements OnInit {
     const file = input.files[0];
 
     if (file.size > 5 * 1024 * 1024) {
-      this.dialog.open(GenericDialogComponent, {
-        data: {
-          titulo: 'Arquivo muito grande',
-          mensagem: 'A imagem original deve ter no máximo 5MB para otimização do sistema.',
-          textoConfirmar: 'Entendi',
-          tipo: 'info',
-          ocultarCancelar: true,
-        },
-        panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
-        width: '90%',
-        maxWidth: '400px',
-      });
+      this.notification.aviso('A imagem original deve ter no máximo 5MB.');
       input.value = '';
       return;
     }
 
-    try {
-      this.carregandoUpload.set(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const previewUrl = reader.result as string;
 
-      const opcoes = {
-        maxSizeMB: 0.4,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        initialQuality: 0.85,
-      };
-
-      const arquivoComprimido = await imageCompression(file, opcoes);
-
-      const novoAviso = await this.avisoService.criar(arquivoComprimido);
-      this.avisos.update((atual) => [novoAviso, ...atual]);
-    } catch (error) {
-      console.error('Erro no upload ou compressão', error);
-
-      this.dialog.open(GenericDialogComponent, {
-        data: {
-          titulo: 'Falha no Envio',
-          mensagem: 'Não foi possível processar e enviar a imagem. Tente novamente mais tarde.',
-          textoConfirmar: 'Entendi',
-          tipo: 'perigo',
-          ocultarCancelar: true,
-        },
-        panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+      const dialogRef = this.dialog.open(AvisoFormDialogComponent, {
         width: '90%',
-        maxWidth: '400px',
+        maxWidth: '450px',
+        panelClass: ['!p-0', '!rounded-3xl', '!overflow-hidden'],
+        data: { previewUrl },
       });
-    } finally {
-      this.carregandoUpload.set(false);
-      input.value = '';
-    }
+
+      dialogRef.afterClosed().subscribe(async (dadosFormulario) => {
+        if (!dadosFormulario) {
+          input.value = '';
+          return;
+        }
+
+        try {
+          this.carregandoUpload.set(true);
+          this.notification.aviso('Comprimindo e enviando imagem...', 2000);
+
+          const opcoes = {
+            maxSizeMB: 0.6,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            initialQuality: 0.85,
+          };
+
+          const arquivoComprimido = await imageCompression(file, opcoes);
+
+          const novoAviso = await this.avisoService.criar(
+            arquivoComprimido,
+            dadosFormulario.data_evento,
+            dadosFormulario.descricao,
+          );
+
+          this.avisos.update((atual) => [novoAviso, ...atual]);
+          this.notification.sucesso('Novo banner de aviso publicado!');
+        } catch (error) {
+          console.error('Erro no upload ou compressão', error);
+          this.notification.erro('Falha ao processar e enviar o banner. Tente novamente.');
+        } finally {
+          this.carregandoUpload.set(false);
+          input.value = '';
+        }
+      });
+    };
+
+    reader.readAsDataURL(file);
   }
 
   excluirAviso(aviso: Aviso) {
     if (!aviso.id || !aviso.foto_url) return;
 
-    const avisoId = aviso.id;
-    const avisoFotoUrl = aviso.foto_url;
-
     const dialogRef = this.dialog.open(GenericDialogComponent, {
       data: {
-        titulo: 'Excluir Aviso',
+        titulo: 'Excluir Banner',
         mensagem:
-          'Tem certeza que deseja remover este banner? Essa ação não pode ser desfeita e ele sumirá para todos os membros.',
+          'Tem certeza que deseja remover este banner? Ele sumirá imediatamente da tela inicial da rede.',
         textoCancelar: 'Cancelar',
         textoConfirmar: 'Sim, remover',
         tipo: 'perigo',
@@ -121,23 +127,13 @@ export class AvisosAdminComponent implements OnInit {
     dialogRef.afterClosed().subscribe(async (confirmado) => {
       if (confirmado) {
         try {
-          this.avisos.update((atual) => atual.filter((a) => a.id !== avisoId));
-          await this.avisoService.excluir(avisoId, avisoFotoUrl);
+          this.avisos.update((atual) => atual.filter((a) => a.id !== aviso.id));
+
+          await this.avisoService.excluir(aviso.id!, aviso.foto_url);
+          this.notification.sucesso('Banner removido com sucesso.');
         } catch (error) {
           console.error('Erro ao excluir', error);
-
-          this.dialog.open(GenericDialogComponent, {
-            data: {
-              titulo: 'Erro na Exclusão',
-              mensagem: 'Não foi possível excluir o banner. Verifique sua conexão.',
-              textoConfirmar: 'Entendi',
-              tipo: 'perigo',
-              ocultarCancelar: true,
-            },
-            panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
-            width: '90%',
-            maxWidth: '400px',
-          });
+          this.notification.erro('Erro ao excluir o banner no servidor. Tente recarregar.');
           this.carregarAvisos();
         }
       }

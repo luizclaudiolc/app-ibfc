@@ -3,4 +3,6 @@ export interface Aviso {
   foto_url: string;
   autor_id: string;
   created_at?: string;
+  data_evento: string;
+  descricao?: string;
 }
