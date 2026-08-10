@@ -17,7 +17,7 @@ export class AvisoService {
     return from(promise).pipe(map((res) => res.data as Aviso[]));
   }
 
-  async criar(file: File): Promise<Aviso> {
+  async criar(file: File, dataEvento: string, descricao?: string | null): Promise<Aviso> {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `banners/${fileName}`;
@@ -34,9 +34,18 @@ export class AvisoService {
 
     const foto_url = publicUrlData.publicUrl;
 
+    const payloadParaSalvar: any = {
+      foto_url,
+      data_evento: dataEvento,
+    };
+
+    if (descricao && descricao.trim() !== '') {
+      payloadParaSalvar.descricao = descricao.trim();
+    }
+
     const { data, error: dbError } = await this.supabaseService.supabase
       .from('avisos')
-      .insert([{ foto_url }])
+      .insert([payloadParaSalvar])
       .select()
       .single();
 

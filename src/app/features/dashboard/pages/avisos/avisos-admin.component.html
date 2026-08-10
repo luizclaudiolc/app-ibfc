@@ -7,16 +7,23 @@
   <div
     class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden p-4 pt-6 space-y-6"
   >
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5"
+    >
       <div>
-        <h2 class="text-base font-bold text-slate-800 tracking-tight">Banners Ativos</h2>
-        <p class="text-slate-500 text-xs mt-0.5">Formatos suportados: JPG, PNG (máx. 5MB).</p>
+        <h2 class="text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
+          <mat-icon class="text-sky-500 !w-5 !h-5 text-[20px]">collections</mat-icon>
+          Banners Ativos na Home
+        </h2>
+        <p class="text-slate-500 text-xs mt-0.5">
+          Estes banners aparecem rotacionando na tela inicial.
+        </p>
       </div>
 
       <button
         (click)="fileInput.click()"
         [disabled]="carregandoUpload()"
-        class="w-full sm:w-auto px-5 py-2.5 bg-sky-600 text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-sky-700 hover:shadow-md transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+        class="w-full sm:w-auto px-5 py-2.5 bg-sky-600 text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-sky-700 hover:shadow-md transition-all active:scale-95 disabled:opacity-60 disabled:bg-slate-300 flex items-center justify-center gap-2"
       >
         @if (carregandoUpload()) {
           <mat-spinner diameter="18" class="!stroke-white"></mat-spinner>
@@ -30,32 +37,38 @@
       <input
         #fileInput
         type="file"
-        accept="image/*"
+        accept="image/jpeg, image/png"
         class="hidden"
         (change)="onFileSelected($event)"
       />
     </div>
 
     @if (carregandoAvisos()) {
-      <div class="flex justify-center py-12">
-        <mat-spinner diameter="32"></mat-spinner>
+      <div class="flex flex-col items-center justify-center py-16 gap-3 text-slate-500">
+        <mat-spinner diameter="32" class="!stroke-sky-600"></mat-spinner>
+        <p class="text-sm font-medium">Carregando banners...</p>
       </div>
     } @else {
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
         @for (aviso of avisos(); track aviso.id) {
           <div
-            class="relative group bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md"
+            class="relative group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden transition-all hover:shadow-lg hover:border-slate-200 flex flex-col"
           >
-            <div class="relative aspect-video">
+            <div class="relative aspect-[16/10] overflow-hidden">
               <img
                 [src]="aviso.foto_url"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 alt="Banner de Aviso"
               />
 
+              <div
+                class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent"
+              ></div>
+
               <button
                 (click)="excluirAviso(aviso)"
-                class="absolute top-2 right-2 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md text-red-600 font-bold text-[11px] rounded-lg shadow-sm border border-white/20 active:bg-red-500 active:text-white transition-all"
+                class="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md text-red-600 font-bold text-[11px] rounded-lg shadow-sm border border-white/20 hover:bg-red-50 active:bg-red-100 transition-colors z-10"
+                title="Remover este banner"
               >
                 <mat-icon class="!w-4 !h-4 !text-[16px] !leading-[16px] !block"
                   >delete_outline</mat-icon
@@ -63,13 +76,47 @@
                 <span>Remover</span>
               </button>
             </div>
+
+            <div
+              class="p-4 flex flex-col flex-1 justify-between bg-slate-50/50 border-t border-slate-100"
+            >
+              <div
+                class="flex items-center gap-1.5 text-sky-700 font-bold text-xs mb-1.5 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100 self-start shadow-inner"
+              >
+                <mat-icon class="!w-4 !h-4 !text-[16px]">calendar_today</mat-icon>
+
+                <span>Data: {{ aviso.data_evento | date: 'dd/MM/yyyy' : 'UTC' }}</span>
+              </div>
+
+              @if (aviso.descricao) {
+                <p
+                  class="text-slate-700 text-xs mt-1.5 leading-relaxed font-medium line-clamp-2"
+                  [title]="aviso.descricao"
+                >
+                  {{ aviso.descricao }}
+                </p>
+              } @else {
+                <p class="text-slate-400 text-xs mt-1.5 italic font-normal">
+                  Sem descrição informada.
+                </p>
+              }
+            </div>
           </div>
         } @empty {
           <div
-            class="col-span-full text-center py-16 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200"
+            class="col-span-full text-center py-20 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center gap-3"
           >
-            <mat-icon class="text-slate-300 !w-12 !h-12 text-[48px] mb-2">collections</mat-icon>
-            <p class="text-sm font-medium text-slate-500">Nenhum banner cadastrado</p>
+            <div
+              class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200"
+            >
+              <mat-icon class="text-slate-400 !w-8 !h-8 text-[32px]">collections</mat-icon>
+            </div>
+            <p class="text-base font-semibold text-slate-600 tracking-tight mt-1">
+              Nenhum banner cadastrado
+            </p>
+            <p class="text-sm text-slate-500 -mt-1 max-w-xs">
+              Clique em "Novo Banner" acima para adicionar o primeiro aviso rotativo da Home.
+            </p>
           </div>
         }
       </div>
