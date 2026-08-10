@@ -69,7 +69,7 @@
             <div>
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">WhatsApp</p>
               <p class="text-sm font-semibold text-slate-700">
-                {{ formatarTelefone(membro()!.telefone) }}
+                {{ formatarTelefone(membro()!.telefone || '') }}
               </p>
             </div>
           </div>

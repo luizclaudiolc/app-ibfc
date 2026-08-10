@@ -55,7 +55,7 @@ export class SelecionarLiderDialogComponent {
   confirmar() {
     if (this.setorSelecionado && this.membrosSelecionados.length > 0) {
       const requests = this.membrosSelecionados.map((m) =>
-        this.membroService.atualizarSetor(m.id, this.setorSelecionado),
+        this.membroService.atualizarSetor(m.id!, this.setorSelecionado),
       );
 
       forkJoin(requests).subscribe({

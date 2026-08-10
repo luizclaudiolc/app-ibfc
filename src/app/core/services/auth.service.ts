@@ -106,7 +106,8 @@ export class AuthService {
     console.log({ perfil });
 
     localStorage.setItem('user_email', perfil.email);
-    localStorage.setItem('user_nivel', perfil.nivel_acesso);
+
+    localStorage.setItem('user_nivel', perfil.nivel_acesso || ENiveisAcesso.User);
 
     if (perfil.setor_responsavel) {
       localStorage.setItem('user_setor', perfil.setor_responsavel);
@@ -170,13 +171,16 @@ export class AuthService {
           nivel_acesso: ENiveisAcesso.User,
           status: EStatusMembro.ATIVO,
           foto_url: urlDaFoto,
+
+          genero: membro.genero || null,
+          estado_civil: membro.estado_civil || null,
+          nivel_escolaridade: membro.nivel_escolaridade || null,
+          endereco: membro.endereco || null,
         },
       ]);
 
       if (insertError) throw new Error('Erro ao salvar os dados do perfil.');
 
-      // CORREÇÃO: Encerra a sessão automática gerada pelo signUp e limpa o cache local
-      // para evitar que o usuário seja logado automaticamente com dados residuais.
       await this.supabaseService.supabase.auth.signOut();
       this.limparSessaoLocal();
 

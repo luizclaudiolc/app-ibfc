@@ -1,19 +1,24 @@
-import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import {
-  ReactiveFormsModule,
-  FormBuilder,
-  Validators,
   AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
   ValidationErrors,
+  Validators,
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth.service';
-import { MaterialModule } from '../../../../core/modules/material.module';
 import { timer } from 'rxjs';
-import { UsuarioCadastro } from '../../../../shared/models/membro.model';
-import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
+import { MaterialModule } from '../../../../core/modules/material.module';
+import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../../core/services/notifications.service';
+import {
+  CARGOS_DISPONIVEIS,
+  ESCOLARIDADE_MAP,
+  ESTADO_CIVIL_MAP,
+  GENERO_MAP,
+} from '../../../../shared/models/consts';
+import { UsuarioCadastro } from '../../../../shared/models/membro.model';
 
 @Component({
   selector: 'app-cadastro',
@@ -37,6 +42,19 @@ export class CadastroComponent {
 
   cargosDisponiveis = CARGOS_DISPONIVEIS;
 
+  opcoesGenero = Object.entries(GENERO_MAP).map(([value, label]) => ({
+    value: +value,
+    label,
+  }));
+  opcoesEstadoCivil = Object.entries(ESTADO_CIVIL_MAP).map(([value, label]) => ({
+    value: +value,
+    label,
+  }));
+  opcoesEscolaridade = Object.entries(ESCOLARIDADE_MAP).map(([value, label]) => ({
+    value: +value,
+    label,
+  }));
+
   cadastroForm = this.fb.nonNullable.group(
     {
       nome: ['', [Validators.required]],
@@ -45,6 +63,12 @@ export class CadastroComponent {
       telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
       cargo: ['membro', [Validators.required]],
       dataNascimento: ['', [Validators.required]],
+
+      genero: [null as number | null, [Validators.required]],
+      estadoCivil: [null as number | null, [Validators.required]],
+      escolaridade: [null as number | null],
+      endereco: [''],
+
       senha: ['', [Validators.required, Validators.minLength(6)]],
       confirmarSenha: ['', [Validators.required]],
     },
@@ -108,6 +132,11 @@ export class CadastroComponent {
       dataNascimento: formValues.dataNascimento,
       cargo: formValues.cargo,
       foto: this.arquivoFotoSelecionado,
+
+      genero: formValues.genero ? Number(formValues.genero) : undefined,
+      estado_civil: formValues.estadoCivil ? Number(formValues.estadoCivil) : undefined,
+      nivel_escolaridade: formValues.escolaridade ? Number(formValues.escolaridade) : undefined,
+      endereco: formValues.endereco,
     };
 
     this.authService.cadastrar(dadosEnvio).subscribe({

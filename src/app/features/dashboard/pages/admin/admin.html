@@ -106,7 +106,7 @@
                 [ngClass]="
                   membro.status === 'INATIVO'
                     ? 'bg-red-50 text-red-500 border-red-100 opacity-70'
-                    : membro.cargo.toLocaleLowerCase() === 'membro'
+                    : membro.cargo?.toLocaleLowerCase() === 'membro'
                       ? 'bg-slate-50 text-slate-500 border-slate-200'
                       : 'bg-sky-50 text-sky-600 border-sky-100'
                 "

@@ -256,7 +256,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           if (d < hoje) d.setFullYear(anoAtual + 1);
           return d.getTime();
         };
-        return getProxNiver(a.data_nascimento) - getProxNiver(b.data_nascimento);
+        return getProxNiver(a.data_nascimento!) - getProxNiver(b.data_nascimento!);
       });
   });
 

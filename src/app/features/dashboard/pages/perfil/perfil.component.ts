@@ -11,7 +11,12 @@ import { MembroService } from '../../../../core/services/membro.service';
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
-import { CARGOS_DISPONIVEIS } from '../../../../shared/models/consts';
+import {
+  CARGOS_DISPONIVEIS,
+  GENERO_MAP,
+  ESTADO_CIVIL_MAP,
+  ESCOLARIDADE_MAP,
+} from '../../../../shared/models/consts';
 import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
 
 @Component({
@@ -26,15 +31,26 @@ export class PerfilComponent implements OnInit {
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
   private authService = inject(AuthService);
-  private notification = inject(NotificationService); // INJEÇÃO DO SERVIÇO
+  private notification = inject(NotificationService);
 
   carregando = signal<boolean>(false);
   carregandoDados = signal<boolean>(true);
 
-  // REMOVIDOS: mensagemSucesso e mensagemErro
-
   previewFoto = signal<string | null>(this.authService.fotoUsuario$());
   cargosDisponiveis = CARGOS_DISPONIVEIS;
+
+  opcoesGenero = Object.entries(GENERO_MAP).map(([value, label]) => ({
+    value: +value,
+    label,
+  }));
+  opcoesEstadoCivil = Object.entries(ESTADO_CIVIL_MAP).map(([value, label]) => ({
+    value: +value,
+    label,
+  }));
+  opcoesEscolaridade = Object.entries(ESCOLARIDADE_MAP).map(([value, label]) => ({
+    value: +value,
+    label,
+  }));
 
   perfilForm = this.fb.nonNullable.group({
     nome: ['', [Validators.required]],
@@ -43,6 +59,11 @@ export class PerfilComponent implements OnInit {
     telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
     cargo: ['membro', [Validators.required]],
     data_nascimento: ['', [Validators.required]],
+
+    genero: [null as number | null, [Validators.required]],
+    estado_civil: [null as number | null, [Validators.required]],
+    nivel_escolaridade: [null as number | null],
+    endereco: [''],
   });
 
   ngOnInit(): void {
@@ -62,6 +83,12 @@ export class PerfilComponent implements OnInit {
             telefone: res.telefone || '',
             cargo: res.cargo || 'membro',
             data_nascimento: res.data_nascimento || '',
+
+            genero: res.genero !== undefined ? Number(res.genero) : null,
+            estado_civil: res.estado_civil !== undefined ? Number(res.estado_civil) : null,
+            nivel_escolaridade:
+              res.nivel_escolaridade !== undefined ? Number(res.nivel_escolaridade) : null,
+            endereco: res.endereco || '',
           });
         }
         this.carregandoDados.set(false);
@@ -82,9 +109,22 @@ export class PerfilComponent implements OnInit {
     this.carregando.set(true);
     this.perfilForm.disable();
 
-    const formValues: UsuarioAtualizacao = this.perfilForm.getRawValue();
+    const formValues = this.perfilForm.getRawValue();
 
-    this.membroService.atualizarPerfil(formValues).subscribe({
+    const dadosEnvio: UsuarioAtualizacao = {
+      nome: formValues.nome,
+      sobrenome: formValues.sobrenome,
+      telefone: formValues.telefone,
+      cargo: formValues.cargo,
+      data_nascimento: formValues.data_nascimento,
+      genero: formValues.genero !== null ? Number(formValues.genero) : undefined,
+      estado_civil: formValues.estado_civil !== null ? Number(formValues.estado_civil) : undefined,
+      nivel_escolaridade:
+        formValues.nivel_escolaridade !== null ? Number(formValues.nivel_escolaridade) : undefined,
+      endereco: formValues.endereco,
+    };
+
+    this.membroService.atualizarPerfil(dadosEnvio).subscribe({
       next: (res) => {
         this.carregando.set(false);
         this.perfilForm.enable();
@@ -92,8 +132,8 @@ export class PerfilComponent implements OnInit {
 
         if (res.sucesso) {
           this.notification.sucesso('Perfil atualizado com sucesso!');
-          if (formValues.nome && formValues.sobrenome) {
-            this.authService.atualizarNomeGlobal(`${formValues.nome} ${formValues.sobrenome}`);
+          if (dadosEnvio.nome && dadosEnvio.sobrenome) {
+            this.authService.atualizarNomeGlobal(`${dadosEnvio.nome} ${dadosEnvio.sobrenome}`);
           }
         } else {
           this.notification.erro(res.mensagem || 'Erro ao salvar.');

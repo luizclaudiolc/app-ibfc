@@ -64,90 +64,129 @@
           @if (cadastroForm.controls.telefone.hasError('required')) {
             <mat-error>Obrigatório.</mat-error>
           } @else if (cadastroForm.controls.telefone.hasError('pattern')) {
-            <mat-error>Digite 10 ou 11 números.</mat-error>
+            <mat-error>10 ou 11 números.</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Cargo</mat-label>
-          <mat-select formControlName="cargo">
-            @for (item of cargosDisponiveis; track item.value) {
+          <mat-label>Data de Nascimento</mat-label>
+          <input matInput type="date" formControlName="dataNascimento" />
+          @if (cadastroForm.controls.dataNascimento.hasError('required')) {
+            <mat-error>Obrigatório.</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Gênero</mat-label>
+          <mat-select formControlName="genero">
+            @for (item of opcoesGenero; track item.value) {
               <mat-option [value]="item.value">{{ item.label }}</mat-option>
             }
           </mat-select>
+          @if (cadastroForm.controls.genero.hasError('required')) {
+            <mat-error>Obrigatório.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado Civil</mat-label>
+          <mat-select formControlName="estadoCivil">
+            @for (item of opcoesEstadoCivil; track item.value) {
+              <mat-option [value]="item.value">{{ item.label }}</mat-option>
+            }
+          </mat-select>
+          @if (cadastroForm.controls.estadoCivil.hasError('required')) {
+            <mat-error>Obrigatório.</mat-error>
+          }
         </mat-form-field>
       </div>
 
       <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Nascimento</mat-label>
-        <input matInput type="date" formControlName="dataNascimento" />
-        @if (cadastroForm.controls.dataNascimento.hasError('required')) {
-          <mat-error>Obrigatório.</mat-error>
-        }
+        <mat-label>Escolaridade</mat-label>
+        <mat-select formControlName="escolaridade">
+          @for (item of opcoesEscolaridade; track item.value) {
+            <mat-option [value]="item.value">{{ item.label }}</mat-option>
+          }
+        </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Senha</mat-label>
-        <input
-          matInput
-          [type]="esconderSenha() ? 'password' : 'text'"
-          formControlName="senha"
-          placeholder="Sua senha"
-        />
-        <button
-          type="button"
-          mat-icon-button
-          matSuffix
-          (click)="esconderSenha.set(!esconderSenha())"
-          class="text-slate-400"
-          [disabled]="carregando()"
-        >
-          @if (esconderSenha()) {
-            <mat-icon>visibility_off</mat-icon>
-          } @else {
-            <mat-icon>visibility</mat-icon>
+        <mat-label>Escolaridade</mat-label>
+        <mat-select formControlName="escolaridade">
+          @for (esc of opcoesEscolaridade; track esc) {
+            <mat-option [value]="esc">{{ esc }}</mat-option>
           }
-        </button>
-        @if (cadastroForm.controls.senha.hasError('required')) {
-          <mat-error>Obrigatório.</mat-error>
-        } @else if (cadastroForm.controls.senha.hasError('minlength')) {
-          <mat-error>Mínimo 6 caracteres.</mat-error>
-        }
+        </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Repetir Senha</mat-label>
-        <input
-          matInput
-          [type]="esconderConfirmarSenha() ? 'password' : 'text'"
-          formControlName="confirmarSenha"
-          placeholder="Repita a senha"
-        />
-        <button
-          type="button"
-          mat-icon-button
-          matSuffix
-          (click)="esconderConfirmarSenha.set(!esconderConfirmarSenha())"
-          class="text-slate-400"
-          [disabled]="carregando()"
-        >
-          @if (esconderConfirmarSenha()) {
-            <mat-icon>visibility_off</mat-icon>
-          } @else {
-            <mat-icon>visibility</mat-icon>
-          }
-        </button>
-        @if (cadastroForm.controls.confirmarSenha.hasError('required')) {
-          <mat-error>Obrigatório.</mat-error>
-        } @else if (cadastroForm.controls.confirmarSenha.hasError('senhasDiferentes')) {
-          <mat-error>Não coincidem.</mat-error>
-        }
+        <mat-label>Endereço Completo</mat-label>
+        <input matInput formControlName="endereco" placeholder="Rua, Número, Bairro, Cidade" />
       </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Cargo na Igreja</mat-label>
+        <mat-select formControlName="cargo">
+          @for (item of cargosDisponiveis; track item.value) {
+            <mat-option [value]="item.value">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <div class="flex flex-col gap-2 pt-3 border-t border-slate-100">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Senha</mat-label>
+          <input
+            matInput
+            [type]="esconderSenha() ? 'password' : 'text'"
+            formControlName="senha"
+            placeholder="Senha"
+          />
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="esconderSenha.set(!esconderSenha())"
+            class="text-slate-400"
+            [disabled]="carregando()"
+          >
+            <mat-icon>{{ esconderSenha() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (cadastroForm.controls.senha.hasError('minlength')) {
+            <mat-error>Mínimo 6 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Repetir Senha</mat-label>
+          <input
+            matInput
+            [type]="esconderConfirmarSenha() ? 'password' : 'text'"
+            formControlName="confirmarSenha"
+            placeholder="Repetir"
+          />
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="esconderConfirmarSenha.set(!esconderConfirmarSenha())"
+            class="text-slate-400"
+            [disabled]="carregando()"
+          >
+            <mat-icon>{{ esconderConfirmarSenha() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (cadastroForm.controls.confirmarSenha.hasError('senhasDiferentes')) {
+            <mat-error>Não coincidem.</mat-error>
+          }
+        </mat-form-field>
+      </div>
 
       <button
         mat-flat-button
         type="submit"
-        class="w-full !rounded-xl !h-12 !text-sm !font-bold transition-all mt-2"
+        class="w-full !rounded-xl !h-12 !text-sm !font-bold transition-all mt-4"
         [ngClass]="
           carregando() || cadastroForm.invalid
             ? '!bg-slate-200 !text-slate-400'

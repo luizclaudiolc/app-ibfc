@@ -98,6 +98,46 @@
           }
         </mat-form-field>
 
+        <div class="grid grid-cols-2 gap-3">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Gênero</mat-label>
+            <mat-select formControlName="genero">
+              @for (item of opcoesGenero; track item.value) {
+                <mat-option [value]="item.value">{{ item.label }}</mat-option>
+              }
+            </mat-select>
+            @if (perfilForm.controls.genero.hasError('required')) {
+              <mat-error>Obrigatório.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Estado Civil</mat-label>
+            <mat-select formControlName="estado_civil">
+              @for (item of opcoesEstadoCivil; track item.value) {
+                <mat-option [value]="item.value">{{ item.label }}</mat-option>
+              }
+            </mat-select>
+            @if (perfilForm.controls.estado_civil.hasError('required')) {
+              <mat-error>Obrigatório.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Escolaridade</mat-label>
+          <mat-select formControlName="nivel_escolaridade">
+            @for (item of opcoesEscolaridade; track item.value) {
+              <mat-option [value]="item.value">{{ item.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Endereço Completo</mat-label>
+          <input matInput formControlName="endereco" placeholder="Rua, Número, Bairro, Cidade" />
+        </mat-form-field>
+
         <div class="flex gap-3 pt-4">
           <button
             mat-flat-button

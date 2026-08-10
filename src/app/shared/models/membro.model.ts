@@ -1,17 +1,39 @@
-import { NivelAcesso, StatusMembro } from './consts';
+import { EEscolaridade, EEstadoCivil, EGenero, NivelAcesso, StatusMembro } from './consts';
 
-export interface Membro {
-  id: string;
+export interface PerfilBase {
   nome: string;
   sobrenome: string;
+  telefone?: string;
+  cargo?: string;
+  genero?: number;
+  nivel_escolaridade?: number;
+  endereco?: string;
+  estado_civil?: number | string;
+}
+
+export interface Membro extends PerfilBase {
+  id?: string;
   email: string;
-  telefone: string;
-  cargo: string;
-  nivel_acesso: NivelAcesso;
-  status: StatusMembro;
-  data_nascimento: string;
+  data_nascimento?: string;
+  nivel_acesso?: string;
+  status?: string;
   foto_url?: string;
   setor_responsavel?: string;
+}
+
+export interface UsuarioCadastro extends PerfilBase {
+  email: string;
+  senha: string;
+  telefone: string;
+  cargo: string;
+  dataNascimento?: string;
+  foto?: File | null;
+}
+
+export interface UsuarioAtualizacao extends PerfilBase {
+  telefone: string;
+  cargo: string;
+  data_nascimento: string;
 }
 
 export interface MembroAtualizacaoAdmin extends Omit<Membro, 'email' | 'foto_url'> {
@@ -24,23 +46,4 @@ export interface UsuarioLogado {
   email: string;
   nivel: NivelAcesso;
   setorResponsavel?: string;
-}
-
-export interface UsuarioCadastro {
-  nome: string;
-  sobrenome: string;
-  email: string;
-  senha: string;
-  telefone: string;
-  cargo: string;
-  dataNascimento?: string;
-  foto?: File | null;
-}
-
-export interface UsuarioAtualizacao {
-  nome: string;
-  sobrenome: string;
-  telefone: string;
-  cargo: string;
-  data_nascimento: string;
 }

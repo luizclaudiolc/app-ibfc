@@ -47,12 +47,12 @@
               >
                 <app-birthday-card
                   [membro]="aniversariante"
-                  [ehHoje]="ehHoje(aniversariante.data_nascimento)"
+                  [ehHoje]="ehHoje(aniversariante.data_nascimento!)"
                   (enviarMensagem)="
                     abrirWhatsApp(
                       aniversariante.telefone,
                       aniversariante.nome,
-                      aniversariante.data_nascimento
+                      aniversariante.data_nascimento!
                     )
                   "
                 />
@@ -132,7 +132,7 @@
             <app-membro-list-item
               [membro]="membro"
               [isCurrentUser]="membro.email.toLowerCase() === emailUsuario().toLowerCase()"
-              [cargoNome]="cargosDisponiveis[membro.cargo] || 'Membro'"
+              [cargoNome]="cargosDisponiveis[membro.cargo || ''] || 'Membro'"
               [departamentoNome]="
                 membro.setor_responsavel && membro.setor_responsavel !== 'membro'
                   ? departamentos[membro.setor_responsavel]

@@ -89,6 +89,50 @@ export const EVENTOS_MAP: Record<string, string> = {
   OUTRO: 'Outro',
 };
 
+export enum EGenero {
+  MASCULINO = 1,
+  FEMININO = 2,
+}
+
+export enum EEstadoCivil {
+  SOLTEIRO = 1,
+  CASADO = 2,
+  DIVORCIADO = 3,
+  VIUVO = 4,
+}
+
+export enum EEscolaridade {
+  FUNDAMENTAL_INCOMPLETO = 1,
+  FUNDAMENTAL_COMPLETO = 2,
+  MEDIO_INCOMPLETO = 3,
+  MEDIO_COMPLETO = 4,
+  SUPERIOR_INCOMPLETO = 5,
+  SUPERIOR_COMPLETO = 6,
+  POS_GRADUACAO = 7,
+}
+
+export const GENERO_MAP: Record<number, string> = {
+  [EGenero.MASCULINO]: 'Masculino',
+  [EGenero.FEMININO]: 'Feminino',
+};
+
+export const ESTADO_CIVIL_MAP: Record<number, string> = {
+  [EEstadoCivil.SOLTEIRO]: 'Solteiro(a)',
+  [EEstadoCivil.CASADO]: 'Casado(a)',
+  [EEstadoCivil.DIVORCIADO]: 'Divorciado(a)',
+  [EEstadoCivil.VIUVO]: 'Viúvo(a)',
+};
+
+export const ESCOLARIDADE_MAP: Record<number, string> = {
+  [EEscolaridade.FUNDAMENTAL_INCOMPLETO]: 'Ensino Fundamental Incompleto',
+  [EEscolaridade.FUNDAMENTAL_COMPLETO]: 'Ensino Fundamental Completo',
+  [EEscolaridade.MEDIO_INCOMPLETO]: 'Ensino Médio Incompleto',
+  [EEscolaridade.MEDIO_COMPLETO]: 'Ensino Médio Completo',
+  [EEscolaridade.SUPERIOR_INCOMPLETO]: 'Ensino Superior Incompleto',
+  [EEscolaridade.SUPERIOR_COMPLETO]: 'Ensino Superior Completo',
+  [EEscolaridade.POS_GRADUACAO]: 'Pós-graduação',
+};
+
 export const GRADIENTES_PASTEIS = [
   'bg-gradient-to-r from-red-200 to-orange-200',
   'bg-gradient-to-r from-orange-200 to-amber-200',
