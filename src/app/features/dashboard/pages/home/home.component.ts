@@ -86,6 +86,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   eventosMap = EVENTOS_MAP;
 
   ngOnInit(): void {
+    console.log('To aqui!!!');
+
     this.carregarTodosOsDados();
     this.setupScrollSync();
     this.startAutoScroll();
