@@ -12,6 +12,7 @@ import { EscalaService } from '../../../../../core/services/escala.service';
 import { Escala } from '../../../../../shared/models/escala.model';
 import { PageLayoutComponent } from '../../../../../shared/components/page-layout/page-layout.component';
 import { AuthService } from '../../../../../core/services/auth.service';
+import { NotificationService } from '../../../../../core/services/notifications.service';
 
 @Component({
   selector: 'app-escalas',
@@ -20,7 +21,11 @@ import { AuthService } from '../../../../../core/services/auth.service';
   templateUrl: './escalas.component.html',
 })
 export class EscalasComponent implements OnInit {
+  private readonly notificationService = inject(NotificationService);
   private authService = inject(AuthService);
+  private escalaService = inject(EscalaService);
+  private dialog = inject(MatDialog);
+
   nivelUsuario = this.authService.obterUsuarioLogado().nivel;
 
   getSetorValido(): string | null {
@@ -55,12 +60,9 @@ export class EscalasComponent implements OnInit {
     return this.dataAtual().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   });
 
-  private escalaService = inject(EscalaService);
-  private dialog = inject(MatDialog);
-
   ngOnInit() {
     this.gerarCalendario(this.dataAtual());
-    this.carregarEscalasMes(this.dataAtual());
+    this.carregarEscalasMes();
   }
 
   obterNomeDepartamento(valor: string): string {
@@ -111,21 +113,24 @@ export class EscalasComponent implements OnInit {
     );
     this.dataAtual.set(novaData);
     this.gerarCalendario(novaData);
-    this.carregarEscalasMes(novaData);
+    this.carregarEscalasMes();
   }
 
-  carregarEscalasMes(data: Date) {
-    this.escalaService.buscarTodas().subscribe({
+  carregarEscalasMes() {
+    this.escalaService.buscarTodas(false).subscribe({
       next: (escalasDoBanco) => {
         const escalasVisiveis = this.isAdmin()
           ? escalasDoBanco
-          : escalasDoBanco.filter(({ departamento }) => departamento === this.setorUsuario);
+          : this.setorUsuario
+            ? escalasDoBanco.filter(({ departamento }) => departamento === this.setorUsuario)
+            : [];
 
         this.escalasRaw.set(escalasVisiveis);
         this.distribuirEscalasNosDias(escalasVisiveis);
       },
       error: (err) => {
-        console.error('Erro ao buscar escalas do Supabase:', err);
+        this.notificationService.erro('Erro ao carregar escalas. Por favor, tente novamente.');
+        console.error('Erro ao carregar escalas', err);
       },
     });
   }
@@ -168,7 +173,7 @@ export class EscalasComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((resultado) => {
       if (resultado?.sucesso) {
-        this.carregarEscalasMes(this.dataAtual());
+        this.carregarEscalasMes();
       }
     });
   }

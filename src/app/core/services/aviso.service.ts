@@ -9,10 +9,19 @@ export class AvisoService {
   private bucketName = 'avisos';
 
   buscarTodos(): Observable<Aviso[]> {
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    const dataAtual = `${ano}-${mes}-${dia}`;
+
     const promise = this.supabaseService.supabase
       .from('avisos')
       .select('*')
-      .order('created_at', { ascending: false });
+
+      .gte('data_evento', dataAtual)
+
+      .order('data_evento', { ascending: true });
 
     return from(promise).pipe(map((res) => res.data as Aviso[]));
   }
