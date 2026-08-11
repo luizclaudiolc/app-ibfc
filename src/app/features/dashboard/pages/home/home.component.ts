@@ -288,7 +288,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     const mensagem = `Olá ${nome}, parabéns pelo seu aniversário! É um prazer tê-lo(a) como parte da nossa Igreja. Que seu dia seja repleto de alegria e bênçãos!`;
-    const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
+    const url = `https://wa.me/55${telefone}?text=${encodeURIComponent(mensagem)}`;
     window.open(url, '_blank');
   }
 }
