@@ -20,6 +20,7 @@ import {
   GENERO_MAP,
 } from '../../../../shared/models/consts';
 import { UsuarioCadastro } from '../../../../shared/models/membro.model';
+import { CepService } from '../../../../core/services/busca-cep.service';
 
 @Component({
   selector: 'app-cadastro',
@@ -44,7 +45,7 @@ export class CadastroComponent {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
-  private http = inject(HttpClient);
+  private buscacepService = inject(CepService);
 
   cargosDisponiveis = CARGOS_DISPONIVEIS;
 
@@ -107,11 +108,11 @@ export class CadastroComponent {
     if (cep && cep.length === 8) {
       this.buscandoCep.set(true);
 
-      this.http.get(`https://viacep.com.br/ws/${cep}/json/`).subscribe({
-        next: (dados: any) => {
+      this.buscacepService.buscarCep(cep).subscribe({
+        next: (dados) => {
           this.buscandoCep.set(false);
 
-          if (!dados.erro) {
+          if (dados && !dados.erro) {
             this.cadastroForm.patchValue({
               logradouro: dados.logradouro,
               bairro: dados.bairro,

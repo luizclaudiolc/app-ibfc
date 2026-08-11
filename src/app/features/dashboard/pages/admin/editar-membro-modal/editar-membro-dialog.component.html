@@ -38,7 +38,7 @@
     }
   </ng-container>
 
-  <form [formGroup]="editForm" class="space-y-4">
+  <form [formGroup]="editForm" class="space-y-4 pt-2">
     <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/60">
       <h3 class="text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-3">
         Controle de Acesso
@@ -93,7 +93,7 @@
 
     <div class="pt-2">
       <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">
-        Dados Pessoais
+        Dados Pessoais & Demográficos
       </h3>
       <div class="grid grid-cols-2 gap-3">
         <mat-form-field appearance="outline" class="w-full">
@@ -111,23 +111,104 @@
           }
         </mat-form-field>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Data de Nascimento</mat-label>
           <input matInput type="date" formControlName="data_nascimento" />
-          @if (editForm.controls.data_nascimento.hasError('required')) {
-            <mat-error>Obrigatório.</mat-error>
-          }
         </mat-form-field>
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>WhatsApp</mat-label>
           <input matInput type="tel" formControlName="telefone" placeholder="24 999999999" />
-          @if (editForm.controls.telefone.hasError('required')) {
-            <mat-error>Obrigatório.</mat-error>
-          } @else if (editForm.controls.telefone.hasError('pattern')) {
+          @if (editForm.controls.telefone.hasError('pattern')) {
             <mat-error>Formato inválido.</mat-error>
           }
         </mat-form-field>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Gênero</mat-label>
+          <mat-select formControlName="genero">
+            @for (item of opcoesGenero; track item.value) {
+              <mat-option [value]="item.value">{{ item.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado Civil</mat-label>
+          <mat-select formControlName="estado_civil">
+            @for (item of opcoesEstadoCivil; track item.value) {
+              <mat-option [value]="item.value">{{ item.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Escolaridade</mat-label>
+        <mat-select formControlName="nivel_escolaridade">
+          @for (item of opcoesEscolaridade; track item.value) {
+            <mat-option [value]="item.value">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="pt-2 mt-2 border-t border-slate-100">
+      <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">
+        Endereço
+      </h3>
+      <div class="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 space-y-2">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>CEP</mat-label>
+          <input
+            matInput
+            formControlName="cep"
+            placeholder="00000000"
+            maxlength="9"
+            (blur)="consultarCep()"
+          />
+          <mat-icon matSuffix class="text-slate-400">search</mat-icon>
+          @if (buscandoCep()) {
+            <div matSuffix class="mr-3 ml-2 flex items-center justify-center">
+              <mat-spinner diameter="18"></mat-spinner>
+            </div>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Logradouro</mat-label>
+          <input matInput formControlName="logradouro" />
+        </mat-form-field>
+
+        <div class="grid grid-cols-2 gap-3">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Número</mat-label>
+            <input matInput formControlName="numero" id="numero_endereco_admin" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Complemento</mat-label>
+            <input matInput formControlName="complemento" placeholder="Apto, Casa 2..." />
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Bairro</mat-label>
+          <input matInput formControlName="bairro" />
+        </mat-form-field>
+
+        <div class="grid grid-cols-[2fr_1fr] gap-3">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Cidade</mat-label>
+            <input matInput formControlName="cidade" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>UF</mat-label>
+            <input matInput formControlName="uf" maxlength="2" class="uppercase" />
+          </mat-form-field>
+        </div>
       </div>
     </div>
   </form>

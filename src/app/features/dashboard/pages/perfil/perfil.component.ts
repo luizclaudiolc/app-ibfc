@@ -18,6 +18,7 @@ import {
   ESCOLARIDADE_MAP,
 } from '../../../../shared/models/consts';
 import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
+import { CepService } from '../../../../core/services/busca-cep.service';
 
 @Component({
   selector: 'app-perfil',
@@ -32,9 +33,11 @@ export class PerfilComponent implements OnInit {
   private dialog = inject(MatDialog);
   private authService = inject(AuthService);
   private notification = inject(NotificationService);
+  private cepService = inject(CepService);
 
   carregando = signal<boolean>(false);
   carregandoDados = signal<boolean>(true);
+  buscandoCep = signal<boolean>(false);
 
   previewFoto = signal<string | null>(this.authService.fotoUsuario$());
   cargosDisponiveis = CARGOS_DISPONIVEIS;
@@ -63,7 +66,14 @@ export class PerfilComponent implements OnInit {
     genero: [null as number | null, [Validators.required]],
     estado_civil: [null as number | null, [Validators.required]],
     nivel_escolaridade: [null as number | null],
-    endereco: [''],
+
+    cep: [''],
+    logradouro: [''],
+    numero: [''],
+    complemento: [''],
+    bairro: [''],
+    cidade: [''],
+    uf: [''],
   });
 
   ngOnInit(): void {
@@ -76,6 +86,15 @@ export class PerfilComponent implements OnInit {
     this.membroService.buscarMeuPerfil().subscribe({
       next: (res) => {
         if (res) {
+          let objEndereco: any = {};
+          if (res.endereco) {
+            try {
+              objEndereco = JSON.parse(res.endereco);
+            } catch (error) {
+              objEndereco = { logradouro: res.endereco };
+            }
+          }
+
           this.perfilForm.patchValue({
             nome: res.nome || '',
             sobrenome: res.sobrenome || '',
@@ -84,11 +103,23 @@ export class PerfilComponent implements OnInit {
             cargo: res.cargo || 'membro',
             data_nascimento: res.data_nascimento || '',
 
-            genero: res.genero !== undefined ? Number(res.genero) : null,
-            estado_civil: res.estado_civil !== undefined ? Number(res.estado_civil) : null,
+            genero: res.genero !== undefined && res.genero !== null ? Number(res.genero) : null,
+            estado_civil:
+              res.estado_civil !== undefined && res.estado_civil !== null
+                ? Number(res.estado_civil)
+                : null,
             nivel_escolaridade:
-              res.nivel_escolaridade !== undefined ? Number(res.nivel_escolaridade) : null,
-            endereco: res.endereco || '',
+              res.nivel_escolaridade !== undefined && res.nivel_escolaridade !== null
+                ? Number(res.nivel_escolaridade)
+                : null,
+
+            cep: objEndereco.cep || '',
+            logradouro: objEndereco.logradouro || '',
+            numero: objEndereco.numero || '',
+            complemento: objEndereco.complemento || '',
+            bairro: objEndereco.bairro || '',
+            cidade: objEndereco.cidade || '',
+            uf: objEndereco.uf || '',
           });
         }
         this.carregandoDados.set(false);
@@ -98,6 +129,37 @@ export class PerfilComponent implements OnInit {
         this.carregandoDados.set(false);
       },
     });
+  }
+
+  consultarCep() {
+    const cep = this.perfilForm.get('cep')?.value;
+
+    if (cep && cep.replace(/\D/g, '').length === 8) {
+      this.buscandoCep.set(true);
+
+      this.cepService.buscarCep(cep).subscribe({
+        next: (dados) => {
+          this.buscandoCep.set(false);
+
+          if (dados && !dados.erro) {
+            this.perfilForm.patchValue({
+              logradouro: dados.logradouro,
+              bairro: dados.bairro,
+              cidade: dados.localidade,
+              uf: dados.uf,
+            });
+
+            document.getElementById('numero_endereco_perfil')?.focus();
+          } else {
+            this.notification.aviso('CEP não encontrado. Verifique o número digitado.');
+          }
+        },
+        error: () => {
+          this.buscandoCep.set(false);
+          this.notification.erro('Erro ao consultar o CEP. Preencha manualmente.');
+        },
+      });
+    }
   }
 
   salvarAlteracoes(): void {
@@ -111,6 +173,19 @@ export class PerfilComponent implements OnInit {
 
     const formValues = this.perfilForm.getRawValue();
 
+    const objEndereco = {
+      cep: formValues.cep,
+      logradouro: formValues.logradouro,
+      numero: formValues.numero,
+      complemento: formValues.complemento,
+      bairro: formValues.bairro,
+      cidade: formValues.cidade,
+      uf: formValues.uf,
+    };
+
+    const enderecoString =
+      formValues.logradouro || formValues.cep ? JSON.stringify(objEndereco) : undefined;
+
     const dadosEnvio: UsuarioAtualizacao = {
       nome: formValues.nome,
       sobrenome: formValues.sobrenome,
@@ -121,7 +196,7 @@ export class PerfilComponent implements OnInit {
       estado_civil: formValues.estado_civil !== null ? Number(formValues.estado_civil) : undefined,
       nivel_escolaridade:
         formValues.nivel_escolaridade !== null ? Number(formValues.nivel_escolaridade) : undefined,
-      endereco: formValues.endereco,
+      endereco: enderecoString,
     };
 
     this.membroService.atualizarPerfil(dadosEnvio).subscribe({
