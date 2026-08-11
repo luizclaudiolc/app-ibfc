@@ -11,7 +11,11 @@
         <section class="space-y-4">
           <app-section-header
             title="🗓️ Suas Escalas"
-            subtitle="Seu(s) próximo(s) dia(s) de servir."
+            subtitle="{{
+              escalasPessoais().length > 1
+                ? 'Confira seus próximos dias de servir.'
+                : 'Confira seu próximo dia de servir.'
+            }}"
             [badgeText]="escalasPessoais().length"
           />
 
@@ -35,7 +39,11 @@
         <section class="space-y-4">
           <app-section-header
             title="🎂 Aniversariantes da Semana"
-            subtitle="Celebre a vida dos nossos irmãos."
+            subtitle="{{
+              aniversariantesDaSemana().length > 1
+                ? 'Celebre a vida dos nossos irmãos.'
+                : 'Celebre a vida do nosso irmão(ã).'
+            }}"
             [badgeText]="aniversariantesDaSemana().length"
           />
 
@@ -111,6 +119,7 @@
       <section class="space-y-3">
         <app-section-header
           title="Membros da Família"
+          subtitle="Encontre irmãos, líderes e ministérios."
           [badgeText]="membrosFiltrados().length + ' ativos'"
         />
 

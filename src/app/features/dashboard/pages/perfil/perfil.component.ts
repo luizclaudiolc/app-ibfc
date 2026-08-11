@@ -210,6 +210,10 @@ export class PerfilComponent implements OnInit {
           if (dadosEnvio.nome && dadosEnvio.sobrenome) {
             this.authService.atualizarNomeGlobal(`${dadosEnvio.nome} ${dadosEnvio.sobrenome}`);
           }
+
+          if (dadosEnvio.genero !== undefined) {
+            this.authService.atualizarGeneroGlobal(dadosEnvio.genero);
+          }
         } else {
           this.notification.erro(res.mensagem || 'Erro ao salvar.');
         }

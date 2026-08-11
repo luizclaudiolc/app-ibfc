@@ -13,6 +13,17 @@ export enum EStatusMembro {
   INATIVO = 'INATIVO',
 }
 
+export type Genero = 'Masculino' | 'Feminino';
+export type EstadoCivil = 'Solteiro(a)' | 'Casado(a)' | 'Divorciado(a)' | 'Viúvo(a)';
+export type Escolaridade =
+  | 'Ensino Fundamental Incompleto'
+  | 'Ensino Fundamental Completo'
+  | 'Ensino Médio Incompleto'
+  | 'Ensino Médio Completo'
+  | 'Ensino Superior Incompleto'
+  | 'Ensino Superior Completo'
+  | 'Pós-graduação';
+
 export const CARGOS_DISPONIVEIS = [
   { label: 'Membro', value: 'membro' },
   { label: 'Pastor', value: 'pastor' },
@@ -111,19 +122,19 @@ export enum EEscolaridade {
   POS_GRADUACAO = 7,
 }
 
-export const GENERO_MAP: Record<number, string> = {
+export const GENERO_MAP: Record<number, Genero> = {
   [EGenero.MASCULINO]: 'Masculino',
   [EGenero.FEMININO]: 'Feminino',
 };
 
-export const ESTADO_CIVIL_MAP: Record<number, string> = {
+export const ESTADO_CIVIL_MAP: Record<number, EstadoCivil> = {
   [EEstadoCivil.SOLTEIRO]: 'Solteiro(a)',
   [EEstadoCivil.CASADO]: 'Casado(a)',
   [EEstadoCivil.DIVORCIADO]: 'Divorciado(a)',
   [EEstadoCivil.VIUVO]: 'Viúvo(a)',
 };
 
-export const ESCOLARIDADE_MAP: Record<number, string> = {
+export const ESCOLARIDADE_MAP: Record<number, Escolaridade> = {
   [EEscolaridade.FUNDAMENTAL_INCOMPLETO]: 'Ensino Fundamental Incompleto',
   [EEscolaridade.FUNDAMENTAL_COMPLETO]: 'Ensino Fundamental Completo',
   [EEscolaridade.MEDIO_INCOMPLETO]: 'Ensino Médio Incompleto',

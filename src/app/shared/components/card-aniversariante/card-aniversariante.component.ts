@@ -1,6 +1,8 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, inject, input, OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Membro } from '../../models/membro.model';
+import { GENERO_MAP } from '../../models/consts';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-birthday-card',
@@ -48,7 +50,7 @@ import { Membro } from '../../models/membro.model';
 
       <p class="text-xs text-slate-500 mt-2 mb-5 relative z-10 leading-relaxed">
         @if (ehHoje()) {
-          Deixe o dia do(a) nosso(a) irmão(ã) mais feliz com uma mensagem!
+          {{ this.saudacao() }}
         } @else {
           O aniversário está chegando! Mande seus parabéns.
         }
@@ -77,6 +79,24 @@ import { Membro } from '../../models/membro.model';
 export class CardAniversarianteComponent {
   membro = input.required<Membro>();
   ehHoje = input.required<boolean>();
-
   enviarMensagem = output<void>();
+
+  private readonly authService = inject(AuthService);
+  private readonly userGenero = this.authService.userGenero$;
+
+  saudacao = computed(() => {
+    const generoId = this.membro()?.genero;
+
+    const generoText = generoId != null ? GENERO_MAP[generoId] : null;
+
+    if (generoText === 'Masculino') {
+      return 'Deixe o dia do nosso irmão mais feliz com uma mensagem!';
+    }
+
+    if (generoText === 'Feminino') {
+      return 'Deixe o dia da nossa irmã mais feliz com uma mensagem!';
+    }
+
+    return 'Deixe o dia do nosso irmão(a) mais feliz com uma mensagem!';
+  });
 }

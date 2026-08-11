@@ -21,6 +21,9 @@ export class AuthService {
 
   fotoUsuario$ = signal<string | null>(localStorage.getItem('user_foto'));
   nomeUsuario$ = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
+  userGenero$ = signal<number | null>(
+    localStorage.getItem('user_genero') ? Number(localStorage.getItem('user_genero')) : null,
+  );
 
   constructor() {
     this.iniciarObservadorDeSessao();
@@ -54,6 +57,7 @@ export class AuthService {
   }
 
   atualizarGeneroGlobal(genero: number | null): void {
+    this.userGenero$.set(genero);
     if (genero !== null) {
       localStorage.setItem('user_genero', genero.toString());
     } else {
