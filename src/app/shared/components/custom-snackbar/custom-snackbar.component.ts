@@ -21,14 +21,16 @@ export interface SnackbarData {
         'bg-amber-600': data.tipo === 'aviso',
       }"
     >
-      <div class="flex items-center gap-3 flex-1 min-w-0">
-        <mat-icon class="shrink-0 !w-6 !h-6 !text-[24px]">
+      <div class="flex items-start gap-3 flex-1 min-w-0">
+        <mat-icon class="shrink-0 !w-6 !h-6 !text-[24px] mt-0.5">
           {{
             data.tipo === 'sucesso' ? 'check_circle' : data.tipo === 'erro' ? 'error' : 'warning'
           }}
         </mat-icon>
 
-        <span class="font-semibold text-sm leading-snug tracking-tight truncate">
+        <span
+          class="font-semibold text-sm leading-snug tracking-tight whitespace-normal break-words"
+        >
           {{ data.mensagem }}
         </span>
       </div>
@@ -36,7 +38,7 @@ export interface SnackbarData {
       <button
         type="button"
         (click)="snackBarRef.dismiss()"
-        class="shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white ml-2"
+        class="shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white ml-2 self-start mt-0.5"
       >
         <mat-icon class="!w-4 !h-4 !text-[16px] leading-none flex items-center justify-center"
           >close</mat-icon
