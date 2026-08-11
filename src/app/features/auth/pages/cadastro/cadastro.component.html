@@ -105,7 +105,7 @@
         <div class="grid grid-cols-2 gap-3 animate-fade-in">
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Nascimento</mat-label>
-            <input matInput type="date" formControlName="dataNascimento" />
+            <input matInput type="date" formControlName="dataNascimento" placeholder="11/11/2011" />
             @if (cadastroForm.controls.dataNascimento.hasError('required')) {
               <mat-error>Obrigatório.</mat-error>
             }
