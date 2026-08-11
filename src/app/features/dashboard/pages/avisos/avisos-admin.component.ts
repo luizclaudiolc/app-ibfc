@@ -26,12 +26,13 @@ export class AvisosAdminComponent implements OnInit {
   private notification = inject(NotificationService);
 
   ngOnInit() {
+    this.verificarEExecutarLimpezaMensal();
     this.carregarAvisos();
   }
 
   carregarAvisos() {
     this.carregandoAvisos.set(true);
-    this.avisoService.buscarTodos().subscribe({
+    this.avisoService.buscarTodos(false).subscribe({
       next: (dados) => {
         this.avisos.set(dados);
         this.carregandoAvisos.set(false);
@@ -138,5 +139,26 @@ export class AvisosAdminComponent implements OnInit {
         }
       }
     });
+  }
+
+  async verificarEExecutarLimpezaMensal() {
+    const hoje = new Date();
+    const diaAtual = hoje.getDate();
+    const mesAtual = hoje.getMonth();
+    const anoAtual = hoje.getFullYear();
+
+    if (diaAtual > 7) return;
+
+    const chaveLocalStorage = `limpeza_avisos_${mesAtual}_${anoAtual}`;
+    const limpezaJaExecutada = localStorage.getItem(chaveLocalStorage);
+
+    if (limpezaJaExecutada) return;
+
+    const resultado = await this.avisoService.limparAvisosPassados();
+
+    if (resultado.sucesso) {
+      localStorage.setItem(chaveLocalStorage, 'true');
+      console.log('Rotina mensal de limpeza de avisos executada com sucesso.');
+    }
   }
 }

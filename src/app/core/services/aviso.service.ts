@@ -8,22 +8,27 @@ export class AvisoService {
   private supabaseService = inject(SupabaseService);
   private bucketName = 'avisos';
 
-  buscarTodos(): Observable<Aviso[]> {
-    const hoje = new Date();
-    const ano = hoje.getFullYear();
-    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-    const dia = String(hoje.getDate()).padStart(2, '0');
-    const dataAtual = `${ano}-${mes}-${dia}`;
-
-    const promise = this.supabaseService.supabase
+  /**
+   * Busca os avisos cadastrados.
+   * @param somenteFuturos Se `true` (padrão), traz apenas eventos de hoje em diante. Se `false`, traz todos.
+   */
+  buscarTodos(somenteFuturos: boolean = true): Observable<Aviso[]> {
+    let query = this.supabaseService.supabase
       .from('avisos')
       .select('*')
-
-      .gte('data_evento', dataAtual)
-
       .order('data_evento', { ascending: true });
 
-    return from(promise).pipe(map((res) => res.data as Aviso[]));
+    if (somenteFuturos) {
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoje.getDate()).padStart(2, '0');
+      const dataAtual = `${ano}-${mes}-${dia}`;
+
+      query = query.gte('data_evento', dataAtual);
+    }
+
+    return from(query).pipe(map((res) => res.data as Aviso[]));
   }
 
   async criar(file: File, dataEvento: string, descricao?: string | null): Promise<Aviso> {
@@ -75,5 +80,65 @@ export class AvisoService {
     if (dbError) throw dbError;
 
     await this.supabaseService.supabase.storage.from(this.bucketName).remove([filePath]);
+  }
+
+  async limparAvisosPassados(): Promise<{ sucesso: boolean; mensagem?: string }> {
+    try {
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+      const primeiroDiaMesAtual = `${ano}-${mes}-01`;
+
+      const { data: avisosAntigos, error: erroBusca } = await this.supabaseService.supabase
+        .from('avisos')
+        .select('id, foto_url')
+        .lt('data_evento', primeiroDiaMesAtual);
+
+      if (erroBusca) throw erroBusca;
+
+      if (!avisosAntigos || avisosAntigos.length === 0) {
+        return { sucesso: true, mensagem: 'Nenhum aviso antigo para limpar.' };
+      }
+
+      const pathsParaRemover: string[] = [];
+      const idsParaApagar: string[] = [];
+
+      for (const aviso of avisosAntigos) {
+        idsParaApagar.push(aviso.id);
+        if (aviso.foto_url) {
+          try {
+            const urlParts = aviso.foto_url.split('/');
+            const fileName = urlParts.pop()?.split('?')[0];
+            if (fileName) {
+              pathsParaRemover.push(`banners/${fileName}`);
+            }
+          } catch (e) {
+            console.error('Erro ao processar URL da foto do aviso:', aviso.foto_url);
+          }
+        }
+      }
+
+      const { error: erroDelete } = await this.supabaseService.supabase
+        .from('avisos')
+        .delete()
+        .in('id', idsParaApagar);
+
+      if (erroDelete) throw erroDelete;
+
+      if (pathsParaRemover.length > 0) {
+        const { error: erroStorage } = await this.supabaseService.supabase.storage
+          .from(this.bucketName)
+          .remove(pathsParaRemover);
+
+        if (erroStorage) {
+          console.error('Erro ao remover arquivos físicos do Storage:', erroStorage);
+        }
+      }
+
+      return { sucesso: true, mensagem: 'Avisos passados e arquivos limpos com sucesso!' };
+    } catch (error: any) {
+      console.error('Erro ao limpar avisos antigos:', error);
+      return { sucesso: false, mensagem: error.message };
+    }
   }
 }
