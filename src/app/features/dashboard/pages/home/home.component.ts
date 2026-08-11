@@ -66,7 +66,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
 
   nomeUsuario = this.authService.nomeUsuario$;
-  emailUsuario = signal<string>(localStorage.getItem('user_email') || '');
+  emailUsuario = signal<string>(this.authService.obterUsuarioLogado().email || '');
   carregando = signal(true);
 
   avisos = signal<Aviso[]>([]);

@@ -11,6 +11,7 @@ import { EscalaDialogComponent } from '../criar-escala-modal/escala-dialog.compo
 import { EscalaService } from '../../../../../core/services/escala.service';
 import { Escala } from '../../../../../shared/models/escala.model';
 import { PageLayoutComponent } from '../../../../../shared/components/page-layout/page-layout.component';
+import { AuthService } from '../../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-escalas',
@@ -19,10 +20,11 @@ import { PageLayoutComponent } from '../../../../../shared/components/page-layou
   templateUrl: './escalas.component.html',
 })
 export class EscalasComponent implements OnInit {
-  nivelUsuario = localStorage.getItem('user_nivel') || 'MEMBRO';
+  private authService = inject(AuthService);
+  nivelUsuario = this.authService.obterUsuarioLogado().nivel;
 
   getSetorValido(): string | null {
-    const setor = localStorage.getItem('user_setor');
+    const setor = this.authService.obterUsuarioLogado().setor;
     return setor === 'null' || setor === 'undefined' || !setor ? null : setor;
   }
   setorUsuario = this.getSetorValido();

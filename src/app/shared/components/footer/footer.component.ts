@@ -30,8 +30,7 @@ export class FooterComponent implements OnInit {
   menuAberto = signal<boolean>(false);
 
   ngOnInit(): void {
-    const nivel = localStorage.getItem('user_nivel');
-    const setor = localStorage.getItem('user_setor');
+    const { nivel, setor } = this.authService.obterUsuarioLogado();
 
     const isAdmin = nivel === ENiveisAcesso.Admin;
     const isLider = setor && setor !== 'null' && setor !== 'undefined' && setor !== 'membro';

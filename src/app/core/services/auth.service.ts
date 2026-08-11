@@ -26,6 +26,19 @@ export class AuthService {
     this.iniciarObservadorDeSessao();
   }
 
+  obterUsuarioLogado() {
+    const generoStr = localStorage.getItem('user_genero');
+
+    return {
+      email: localStorage.getItem('user_email'),
+      nome: localStorage.getItem('user_nome'),
+      nivel: localStorage.getItem('user_nivel'),
+      setor: localStorage.getItem('user_setor'),
+      fotoUrl: localStorage.getItem('user_foto'),
+      genero: generoStr && generoStr !== '' ? Number(generoStr) : null,
+    };
+  }
+
   atualizarFotoGlobal(url: string | null): void {
     this.fotoUsuario$.set(url);
     if (url) {
@@ -38,6 +51,14 @@ export class AuthService {
   atualizarNomeGlobal(nome: string): void {
     this.nomeUsuario$.set(nome);
     localStorage.setItem('user_nome', nome);
+  }
+
+  atualizarGeneroGlobal(genero: number | null): void {
+    if (genero !== null) {
+      localStorage.setItem('user_genero', genero.toString());
+    } else {
+      localStorage.removeItem('user_genero');
+    }
   }
 
   private iniciarObservadorDeSessao() {
@@ -62,9 +83,11 @@ export class AuthService {
     localStorage.removeItem('user_nivel');
     localStorage.removeItem('user_setor');
     localStorage.removeItem('user_foto');
+    localStorage.removeItem('user_genero');
 
     this.fotoUsuario$.set(null);
     this.nomeUsuario$.set('Irmão(ã)');
+    this.atualizarGeneroGlobal(null);
   }
 
   login(email: string, senha: string): Observable<RespostaLogin> {
@@ -106,8 +129,8 @@ export class AuthService {
     console.log({ perfil });
 
     localStorage.setItem('user_email', perfil.email);
-
     localStorage.setItem('user_nivel', perfil.nivel_acesso || ENiveisAcesso.User);
+    localStorage.setItem('user_genero', perfil.genero?.toString() || '');
 
     if (perfil.setor_responsavel) {
       localStorage.setItem('user_setor', perfil.setor_responsavel);
@@ -117,6 +140,7 @@ export class AuthService {
 
     this.atualizarNomeGlobal(`${perfil.nome} ${perfil.sobrenome}`);
     this.atualizarFotoGlobal(perfil.foto_url || null);
+    this.atualizarGeneroGlobal(perfil.genero || null);
   }
 
   cadastrar(membro: UsuarioCadastro): Observable<{ sucesso: boolean; mensagem: string }> {
