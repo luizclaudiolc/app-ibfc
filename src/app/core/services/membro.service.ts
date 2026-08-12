@@ -101,7 +101,6 @@ export class MembroService {
     nivel_escolaridade,
     endereco,
     pedido_oracao,
-    total_oracoes,
   }: UsuarioAtualizacao): Promise<{ sucesso: boolean; mensagem?: string }> {
     try {
       const {
@@ -109,21 +108,26 @@ export class MembroService {
       } = await this.supabaseService.supabase.auth.getUser();
       if (!user) throw new Error('Usuário não encontrado.');
 
+      const payloadParaSalvar: any = {
+        nome,
+        sobrenome,
+        telefone,
+        cargo,
+        data_nascimento,
+        genero: genero ?? null,
+        estado_civil: estado_civil ?? null,
+        nivel_escolaridade: nivel_escolaridade ?? null,
+        endereco: endereco || null,
+        pedido_oracao: pedido_oracao || null,
+      };
+
+      if (!pedido_oracao || pedido_oracao.trim() === '') {
+        payloadParaSalvar.total_oracoes = 0;
+      }
+
       const { error } = await this.supabaseService.supabase
         .from('membros')
-        .update({
-          nome,
-          sobrenome,
-          telefone,
-          cargo,
-          data_nascimento,
-          genero: genero ?? null,
-          estado_civil: estado_civil ?? null,
-          nivel_escolaridade: nivel_escolaridade ?? null,
-          endereco: endereco || null,
-          pedido_oracao: pedido_oracao || null,
-          total_oracoes: total_oracoes ?? 0,
-        })
+        .update(payloadParaSalvar)
         .eq('id', user.id);
 
       if (error) throw error;

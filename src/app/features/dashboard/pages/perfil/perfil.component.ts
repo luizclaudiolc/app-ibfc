@@ -308,6 +308,11 @@ export class PerfilComponent implements OnInit {
     });
   }
 
+  limparPedidoOracao(): void {
+    this.perfilForm.controls.pedido_oracao.setValue('');
+    this.perfilForm.markAsDirty();
+  }
+
   cancelar(): void {
     this.router.navigate(['dashboard/home']);
   }

@@ -201,9 +201,30 @@
             placeholder="Compartilhe um pedido de oração com a comunidade..."
             maxlength="160"
           ></textarea>
-          <mat-icon matSuffix class="text-sky-500">volunteer_activism</mat-icon>
+
+          @if (perfilForm.controls.pedido_oracao.value) {
+            <button
+              type="button"
+              mat-icon-button
+              matSuffix
+              (click)="limparPedidoOracao()"
+              title="Apagar pedido"
+              class="text-slate-400 hover:text-red-500 transition-colors mr-1"
+            >
+              <mat-icon class="!w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
+                >delete_outline</mat-icon
+              >
+            </button>
+          } @else {
+            <mat-icon
+              matSuffix
+              class="text-sky-500 mr-2 !w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
+              >volunteer_activism</mat-icon
+            >
+          }
+
           <mat-hint align="end" class="text-xs font-medium"
-            >{{ perfilForm.controls.pedido_oracao.value.length }}/160</mat-hint
+            >{{ perfilForm.controls.pedido_oracao.value.length || 0 }}/160</mat-hint
           >
         </mat-form-field>
 
