@@ -17,23 +17,38 @@ export interface AvisoFormDialogData {
     <app-dialog-layout title="Novo Banner / Aviso">
       <div
         dialog-icon
-        class="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100"
+        class="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100 shadow-sm"
       >
-        <mat-icon class="!w-6 !h-6 text-[24px]">add_photo_alternate</mat-icon>
+        <mat-icon class="!w-[24px] !h-[24px] !text-[24px] !leading-none overflow-visible">
+          add_photo_alternate
+        </mat-icon>
       </div>
 
-      <form [formGroup]="form" class="space-y-4">
+      <form [formGroup]="form" class="space-y-4 pt-2">
         <div
-          class="aspect-video rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 mb-4 shadow-inner relative"
+          class="aspect-[16/10] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 mb-4 shadow-sm relative group"
         >
-          <img [src]="data.previewUrl" class="w-full h-full object-cover" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          <span class="absolute bottom-3 left-4 text-white text-xs font-medium">Prévia</span>
+          <img
+            [src]="data.previewUrl"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"
+          ></div>
+
+          <div class="absolute bottom-3 left-4 flex items-center gap-1.5 text-white/90">
+            <mat-icon class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible"
+              >visibility</mat-icon
+            >
+            <span class="text-xs font-bold uppercase tracking-wider pt-[1px]">Prévia</span>
+          </div>
         </div>
 
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Data do Evento</mat-label>
           <input matInput type="date" formControlName="data_evento" />
+
           <mat-icon matSuffix class="text-slate-400">calendar_today</mat-icon>
           @if (form.controls.data_evento.hasError('required')) {
             <mat-error>A data do evento é obrigatória.</mat-error>
@@ -49,7 +64,9 @@ export interface AvisoFormDialogData {
             placeholder="Ex: Culto especial de celebração, reunião geral, etc."
             maxlength="150"
           ></textarea>
-          <mat-hint align="end">{{ form.controls.descricao.value.length }}/150</mat-hint>
+          <mat-hint align="end" class="text-xs font-medium"
+            >{{ form.controls.descricao.value.length }}/150</mat-hint
+          >
         </mat-form-field>
       </form>
 

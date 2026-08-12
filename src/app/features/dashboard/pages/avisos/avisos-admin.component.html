@@ -12,8 +12,11 @@
     >
       <div>
         <h2 class="text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
-          <mat-icon class="text-sky-500 !w-5 !h-5 text-[20px]">collections</mat-icon>
-          Banners Ativos na Home
+          <mat-icon
+            class="text-sky-500 !w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
+            >collections</mat-icon
+          >
+          <span class="pt-[1px]">Banners Ativos na Home</span>
         </h2>
         <p class="text-slate-500 text-xs mt-0.5">
           Estes banners aparecem rotacionando na tela inicial.
@@ -27,10 +30,12 @@
       >
         @if (carregandoUpload()) {
           <mat-spinner diameter="18" class="!stroke-white"></mat-spinner>
-          <span>Enviando...</span>
+          <span class="pt-[1px]">Enviando...</span>
         } @else {
-          <mat-icon class="!w-5 !h-5 !text-[20px] !leading-[20px]">add_photo_alternate</mat-icon>
-          <span>Novo Banner</span>
+          <mat-icon class="!w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
+            >add_photo_alternate</mat-icon
+          >
+          <span class="pt-[1px]">Novo Banner</span>
         }
       </button>
 
@@ -67,13 +72,13 @@
 
               <button
                 (click)="excluirAviso(aviso)"
-                class="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md text-red-600 font-bold text-[11px] rounded-lg shadow-sm border border-white/20 hover:bg-red-50 active:bg-red-100 transition-colors z-10"
+                class="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md text-red-600 font-bold text-[10px] uppercase tracking-wider rounded-lg shadow-sm border border-white/20 hover:bg-red-50 active:bg-red-100 transition-colors z-10"
                 title="Remover este banner"
               >
-                <mat-icon class="!w-4 !h-4 !text-[16px] !leading-[16px] !block"
+                <mat-icon class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible"
                   >delete_outline</mat-icon
                 >
-                <span>Remover</span>
+                <span class="pt-[1px]">Remover</span>
               </button>
             </div>
 
@@ -81,22 +86,25 @@
               class="p-4 flex flex-col flex-1 justify-between bg-slate-50/50 border-t border-slate-100"
             >
               <div
-                class="flex items-center gap-1.5 text-sky-700 font-bold text-xs mb-1.5 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100 self-start shadow-inner"
+                class="flex items-center gap-1.5 text-sky-700 font-bold text-[10px] uppercase tracking-wider mb-2 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100 self-start shadow-sm"
               >
-                <mat-icon class="!w-4 !h-4 !text-[16px]">calendar_today</mat-icon>
-
-                <span>Data: {{ aviso.data_evento | date: 'dd/MM/yyyy' : 'UTC' }}</span>
+                <mat-icon class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
+                  >calendar_today</mat-icon
+                >
+                <span class="pt-[1px]"
+                  >Data: {{ aviso.data_evento | date: 'dd/MM/yyyy' : 'UTC' }}</span
+                >
               </div>
 
               @if (aviso.descricao) {
                 <p
-                  class="text-slate-700 text-xs mt-1.5 leading-relaxed font-medium line-clamp-2"
+                  class="text-slate-600 text-xs mt-1 leading-relaxed font-medium line-clamp-2"
                   [title]="aviso.descricao"
                 >
                   {{ aviso.descricao }}
                 </p>
               } @else {
-                <p class="text-slate-400 text-xs mt-1.5 italic font-normal">
+                <p class="text-slate-400 text-xs mt-1 italic font-normal">
                   Sem descrição informada.
                 </p>
               }
@@ -107,11 +115,14 @@
             class="col-span-full text-center py-20 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center gap-3"
           >
             <div
-              class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200"
+              class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 shadow-sm"
             >
-              <mat-icon class="text-slate-400 !w-8 !h-8 text-[32px]">collections</mat-icon>
+              <mat-icon
+                class="text-slate-400 !w-[32px] !h-[32px] !text-[32px] !leading-none overflow-visible"
+                >collections</mat-icon
+              >
             </div>
-            <p class="text-base font-semibold text-slate-600 tracking-tight mt-1">
+            <p class="text-base font-semibold text-slate-700 tracking-tight mt-1">
               Nenhum banner cadastrado
             </p>
             <p class="text-sm text-slate-500 -mt-1 max-w-xs">

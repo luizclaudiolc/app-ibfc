@@ -40,21 +40,21 @@ export class FooterComponent implements OnInit {
     const podeAcessarAvisos = isAdmin || !!isLiderMidia;
 
     const allItems: FooterItem[] = [
-      { label: 'Início', icon: '🏠', route: '/dashboard/home', exact: true },
+      { label: 'Início', icon: 'home', route: '/dashboard/home', exact: true },
     ];
 
     if (podeAcessarEscalas) {
-      allItems.push({ label: 'Escalas', icon: '📅', route: '/dashboard/escala' });
+      allItems.push({ label: 'Escalas', icon: 'calendar_month', route: '/dashboard/escala' });
     }
 
     if (podeAcessarAvisos) {
-      allItems.push({ label: 'Avisos', icon: '📢', route: '/dashboard/avisos' });
+      allItems.push({ label: 'Avisos', icon: 'campaign', route: '/dashboard/avisos' });
     }
 
-    allItems.push({ label: 'Perfil', icon: '👤', route: '/dashboard/perfil' });
+    allItems.push({ label: 'Perfil', icon: 'person', route: '/dashboard/perfil' });
 
     if (isAdmin) {
-      allItems.push({ label: 'Membros', icon: '🛠️', route: '/dashboard/admin' });
+      allItems.push({ label: 'Membros', icon: 'manage_accounts', route: '/dashboard/admin' });
     }
 
     this.visibleItems.set(allItems.slice(0, 3));

@@ -30,6 +30,7 @@ import {
   CARGOS_DISPONIVEIS_MAP,
   DEPARTAMENTOS_DISPONIVEIS_MAP,
   EVENTOS_MAP,
+  GENERO_MAP,
 } from '../../../../shared/models/consts';
 
 import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
@@ -270,8 +271,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
   }
 
-  abrirWhatsApp(telefone: string | undefined, nome: string, dataNascimento: string): void {
-    if (!telefone) {
+  abrirWhatsApp(aniversariante: Membro): void {
+    if (!aniversariante.telefone) {
       this.dialog.open(GenericDialogComponent, {
         data: {
           titulo: 'Sem Contato',
@@ -287,8 +288,16 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const mensagem = `Olá ${nome}, parabéns pelo seu aniversário! É um prazer tê-lo(a) como parte da nossa Igreja. Que seu dia seja repleto de alegria e bênçãos!`;
-    const url = `https://wa.me/55${telefone}?text=${encodeURIComponent(mensagem)}`;
+    const generoId = aniversariante.genero;
+    const generoText = generoId != null ? GENERO_MAP[generoId] : null;
+
+    let pronome = 'tê-lo(a)';
+    if (generoText === 'Masculino') pronome = 'tê-lo';
+    if (generoText === 'Feminino') pronome = 'tê-la';
+
+    const mensagem = `Olá ${aniversariante.nome}, parabéns pelo seu aniversário! É um prazer ${pronome} como parte da nossa Igreja. Que seu dia seja repleto de alegria e bênçãos de nosso Senhor!`;
+    const url = `https://wa.me/55${aniversariante.telefone}?text=${encodeURIComponent(mensagem)}`;
+
     window.open(url, '_blank');
   }
 }

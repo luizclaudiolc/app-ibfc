@@ -1,5 +1,5 @@
 <app-page-layout>
-  <div class="space-y-6">
+  <div class="space-y-8 pb-4">
     @if (carregando()) {
       <div class="space-y-4 animate-pulse">
         <div class="h-24 bg-slate-200 rounded-2xl"></div>
@@ -8,9 +8,10 @@
       </div>
     } @else {
       @if (escalasPessoais().length > 0) {
-        <section class="space-y-4">
+        <section class="space-y-3">
           <app-section-header
-            title="🗓️ Suas Escalas"
+            title="Suas Escalas"
+            icon="event_available"
             subtitle="{{
               escalasPessoais().length > 1
                 ? 'Confira seus próximos dias de servir.'
@@ -36,9 +37,10 @@
       }
 
       @if (aniversariantesDaSemana().length > 0) {
-        <section class="space-y-4">
+        <section class="space-y-3">
           <app-section-header
-            title="🎂 Aniversariantes da Semana"
+            title="Aniversariantes da Semana"
+            icon="cake"
             subtitle="{{
               aniversariantesDaSemana().length > 1
                 ? 'Celebre a vida dos nossos irmãos.'
@@ -56,13 +58,7 @@
                 <app-birthday-card
                   [membro]="aniversariante"
                   [ehHoje]="ehHoje(aniversariante.data_nascimento!)"
-                  (enviarMensagem)="
-                    abrirWhatsApp(
-                      aniversariante.telefone,
-                      aniversariante.nome,
-                      aniversariante.data_nascimento!
-                    )
-                  "
+                  (enviarMensagem)="abrirWhatsApp(aniversariante)"
                 />
               </div>
             }
@@ -70,9 +66,10 @@
         </section>
       }
 
-      <section class="space-y-4">
+      <section class="space-y-3">
         <app-section-header
           title="Quadro de Avisos"
+          icon="campaign"
           subtitle="Fique por dentro dos próximos eventos da igreja."
           [badgeText]="avisos().length > 1 ? currentIndex() + 1 + '/' + avisos().length : undefined"
         />
@@ -99,7 +96,7 @@
                   [ngClass]="
                     i === currentIndex() % avisos().length
                       ? 'w-8 h-2 bg-sky-600'
-                      : 'w-2 h-2 bg-slate-300'
+                      : 'w-2 h-2 bg-slate-200'
                   "
                 ></div>
               }
@@ -119,21 +116,24 @@
       <section class="space-y-3">
         <app-section-header
           title="Membros da Família"
+          icon="groups"
           subtitle="Encontre irmãos, líderes e ministérios."
           [badgeText]="membrosFiltrados().length + ' ativos'"
         />
 
-        <div class="relative">
+        <div class="relative mt-1">
           <input
             type="text"
             (input)="termoBusca.set($any($event.target).value)"
             placeholder="Pesquisar irmão, líder ou ministério..."
-            class="w-full pl-5 pr-12 py-3 text-sm bg-white border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/5 transition-all shadow-sm placeholder-slate-400"
+            class="w-full pl-5 pr-12 py-3 text-sm bg-white border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm placeholder-slate-400"
           />
-          <span
-            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-base"
-            >🔍</span
+
+          <mat-icon
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none w-5 h-5 flex justify-center items-center"
           >
+            search
+          </mat-icon>
         </div>
 
         <div class="space-y-2.5">

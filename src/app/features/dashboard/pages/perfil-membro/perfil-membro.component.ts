@@ -72,6 +72,31 @@ export class PerfilMembroComponent implements OnInit {
     return tel.replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3');
   }
 
+  formatarDataHumanizada(dataStr: string | undefined): string {
+    if (!dataStr) return 'Não informado';
+    const partes = dataStr.split('-');
+    if (partes.length !== 3) return dataStr;
+
+    const meses = [
+      'Janeiro',
+      'Fevereiro',
+      'Março',
+      'Abril',
+      'Maio',
+      'Junho',
+      'Julho',
+      'Agosto',
+      'Setembro',
+      'Outubro',
+      'Novembro',
+      'Dezembro',
+    ];
+    const dia = parseInt(partes[2], 10);
+    const mes = parseInt(partes[1], 10) - 1;
+
+    return `${dia} de ${meses[mes]}`;
+  }
+
   abrirFoto(url: any, nome: string): void {
     if (!url) return;
     this.dialog.open(ImagePreviewDialogComponent, {

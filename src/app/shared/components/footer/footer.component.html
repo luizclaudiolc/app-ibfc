@@ -1,14 +1,14 @@
 <footer
-  class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50 px-2 py-2 flex justify-around items-center max-w-xl mx-auto pb-safe"
+  class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50 px-2 py-1.5 flex justify-around items-center max-w-xl mx-auto pb-safe"
 >
   @for (item of visibleItems(); track item.route) {
     <a
       [routerLink]="item.route"
       routerLinkActive="text-sky-600 opacity-100"
       [routerLinkActiveOptions]="{ exact: !!item.exact }"
-      class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-all w-16 hover:opacity-80"
+      class="flex flex-col items-center gap-1 focus:outline-none text-slate-400 opacity-60 transition-all w-16 hover:opacity-100 py-1"
     >
-      <span class="text-[22px] leading-tight">{{ item.icon }}</span>
+      <mat-icon class="!w-6 !h-6 text-[24px]">{{ item.icon }}</mat-icon>
       <span class="text-[10px] font-bold tracking-wide">{{ item.label }}</span>
     </a>
   }
@@ -17,7 +17,7 @@
     [matMenuTriggerFor]="footerMenu"
     (menuOpened)="menuAberto.set(true)"
     (menuClosed)="menuAberto.set(false)"
-    class="flex flex-col items-center gap-0.5 focus:outline-none text-slate-400 opacity-50 transition-all w-16 hover:opacity-100"
+    class="flex flex-col items-center gap-1 focus:outline-none text-slate-400 opacity-60 transition-all w-16 hover:opacity-100 py-1"
   >
     <mat-icon
       class="!w-6 !h-6 text-[24px] transition-transform duration-300 transform"
@@ -31,10 +31,10 @@
   </button>
 </footer>
 
-<mat-menu #footerMenu="matMenu" yPosition="above" class="rounded-2xl mb-2">
+<mat-menu #footerMenu="matMenu" yPosition="above" class="rounded-2xl mb-2 min-w-[200px]">
   @for (overflow of overflowItems(); track overflow.route) {
-    <a mat-menu-item [routerLink]="overflow.route">
-      <span class="mr-3 text-lg">{{ overflow.icon }}</span>
+    <a mat-menu-item [routerLink]="overflow.route" class="flex items-center">
+      <mat-icon class="text-slate-500 mr-2">{{ overflow.icon }}</mat-icon>
       <span class="font-medium text-slate-700">{{ overflow.label }}</span>
     </a>
   }
