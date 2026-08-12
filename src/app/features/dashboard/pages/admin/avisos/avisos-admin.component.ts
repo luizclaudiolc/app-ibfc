@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import imageCompression from 'browser-image-compression';
-import { MaterialModule } from '../../../../core/modules/material.module';
-import { AvisoService } from '../../../../core/services/aviso.service';
-import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
-import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
-import { Aviso } from '../../../../shared/models/aviso.model';
-import { NotificationService } from '../../../../core/services/notifications.service';
+import { MaterialModule } from '../../../../../core/modules/material.module';
+import { AvisoService } from '../../../../../core/services/aviso.service';
+import { GenericDialogComponent } from '../../../../../shared/components/modal-generico/modal-generico.component';
+import { PageLayoutComponent } from '../../../../../shared/components/page-layout/page-layout.component';
+import { Aviso } from '../../../../../shared/models/aviso.model';
+import { NotificationService } from '../../../../../core/services/notifications.service';
 import { AvisoFormDialogComponent } from './modal/aviso-form-dialog.component';
 
 @Component({

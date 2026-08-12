@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaterialModule } from '../../../../../core/modules/material.module';
-import { DialogLayoutComponent } from '../../../../../shared/components/layout-modal/dialog-layout.component';
+import { MaterialModule } from '../../../../../../core/modules/material.module';
+import { DialogLayoutComponent } from '../../../../../../shared/components/layout-modal/dialog-layout.component';
 
 export interface AvisoFormDialogData {
   previewUrl: string;

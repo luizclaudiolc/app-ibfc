@@ -41,6 +41,7 @@ export class FooterComponent implements OnInit {
 
     const allItems: FooterItem[] = [
       { label: 'Início', icon: 'home', route: '/dashboard/home', exact: true },
+      { label: 'Estudos', icon: 'menu_book', route: '/dashboard/estudos' },
     ];
 
     if (podeAcessarEscalas) {
@@ -55,6 +56,11 @@ export class FooterComponent implements OnInit {
 
     if (isAdmin) {
       allItems.push({ label: 'Membros', icon: 'manage_accounts', route: '/dashboard/admin' });
+      allItems.push({
+        label: 'Ger. Estudos',
+        icon: 'library_books',
+        route: '/dashboard/admin/estudos',
+      });
     }
 
     this.visibleItems.set(allItems.slice(0, 3));

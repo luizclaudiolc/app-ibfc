@@ -42,8 +42,25 @@ export const routes: Routes = [
       {
         path: 'avisos',
         loadComponent: () =>
-          import('./features/dashboard/pages/avisos/avisos-admin.component').then(
+          import('./features/dashboard/pages/admin/avisos/avisos-admin.component').then(
             (c) => c.AvisosAdminComponent,
+          ),
+      },
+
+      {
+        path: 'estudos',
+        loadComponent: () =>
+          import('./features/dashboard/pages/estudos/estudos.component').then(
+            (c) => c.EstudosComponent,
+          ),
+      },
+
+      {
+        path: 'admin/estudos',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/pages/admin/estudos/estudos-admin.component').then(
+            (c) => c.EstudosAdminComponent,
           ),
       },
       {
