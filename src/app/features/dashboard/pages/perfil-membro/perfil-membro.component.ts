@@ -54,6 +54,8 @@ export class PerfilMembroComponent implements OnInit {
       next: (dados) => {
         if (dados) {
           this.membro.set(dados);
+
+          this.verificarStatusOracaoLocal(dados.id!, dados.total_oracoes || 0);
         } else {
           this.erro.set(true);
         }
@@ -116,6 +118,8 @@ export class PerfilMembroComponent implements OnInit {
 
     this.jaOrou.set(true);
 
+    this.salvarOracaoLocal(membroAtual.id);
+
     const totalAtual = membroAtual.total_oracoes || 0;
     this.membro.update((mef) => (mef ? { ...mef, total_oracoes: totalAtual + 1 } : null));
 
@@ -125,15 +129,46 @@ export class PerfilMembroComponent implements OnInit {
           this.notification.sucesso('Sua intercessão foi registrada. Deus abençoe!');
         } else {
           this.jaOrou.set(false);
+          this.removerOracaoLocal(membroAtual.id!);
           this.membro.update((mef) => (mef ? { ...mef, total_oracoes: totalAtual } : null));
           this.notification.erro('Não foi possível registrar a oração no momento.');
         }
       },
       error: () => {
         this.jaOrou.set(false);
+        this.removerOracaoLocal(membroAtual.id!);
         this.membro.update((mef) => (mef ? { ...mef, total_oracoes: totalAtual } : null));
         this.notification.erro('Erro de comunicação ao registrar a oração.');
       },
     });
+  }
+
+  private verificarStatusOracaoLocal(membroId: string, totalOracoesBanco: number): void {
+    const oracoesSalvas = JSON.parse(localStorage.getItem('oracoes_realizadas') || '[]');
+
+    if (totalOracoesBanco === 0) {
+      const novaLista = oracoesSalvas.filter((id: string) => id !== membroId);
+      localStorage.setItem('oracoes_realizadas', JSON.stringify(novaLista));
+      this.jaOrou.set(false);
+      return;
+    }
+
+    if (oracoesSalvas.includes(membroId)) {
+      this.jaOrou.set(true);
+    }
+  }
+
+  private salvarOracaoLocal(membroId: string): void {
+    const oracoesSalvas = JSON.parse(localStorage.getItem('oracoes_realizadas') || '[]');
+    if (!oracoesSalvas.includes(membroId)) {
+      oracoesSalvas.push(membroId);
+      localStorage.setItem('oracoes_realizadas', JSON.stringify(oracoesSalvas));
+    }
+  }
+
+  private removerOracaoLocal(membroId: string): void {
+    const oracoesSalvas = JSON.parse(localStorage.getItem('oracoes_realizadas') || '[]');
+    const novaLista = oracoesSalvas.filter((id: string) => id !== membroId);
+    localStorage.setItem('oracoes_realizadas', JSON.stringify(novaLista));
   }
 }
