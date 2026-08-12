@@ -55,7 +55,7 @@ export class EditarMembroDialogComponent {
 
   niveisAcesso = [
     { label: 'Administrador (Acesso Total)', value: 'ADMIN' as NivelAcesso },
-    { label: 'Membro', value: 'MEMBRO' as NivelAcesso },
+    { label: 'Básico', value: 'MEMBRO' as NivelAcesso },
   ];
 
   statusOpcoes = [
@@ -102,18 +102,16 @@ export class EditarMembroDialogComponent {
       status: [this.data.status, [Validators.required]],
 
       genero: [
-        this.data.genero !== undefined && this.data.genero !== null
-          ? Number(this.data.genero)
-          : null,
+        this.data.genero !== undefined && this.data.genero !== null ? +this.data.genero : null,
       ],
       estado_civil: [
         this.data.estado_civil !== undefined && this.data.estado_civil !== null
-          ? Number(this.data.estado_civil)
+          ? +this.data.estado_civil
           : null,
       ],
       nivel_escolaridade: [
         this.data.nivel_escolaridade !== undefined && this.data.nivel_escolaridade !== null
-          ? Number(this.data.nivel_escolaridade)
+          ? +this.data.nivel_escolaridade
           : null,
       ],
 
@@ -198,10 +196,10 @@ export class EditarMembroDialogComponent {
       nivel_acesso: formValues.nivel_acesso,
       status: formValues.status,
 
-      genero: formValues.genero !== null ? Number(formValues.genero) : null,
-      estado_civil: formValues.estado_civil !== null ? Number(formValues.estado_civil) : null,
+      genero: formValues.genero !== null ? +formValues.genero : null,
+      estado_civil: formValues.estado_civil !== null ? +formValues.estado_civil : null,
       nivel_escolaridade:
-        formValues.nivel_escolaridade !== null ? Number(formValues.nivel_escolaridade) : null,
+        formValues.nivel_escolaridade !== null ? +formValues.nivel_escolaridade : null,
       endereco: enderecoString,
 
       remover_foto: this.fotoParaRemover(),
@@ -214,6 +212,7 @@ export class EditarMembroDialogComponent {
         }
 
         this.dialogRef.close({ sucesso: true, dadosAtualizados });
+        this.notification.sucesso('Membro atualizado com sucesso!');
       },
       error: (err) => {
         console.error('Erro ao atualizar membro:', err);
