@@ -55,4 +55,41 @@ export class EstudosComponent implements OnInit {
         .includes(busca),
     );
   });
+
+  async baixarPdf(url: string, titulo: string): Promise<void> {
+    try {
+      this.notification.aviso('Preparando download do arquivo...', 2000);
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Falha ao baixar o arquivo.');
+
+      const blob = await response.blob();
+
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+
+      const nomeFormatado = titulo
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '_')
+        .replace(/_+/g, '_');
+
+      link.download = `${nomeFormatado}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+      this.notification.sucesso('Download concluído!');
+    } catch (error) {
+      console.error('Erro no download:', error);
+
+      window.open(url, '_blank');
+    }
+  }
 }

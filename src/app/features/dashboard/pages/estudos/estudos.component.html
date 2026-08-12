@@ -59,18 +59,16 @@
             </div>
           </div>
 
-          <a
-            [href]="estudo.arquivo_url"
-            target="_blank"
-            download
-            class="w-full sm:w-auto px-6 py-3 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white hover:shadow-md border border-sky-100 rounded-xl text-sm font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shrink-0 group"
+          <button
+            (click)="baixarPdf(estudo.arquivo_url, estudo.titulo)"
+            class="w-full sm:w-auto px-6 py-3 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white hover:shadow-md border border-sky-100 rounded-xl text-sm font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shrink-0 group cursor-pointer"
           >
             <mat-icon
               class="!w-[18px] !h-[18px] !text-[18px] !leading-none overflow-visible group-hover:animate-bounce"
               >download</mat-icon
             >
             <span class="pt-[1px]">Baixar PDF</span>
-          </a>
+          </button>
         </div>
       } @empty {
         <div
