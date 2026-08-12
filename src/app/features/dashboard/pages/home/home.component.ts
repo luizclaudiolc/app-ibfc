@@ -73,7 +73,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   avisos = signal<Aviso[]>([]);
   escalas = signal<Escala[]>([]);
   membrosRaw = signal<Membro[]>([]);
+
   termoBusca = signal('');
+  limiteExibicao = signal(10);
 
   currentIndex = signal(0);
 
@@ -178,6 +180,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.autoScrollTimeout = setTimeout(() => this.startAutoScroll(), 10000);
   }
 
+  aoBuscarMembro(termo: string): void {
+    this.termoBusca.set(termo);
+    this.limiteExibicao.set(10);
+  }
+
+  carregarMaisMembros(): void {
+    this.limiteExibicao.update((valorAtual) => valorAtual + 10);
+  }
+
   escalasPessoais = computed(() => {
     const volTarget = [this.nomeUsuario(), this.emailUsuario()].map((s) => s.toLowerCase());
 
@@ -215,6 +226,14 @@ export class HomeComponent implements OnInit, OnDestroy {
         .replace(/[\u0300-\u036f]/g, '')
         .includes(busca),
     );
+  });
+
+  membrosExibidos = computed(() => {
+    return this.membrosFiltrados().slice(0, this.limiteExibicao());
+  });
+
+  mostrarBotaoCarregarMais = computed(() => {
+    return this.membrosFiltrados().length > this.limiteExibicao();
   });
 
   aniversariantesDaSemana = computed(() => {
