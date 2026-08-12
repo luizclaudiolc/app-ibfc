@@ -100,6 +100,8 @@ export class MembroService {
     estado_civil,
     nivel_escolaridade,
     endereco,
+    pedido_oracao,
+    total_oracoes,
   }: UsuarioAtualizacao): Promise<{ sucesso: boolean; mensagem?: string }> {
     try {
       const {
@@ -119,6 +121,8 @@ export class MembroService {
           estado_civil: estado_civil ?? null,
           nivel_escolaridade: nivel_escolaridade ?? null,
           endereco: endereco || null,
+          pedido_oracao: pedido_oracao || null,
+          total_oracoes: total_oracoes ?? 0,
         })
         .eq('id', user.id);
 
@@ -231,5 +235,26 @@ export class MembroService {
     if (error) throw error;
 
     return data;
+  }
+
+  incrementarOracao(membroId: string): Observable<{ sucesso: boolean; mensagem?: string }> {
+    return from(this.executarIncrementoOracao(membroId));
+  }
+
+  private async executarIncrementoOracao(
+    membroId: string,
+  ): Promise<{ sucesso: boolean; mensagem?: string }> {
+    try {
+      const { error } = await this.supabaseService.supabase.rpc('incrementar_oracao', {
+        membro_id: membroId,
+      });
+
+      if (error) throw error;
+
+      return { sucesso: true };
+    } catch (error: any) {
+      console.error('Erro ao incrementar oração:', error);
+      return { sucesso: false, mensagem: error.message };
+    }
   }
 }

@@ -192,6 +192,21 @@
           </div>
         </div>
 
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Pedido de Oração / Motivo de Fé</mat-label>
+          <textarea
+            matInput
+            formControlName="pedido_oracao"
+            rows="2"
+            placeholder="Compartilhe um pedido de oração com a comunidade..."
+            maxlength="160"
+          ></textarea>
+          <mat-icon matSuffix class="text-sky-500">volunteer_activism</mat-icon>
+          <mat-hint align="end" class="text-xs font-medium"
+            >{{ perfilForm.controls.pedido_oracao.value.length }}/160</mat-hint
+          >
+        </mat-form-field>
+
         <div class="flex gap-3 pt-4">
           <button
             mat-flat-button

@@ -64,6 +64,62 @@
         </div>
 
         <div class="space-y-1 mt-6 border-t border-slate-100 pt-4">
+          @if (membro()!.pedido_oracao) {
+            <div
+              class="mt-6 p-4 bg-sky-50/60 rounded-2xl border border-sky-100 shadow-sm relative overflow-hidden"
+            >
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 mt-0.5"
+                >
+                  <mat-icon class="!w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
+                    >volunteer_activism</mat-icon
+                  >
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-[10px] font-bold text-sky-600 uppercase tracking-wider mb-1">
+                    Pedido de Oração
+                  </p>
+                  <p class="text-xs font-medium text-slate-700 leading-relaxed italic">
+                    "{{ membro()!.pedido_oracao }}"
+                  </p>
+
+                  <div
+                    class="mt-3 flex items-center justify-between pt-3 border-t border-sky-100/80"
+                  >
+                    <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                      <mat-icon class="!w-[14px] !h-[14px] !text-[14px] text-amber-500"
+                        >local_fire_department</mat-icon
+                      >
+                      <strong>{{ membro()!.total_oracoes || 0 }}</strong> pessoas orando
+                    </span>
+
+                    <button
+                      type="button"
+                      (click)="orarPorMembro()"
+                      [disabled]="jaOrou()"
+                      class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+                      [ngClass]="
+                        jaOrou()
+                          ? 'bg-emerald-500 text-white cursor-default'
+                          : 'bg-white hover:bg-sky-600 hover:text-white text-sky-700 border border-sky-200'
+                      "
+                    >
+                      <mat-icon
+                        class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible"
+                      >
+                        {{ jaOrou() ? 'check' : 'favorite' }}
+                      </mat-icon>
+                      <span class="pt-[1px]">{{
+                        jaOrou() ? 'Estou Orando 🙏' : 'Orar por isso'
+                      }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
           <a
             [href]="'tel:+55' + membro()!.telefone"
             class="flex items-center gap-4 p-3 -mx-3 rounded-2xl hover:bg-slate-50 transition-colors group cursor-pointer decoration-transparent outline-none"

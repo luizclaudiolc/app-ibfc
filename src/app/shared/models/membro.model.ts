@@ -9,6 +9,8 @@ export interface PerfilBase {
   nivel_escolaridade?: number;
   endereco?: string;
   estado_civil?: number | string;
+  pedido_oracao?: string;
+  total_oracoes?: number;
 }
 
 export interface Membro extends PerfilBase {

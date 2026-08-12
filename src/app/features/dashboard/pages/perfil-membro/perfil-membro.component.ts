@@ -11,6 +11,7 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
+import { NotificationService } from '../../../../core/services/notifications.service';
 
 @Component({
   selector: 'app-membro-perfil',
@@ -22,6 +23,7 @@ export class PerfilMembroComponent implements OnInit {
   membro = signal<Membro | null>(null);
   carregando = signal<boolean>(true);
   erro = signal<boolean>(false);
+  jaOrou = signal<boolean>(false);
 
   corFundoCard = signal<string>('');
 
@@ -29,6 +31,7 @@ export class PerfilMembroComponent implements OnInit {
   private membroService = inject(MembroService);
   private location = inject(Location);
   private dialog = inject(MatDialog);
+  private notification = inject(NotificationService);
 
   departamentos = DEPARTAMENTOS_DISPONIVEIS_MAP;
   gradientesPasteis = GRADIENTES_PASTEIS;
@@ -104,6 +107,33 @@ export class PerfilMembroComponent implements OnInit {
       panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
       maxWidth: '100vw',
       maxHeight: '100vh',
+    });
+  }
+
+  orarPorMembro(): void {
+    const membroAtual = this.membro();
+    if (!membroAtual || !membroAtual.id || this.jaOrou()) return;
+
+    this.jaOrou.set(true);
+
+    const totalAtual = membroAtual.total_oracoes || 0;
+    this.membro.update((mef) => (mef ? { ...mef, total_oracoes: totalAtual + 1 } : null));
+
+    this.membroService.incrementarOracao(membroAtual.id).subscribe({
+      next: (res) => {
+        if (res.sucesso) {
+          this.notification.sucesso('Sua intercessão foi registrada. Deus abençoe!');
+        } else {
+          this.jaOrou.set(false);
+          this.membro.update((mef) => (mef ? { ...mef, total_oracoes: totalAtual } : null));
+          this.notification.erro('Não foi possível registrar a oração no momento.');
+        }
+      },
+      error: () => {
+        this.jaOrou.set(false);
+        this.membro.update((mef) => (mef ? { ...mef, total_oracoes: totalAtual } : null));
+        this.notification.erro('Erro de comunicação ao registrar a oração.');
+      },
     });
   }
 }

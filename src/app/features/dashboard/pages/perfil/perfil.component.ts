@@ -74,6 +74,8 @@ export class PerfilComponent implements OnInit {
     bairro: [''],
     cidade: [''],
     uf: [''],
+
+    pedido_oracao: [''],
   });
 
   ngOnInit(): void {
@@ -120,6 +122,8 @@ export class PerfilComponent implements OnInit {
             bairro: objEndereco.bairro || '',
             cidade: objEndereco.cidade || '',
             uf: objEndereco.uf || '',
+
+            pedido_oracao: res.pedido_oracao || '',
           });
         }
         this.carregandoDados.set(false);
@@ -197,6 +201,7 @@ export class PerfilComponent implements OnInit {
       nivel_escolaridade:
         formValues.nivel_escolaridade !== null ? Number(formValues.nivel_escolaridade) : undefined,
       endereco: enderecoString,
+      pedido_oracao: formValues.pedido_oracao,
     };
 
     this.membroService.atualizarPerfil(dadosEnvio).subscribe({
