@@ -261,4 +261,16 @@ export class MembroService {
       return { sucesso: false, mensagem: error.message };
     }
   }
+
+  buscarPedidosOracao(): Observable<Membro[]> {
+    const promise = this.supabaseService.supabase
+      .from('membros')
+      .select('id, nome, sobrenome, foto_url, pedido_oracao, total_oracoes')
+      .not('pedido_oracao', 'is', null)
+      .neq('pedido_oracao', '')
+
+      .order('total_oracoes', { ascending: true });
+
+    return from(promise).pipe(map((res) => res.data as Membro[]));
+  }
 }

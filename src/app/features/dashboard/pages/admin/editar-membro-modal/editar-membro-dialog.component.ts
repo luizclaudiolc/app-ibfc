@@ -55,7 +55,7 @@ export class EditarMembroDialogComponent {
 
   niveisAcesso = [
     { label: 'Administrador (Acesso Total)', value: 'ADMIN' as NivelAcesso },
-    { label: 'Básico', value: 'MEMBRO' as NivelAcesso },
+    { label: 'Padrão', value: 'MEMBRO' as NivelAcesso },
   ];
 
   statusOpcoes = [

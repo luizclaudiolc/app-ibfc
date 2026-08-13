@@ -42,6 +42,7 @@ export class FooterComponent implements OnInit {
     const allItems: FooterItem[] = [
       { label: 'Início', icon: 'home', route: '/dashboard/home', exact: true },
       { label: 'Estudos', icon: 'menu_book', route: '/dashboard/estudos' },
+      { label: 'Orações', icon: 'volunteer_activism', route: '/dashboard/mural-oracoes' },
     ];
 
     if (podeAcessarEscalas) {

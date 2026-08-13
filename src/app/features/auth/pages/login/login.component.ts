@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { NotificationService } from '../../../../core/services/notifications.service';
+import { GENERO_MAP } from '../../../../shared/models/consts';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +40,16 @@ export class LoginComponent {
     this.authService.login(email.trim(), senha).subscribe({
       next: (res) => {
         if (res.sucesso) {
-          this.notification.sucesso('Login realizado com sucesso! Bem-vindo(a).');
+          const generoId = this.authService.obterUsuarioLogado().genero;
+          const generoText = generoId != null ? GENERO_MAP[generoId] : null;
+          const saudacao =
+            generoText === 'Masculino'
+              ? 'Bem-vindo!'
+              : generoText === 'Feminino'
+                ? 'Bem-vinda!'
+                : 'Bem-vindo(a)!';
+
+          this.notification.sucesso(`Login realizado com sucesso! ${saudacao}`);
           this.router.navigate(['/dashboard/home']);
         } else {
           this.carregando.set(false);
