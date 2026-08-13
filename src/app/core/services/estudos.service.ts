@@ -6,7 +6,6 @@ import { Estudo } from '../../shared/models/estudos.model';
 @Injectable({ providedIn: 'root' })
 export class EstudoService {
   private supabaseService = inject(SupabaseService);
-
   private bucketName = 'avisos';
 
   buscarTodos(): Observable<Estudo[]> {
@@ -18,15 +17,16 @@ export class EstudoService {
     return from(promise).pipe(map((res) => res.data as Estudo[]));
   }
 
-  async criar(file: File, titulo: string, descricao?: string | null): Promise<Estudo> {
+  async criar(file: File | Blob, titulo: string, descricao?: string | null): Promise<Estudo> {
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.pdf`;
-
     const filePath = `estudos/${fileName}`;
 
     const { error: uploadError } = await this.supabaseService.supabase.storage
       .from(this.bucketName)
       .upload(filePath, file, {
         contentType: 'application/pdf',
+        cacheControl: '3600',
+        upsert: true,
       });
 
     if (uploadError) throw uploadError;

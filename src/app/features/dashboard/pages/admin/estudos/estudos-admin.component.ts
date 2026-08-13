@@ -83,6 +83,18 @@ export class EstudosAdminComponent implements OnInit {
       return;
     }
 
+    let arquivoBlindadoEmMemoria: Blob;
+    try {
+      this.notification.aviso('Carregando PDF...', 1000);
+      const buffer = await file.arrayBuffer();
+      arquivoBlindadoEmMemoria = new Blob([buffer], { type: 'application/pdf' });
+    } catch (e) {
+      console.error('Erro ao blindar arquivo', e);
+      this.notification.erro('Erro ao processar arquivo no celular. Tente novamente.');
+      input.value = '';
+      return;
+    }
+
     const dialogRef = this.dialog.open(EstudoFormDialogComponent, {
       width: '90%',
       maxWidth: '450px',
@@ -104,7 +116,7 @@ export class EstudosAdminComponent implements OnInit {
         this.notification.aviso('Fazendo upload do documento...', 2000);
 
         const novoEstudo = await this.estudoService.criar(
-          file,
+          arquivoBlindadoEmMemoria,
           dadosFormulario.titulo,
           dadosFormulario.descricao,
         );
