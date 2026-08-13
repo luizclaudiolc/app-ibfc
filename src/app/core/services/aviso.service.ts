@@ -141,4 +141,25 @@ export class AvisoService {
       return { sucesso: false, mensagem: error.message };
     }
   }
+
+  confirmarLeitura(avisoId: string): Observable<{ sucesso: boolean; mensagem?: string }> {
+    return from(this.executarConfirmacaoLeitura(avisoId));
+  }
+
+  private async executarConfirmacaoLeitura(
+    avisoId: string,
+  ): Promise<{ sucesso: boolean; mensagem?: string }> {
+    try {
+      const { error } = await this.supabaseService.supabase.rpc('confirmar_leitura_aviso', {
+        aviso_id: avisoId,
+      });
+
+      if (error) throw error;
+
+      return { sucesso: true };
+    } catch (error: any) {
+      console.error('Erro ao confirmar leitura do aviso:', error);
+      return { sucesso: false, mensagem: error.message };
+    }
+  }
 }

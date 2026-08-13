@@ -5,4 +5,5 @@ export interface Aviso {
   created_at?: string;
   data_evento: string;
   descricao?: string;
+  total_confirmacoes?: number;
 }
