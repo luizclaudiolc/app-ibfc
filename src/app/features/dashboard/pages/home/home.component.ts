@@ -39,6 +39,8 @@ import { EscalaCardComponent } from '../../../../shared/components/card-escala/e
 import { MembroListItemComponent } from '../../../../shared/components/lista-membros/membro-list-item.component';
 import { CardAvisoComponent } from '../../../../shared/components/card-aviso/card-aviso.component';
 import { CardAniversarianteComponent } from '../../../../shared/components/card-aniversariante/card-aniversariante.component';
+import { DevocionalService, VersiculoDia } from '../../../../core/services/devocional.service';
+import { VersiculoCardComponent } from '../../../../shared/components/card-versiculo/card-versiculo.component';
 
 @Component({
   selector: 'app-home',
@@ -54,6 +56,7 @@ import { CardAniversarianteComponent } from '../../../../shared/components/card-
     CardAniversarianteComponent,
     CardAvisoComponent,
     MembroListItemComponent,
+    VersiculoCardComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -65,6 +68,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly authService = inject(AuthService);
+  private readonly devocionalService = inject(DevocionalService);
 
   nomeUsuario = this.authService.nomeUsuario$;
   emailUsuario = signal<string>(this.authService.obterUsuarioLogado().email || '');
@@ -73,6 +77,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   avisos = signal<Aviso[]>([]);
   escalas = signal<Escala[]>([]);
   membrosRaw = signal<Membro[]>([]);
+  versiculoDiario = signal<VersiculoDia | null>(null);
 
   termoBusca = signal('');
   limiteExibicao = signal(10);
@@ -121,6 +126,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       avisos: this.avisoService.buscarTodos(),
       escalas: this.escalaService.buscarTodas(),
       membros: this.membroService.buscarTodos(),
+      versiculo: this.devocionalService.obterVersiculoDoDia(),
     })
       .pipe(finalize(() => this.carregando.set(false)))
       .subscribe({
@@ -128,6 +134,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.avisos.set(res.avisos);
           this.escalas.set(res.escalas);
           this.membrosRaw.set(res.membros);
+          this.versiculoDiario.set(res.versiculo);
         },
         error: (err) => console.error('Erro ao carregar dados', err),
       });

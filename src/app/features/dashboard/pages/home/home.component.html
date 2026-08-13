@@ -7,6 +7,10 @@
         <div class="h-28 bg-slate-200 rounded-2xl"></div>
       </div>
     } @else {
+      @if (versiculoDiario()) {
+        <app-versiculo-card [versiculo]="versiculoDiario()!" />
+      }
+
       @if (escalasPessoais().length > 0) {
         <section class="space-y-3">
           <app-section-header
