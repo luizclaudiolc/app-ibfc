@@ -1,4 +1,4 @@
-import { EEscolaridade, EEstadoCivil, EGenero, NivelAcesso, StatusMembro } from './consts';
+import { NivelAcesso } from './consts';
 
 export interface PerfilBase {
   nome: string;

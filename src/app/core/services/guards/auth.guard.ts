@@ -32,7 +32,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const nivelAcesso = localStorage.getItem('user_nivel');
 
-  if (nivelAcesso === ENiveisAcesso.Admin) {
+  if (nivelAcesso === ENiveisAcesso.Admin || nivelAcesso === ENiveisAcesso.SuperAdmin) {
     return true;
   }
 

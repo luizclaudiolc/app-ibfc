@@ -1,9 +1,12 @@
-export type NivelAcesso = 'ADMIN' | 'USER';
 export type StatusMembro = 'ATIVO' | 'INATIVO';
 export enum ECargos {
   Membro = 'membro',
 }
+
+export type NivelAcesso = 'SUPER_ADMIN' | 'ADMIN' | 'USER';
+
 export enum ENiveisAcesso {
+  SuperAdmin = 'SUPER_ADMIN',
   Admin = 'ADMIN',
   User = 'USER',
 }

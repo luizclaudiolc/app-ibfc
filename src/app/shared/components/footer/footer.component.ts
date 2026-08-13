@@ -32,7 +32,8 @@ export class FooterComponent implements OnInit {
   ngOnInit(): void {
     const { nivel, setor } = this.authService.obterUsuarioLogado();
 
-    const isAdmin = nivel === ENiveisAcesso.Admin;
+    const isAdmin = nivel === ENiveisAcesso.Admin || nivel === ENiveisAcesso.SuperAdmin;
+
     const isLider = setor && setor !== 'null' && setor !== 'undefined' && setor !== 'membro';
     const isLiderMidia = isLider && setor === 'midia';
 

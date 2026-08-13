@@ -53,14 +53,16 @@ export class EditarMembroDialogComponent {
   cargosDisponiveis = CARGOS_DISPONIVEIS;
   departamentos = DEPARTAMENTOS_DISPONIVEIS;
 
+  meuNivel = localStorage.getItem('user_nivel') as NivelAcesso;
+
   niveisAcesso = [
-    { label: 'Administrador (Acesso Total)', value: 'ADMIN' as NivelAcesso },
-    { label: 'Padrão', value: 'MEMBRO' as NivelAcesso },
+    { label: 'Administrador (Padrão)', value: 'ADMIN' satisfies NivelAcesso },
+    { label: 'Básico', value: 'USER' satisfies NivelAcesso },
   ];
 
   statusOpcoes = [
-    { label: 'Ativo', value: 'ATIVO' as StatusMembro },
-    { label: 'Inativo / Bloqueado', value: 'INATIVO' as StatusMembro },
+    { label: 'Ativo', value: 'ATIVO' satisfies StatusMembro },
+    { label: 'Inativo / Bloqueado', value: 'INATIVO' satisfies StatusMembro },
   ];
 
   opcoesGenero = Object.entries(GENERO_MAP).map(([value, label]) => ({ value: +value, label }));
@@ -82,6 +84,19 @@ export class EditarMembroDialogComponent {
   }
 
   private inicializarFormulario() {
+    if (this.meuNivel === 'ADMIN' && this.data.nivel_acesso === 'SUPER_ADMIN') {
+      this.notification.erro('Sem permissão: Você não pode editar um Super Administrador.');
+      this.dialogRef.close();
+      return;
+    }
+
+    if (this.meuNivel === 'SUPER_ADMIN') {
+      this.niveisAcesso.unshift({
+        label: 'Super Admin (Intocável)',
+        value: 'SUPER_ADMIN' satisfies NivelAcesso,
+      });
+    }
+
     if (this.data.endereco) {
       try {
         this.objEnderecoInicial = JSON.parse(this.data.endereco);
