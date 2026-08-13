@@ -57,7 +57,16 @@ export class FooterComponent implements OnInit {
     allItems.push({ label: 'Perfil', icon: 'person', route: '/dashboard/perfil' });
 
     if (isAdmin) {
-      allItems.push({ label: 'Membros', icon: 'manage_accounts', route: '/dashboard/admin' });
+      allItems.push({
+        label: 'Estatísticas',
+        icon: 'analytics',
+        route: '/dashboard/analytics',
+      });
+      allItems.push({
+        label: 'Membros',
+        icon: 'manage_accounts',
+        route: '/dashboard/admin',
+      });
       allItems.push({
         label: 'Ger. Estudos',
         icon: 'library_books',

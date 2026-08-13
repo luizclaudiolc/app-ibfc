@@ -66,6 +66,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'analytics',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/pages/admin/dashboard-admin/dashboard-admin.component').then(
+            (c) => c.DashboardAdminComponent,
+          ),
+      },
+      {
         path: 'admin',
         canActivate: [adminGuard],
         loadComponent: () =>

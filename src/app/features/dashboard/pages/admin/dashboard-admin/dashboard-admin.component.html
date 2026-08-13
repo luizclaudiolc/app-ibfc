@@ -1,0 +1,133 @@
+<app-page-layout>
+  <div class="mb-6">
+    <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Inteligência Pastoral</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">Visão geral e saúde da nossa comunidade.</p>
+  </div>
+
+  @if (carregando()) {
+    <div class="flex justify-center py-20">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (dados(); as d) {
+    <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+      <div
+        class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center"
+      >
+        <div
+          class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center mb-2"
+        >
+          <mat-icon>groups</mat-icon>
+        </div>
+        <span class="text-2xl sm:text-3xl font-extrabold text-slate-800">{{ d.totalMembros }}</span>
+        <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+          >Membros</span
+        >
+      </div>
+
+      <div
+        class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center"
+      >
+        <div
+          class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mb-2"
+        >
+          <mat-icon>cake</mat-icon>
+        </div>
+        <span class="text-2xl sm:text-3xl font-extrabold text-slate-800"
+          >{{ d.mediaIdade }}<span class="text-sm font-bold text-slate-400 ml-0.5">anos</span></span
+        >
+        <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+          >Média Idade</span
+        >
+      </div>
+
+      <div
+        class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center"
+      >
+        <div
+          class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mb-2"
+        >
+          <mat-icon>volunteer_activism</mat-icon>
+        </div>
+        <span class="text-2xl sm:text-3xl font-extrabold text-slate-800">{{
+          d.oracoesAtivas
+        }}</span>
+        <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+          >Orações</span
+        >
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-6">
+      <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <mat-icon class="text-sky-500 !w-5 !h-5 !text-[20px]">favorite</mat-icon> Pulso da Semana
+      </h2>
+
+      @if (d.pulsoSemana.total > 0) {
+        <div class="flex h-4 w-full rounded-full overflow-hidden mb-4 bg-slate-100">
+          <div
+            class="bg-emerald-400 transition-all duration-1000"
+            [style.width.%]="(d.pulsoSemana.paz / d.pulsoSemana.total) * 100"
+          ></div>
+          <div
+            class="bg-amber-400 transition-all duration-1000"
+            [style.width.%]="(d.pulsoSemana.correria / d.pulsoSemana.total) * 100"
+          ></div>
+          <div
+            class="bg-rose-400 transition-all duration-1000"
+            [style.width.%]="(d.pulsoSemana.oracao / d.pulsoSemana.total) * 100"
+          ></div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <div class="text-lg font-bold text-emerald-600">{{ d.pulsoSemana.paz }}</div>
+            <div class="text-[9px] font-bold uppercase text-slate-400">Em Paz</div>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-amber-500">{{ d.pulsoSemana.correria }}</div>
+            <div class="text-[9px] font-bold uppercase text-slate-400">Correria</div>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-rose-500">{{ d.pulsoSemana.oracao }}</div>
+            <div class="text-[9px] font-bold uppercase text-slate-400">Suporte</div>
+          </div>
+        </div>
+      } @else {
+        <p class="text-xs text-slate-400 italic text-center">
+          Nenhum check-in registrado nesta semana ainda.
+        </p>
+      }
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-10">
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+        <h2 class="text-sm font-bold text-slate-800 mb-4 text-center">Gênero</h2>
+        <div class="h-48 relative">
+          <canvas baseChart [data]="chartDataGenero" [options]="chartOptions" [type]="'doughnut'">
+          </canvas>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+        <h2 class="text-sm font-bold text-slate-800 mb-4 text-center">Estado Civil</h2>
+        <div class="h-48 relative">
+          <canvas baseChart [data]="chartDataCivil" [options]="chartOptions" [type]="'doughnut'">
+          </canvas>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 sm:col-span-2">
+        <h2 class="text-sm font-bold text-slate-800 mb-4 text-center">Nível de Escolaridade</h2>
+        <div class="h-56 relative">
+          <canvas
+            baseChart
+            [data]="chartDataEscolaridade"
+            [options]="chartOptions"
+            [type]="'doughnut'"
+          >
+          </canvas>
+        </div>
+      </div>
+    </div>
+  }
+</app-page-layout>
