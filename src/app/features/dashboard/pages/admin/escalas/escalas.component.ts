@@ -34,7 +34,10 @@ export class EscalasComponent implements OnInit {
   }
   setorUsuario = this.getSetorValido();
 
-  isAdmin = computed(() => this.nivelUsuario === ENiveisAcesso.Admin);
+  isAdmin = computed(
+    () =>
+      this.nivelUsuario === ENiveisAcesso.Admin || this.nivelUsuario === ENiveisAcesso.SuperAdmin,
+  );
 
   podeEditar(escala?: Escala): boolean {
     if (this.isAdmin()) return true;

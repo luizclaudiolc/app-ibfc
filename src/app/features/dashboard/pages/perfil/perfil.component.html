@@ -1,20 +1,33 @@
 <app-page-layout>
-  <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mt-4">
-    <div class="flex flex-col items-center mb-8">
+  <div class="max-w-xl mx-auto space-y-6 pb-12">
+    <div
+      class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col items-center text-center relative overflow-hidden"
+    >
       <div
-        class="w-28 h-28 rounded-full border-4 border-slate-50 shadow-inner overflow-hidden mb-4 bg-slate-100 flex items-center justify-center"
+        class="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-sky-500/10 to-indigo-500/15 pointer-events-none"
+      ></div>
+
+      <div
+        class="relative w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden mb-3 bg-slate-100 flex items-center justify-center mt-2"
       >
         @if (previewFoto()) {
           <img [src]="previewFoto()" class="w-full h-full object-cover" />
         } @else {
-          <span class="text-5xl text-slate-300">👤</span>
+          <span class="text-4xl text-slate-300">👤</span>
         }
       </div>
 
-      <div class="flex items-center gap-3">
+      <h2 class="text-base font-extrabold text-slate-800 tracking-tight">
+        {{ perfilForm.controls.nome.value || 'Meu' }}
+        {{ perfilForm.controls.sobrenome.value || 'Perfil' }}
+      </h2>
+      <p class="text-xs text-slate-400 font-medium mb-4">Atualize suas informações na comunidade</p>
+
+      <div class="flex items-center gap-2">
         <label
-          class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-full text-xs font-bold transition-all"
+          class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
         >
+          <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">photo_camera</mat-icon>
           Alterar Foto
           <input
             type="file"
@@ -28,114 +41,129 @@
         @if (previewFoto()) {
           <button
             (click)="removerFoto()"
-            class="text-red-500 hover:text-red-600 text-xs font-bold px-2 py-2 transition-all"
+            class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1"
             [disabled]="carregando()"
           >
+            <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">delete_outline</mat-icon>
             Remover
           </button>
         }
       </div>
 
       @if (carregando()) {
-        <div class="text-[10px] text-sky-600 font-bold mt-2 animate-pulse">Processando...</div>
+        <div class="text-xs text-sky-600 font-bold mt-3 flex items-center gap-1.5 animate-pulse">
+          <mat-spinner diameter="14"></mat-spinner> Processando imagem...
+        </div>
       }
     </div>
 
     @if (!carregandoDados()) {
-      <form [formGroup]="perfilForm" (ngSubmit)="salvarAlteracoes()" class="w-full space-y-2">
-        <div class="grid grid-cols-2 gap-3">
+      <form [formGroup]="perfilForm" (ngSubmit)="salvarAlteracoes()" class="space-y-4">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-slate-50">
+            <mat-icon class="text-sky-500 !w-5 !h-5 !text-[20px]">badge</mat-icon>
+            <h3 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+              Dados Pessoais
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Nome</mat-label>
+              <input matInput formControlName="nome" placeholder="Seu nome" />
+              @if (perfilForm.controls.nome.hasError('required')) {
+                <mat-error>Obrigatório.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Sobrenome</mat-label>
+              <input matInput formControlName="sobrenome" placeholder="Seu sobrenome" />
+              @if (perfilForm.controls.sobrenome.hasError('required')) {
+                <mat-error>Obrigatório.</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Nome</mat-label>
-            <input matInput formControlName="nome" placeholder="Nome" />
-            @if (perfilForm.controls.nome.hasError('required')) {
-              <mat-error>Obrigatório.</mat-error>
-            }
+            <mat-label>E-mail de Acesso</mat-label>
+            <input matInput type="email" formControlName="email" />
+            <mat-hint class="text-[10px]"
+              >O e-mail principal não pode ser alterado por aqui.</mat-hint
+            >
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Sobrenome</mat-label>
-            <input matInput formControlName="sobrenome" placeholder="Sobrenome" />
-            @if (perfilForm.controls.sobrenome.hasError('required')) {
-              <mat-error>Obrigatório.</mat-error>
-            }
-          </mat-form-field>
-        </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>WhatsApp</mat-label>
+              <input matInput type="tel" formControlName="telefone" placeholder="24 999999999" />
+              @if (perfilForm.controls.telefone.hasError('required')) {
+                <mat-error>Obrigatório.</mat-error>
+              } @else if (perfilForm.controls.telefone.hasError('pattern')) {
+                <mat-error>Digite 10 ou 11 números.</mat-error>
+              }
+            </mat-form-field>
 
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>E-mail</mat-label>
-          <input matInput type="email" formControlName="email" />
-          <mat-hint class="text-[10px]"
-            >O e-mail de acesso não pode ser alterado por aqui.</mat-hint
-          >
-        </mat-form-field>
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Data de Nascimento</mat-label>
+              <input matInput type="date" formControlName="data_nascimento" />
+              @if (perfilForm.controls.data_nascimento.hasError('required')) {
+                <mat-error>Obrigatório.</mat-error>
+              }
+            </mat-form-field>
+          </div>
 
-        <div class="grid grid-cols-2 gap-3 mt-2">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>WhatsApp</mat-label>
-            <input matInput type="tel" formControlName="telefone" placeholder="24 999999999" />
-            @if (perfilForm.controls.telefone.hasError('required')) {
-              <mat-error>Obrigatório.</mat-error>
-            } @else if (perfilForm.controls.telefone.hasError('pattern')) {
-              <mat-error>Digite 10 ou 11 números.</mat-error>
-            }
-          </mat-form-field>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Cargo</mat-label>
+              <mat-select formControlName="cargo">
+                @for (item of cargosDisponiveis; track item.value) {
+                  <mat-option [value]="item.value">{{ item.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Gênero</mat-label>
+              <mat-select formControlName="genero">
+                @for (item of opcoesGenero; track item.value) {
+                  <mat-option [value]="item.value">{{ item.label }}</mat-option>
+                }
+              </mat-select>
+              @if (perfilForm.controls.genero.hasError('required')) {
+                <mat-error>Obrigatório.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Estado Civil</mat-label>
+              <mat-select formControlName="estado_civil">
+                @for (item of opcoesEstadoCivil; track item.value) {
+                  <mat-option [value]="item.value">{{ item.label }}</mat-option>
+                }
+              </mat-select>
+              @if (perfilForm.controls.estado_civil.hasError('required')) {
+                <mat-error>Obrigatório.</mat-error>
+              }
+            </mat-form-field>
+          </div>
 
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Cargo</mat-label>
-            <mat-select formControlName="cargo">
-              @for (item of cargosDisponiveis; track item.value) {
+            <mat-label>Escolaridade</mat-label>
+            <mat-select formControlName="nivel_escolaridade">
+              @for (item of opcoesEscolaridade; track item.value) {
                 <mat-option [value]="item.value">{{ item.label }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
         </div>
 
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Data de Nascimento</mat-label>
-          <input matInput type="date" formControlName="data_nascimento" placeholder="11/11/2011" />
-          @if (perfilForm.controls.data_nascimento.hasError('required')) {
-            <mat-error>Obrigatório.</mat-error>
-          }
-        </mat-form-field>
-
-        <div class="grid grid-cols-2 gap-3">
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Gênero</mat-label>
-            <mat-select formControlName="genero">
-              @for (item of opcoesGenero; track item.value) {
-                <mat-option [value]="item.value">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (perfilForm.controls.genero.hasError('required')) {
-              <mat-error>Obrigatório.</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Estado Civil</mat-label>
-            <mat-select formControlName="estado_civil">
-              @for (item of opcoesEstadoCivil; track item.value) {
-                <mat-option [value]="item.value">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (perfilForm.controls.estado_civil.hasError('required')) {
-              <mat-error>Obrigatório.</mat-error>
-            }
-          </mat-form-field>
-        </div>
-
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Escolaridade</mat-label>
-          <mat-select formControlName="nivel_escolaridade">
-            @for (item of opcoesEscolaridade; track item.value) {
-              <mat-option [value]="item.value">{{ item.label }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <div class="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 space-y-2 mt-2 mb-2">
-          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-            Endereço Residencial
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-slate-50">
+            <mat-icon class="text-sky-500 !w-5 !h-5 !text-[20px]">location_on</mat-icon>
+            <h3 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+              Endereço Residencial
+            </h3>
           </div>
 
           <mat-form-field appearance="outline" class="w-full">
@@ -164,13 +192,12 @@
           <div class="grid grid-cols-2 gap-3">
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Número</mat-label>
-
               <input matInput formControlName="numero" id="numero_endereco_perfil" />
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="w-full">
               <mat-label>Complemento</mat-label>
-              <input matInput formControlName="complemento" placeholder="Apto, Casa 2..." />
+              <input matInput formControlName="complemento" placeholder="Apto, Bloco..." />
             </mat-form-field>
           </div>
 
@@ -192,64 +219,75 @@
           </div>
         </div>
 
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Pedido de Oração / Motivo de Fé</mat-label>
-          <textarea
-            matInput
-            formControlName="pedido_oracao"
-            rows="2"
-            placeholder="Compartilhe um pedido de oração com a comunidade..."
-            maxlength="160"
-          ></textarea>
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-slate-50">
+            <mat-icon class="text-rose-500 !w-5 !h-5 !text-[20px]">volunteer_activism</mat-icon>
+            <h3 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+              Mural de Intercessão
+            </h3>
+          </div>
+
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Compartilhe um motivo de fé. Este pedido será publicado publicamente no
+            <strong class="text-slate-700">Mural de Orações (Aba Orações)</strong> para que a
+            comunidade possa interceder por você, além de ser exibido no seu próprio perfil.
+          </p>
+
+          <mat-form-field appearance="outline" class="w-full !mt-1">
+            <mat-label>Pedido de Oração / Motivo de Fé</mat-label>
+            <textarea
+              matInput
+              formControlName="pedido_oracao"
+              rows="3"
+              placeholder="Ex: Peço oração pela minha saúde e família..."
+              maxlength="160"
+            ></textarea>
+
+            <mat-hint align="end" class="text-xs font-medium"
+              >{{ perfilForm.controls.pedido_oracao.value.length || 0 }}/160</mat-hint
+            >
+          </mat-form-field>
 
           @if (perfilForm.controls.pedido_oracao.value) {
-            <button
-              type="button"
-              mat-icon-button
-              matSuffix
-              (click)="limparPedidoOracao()"
-              title="Apagar pedido"
-              class="text-slate-400 hover:text-red-500 transition-colors mr-1"
-            >
-              <mat-icon class="!w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
-                >delete_outline</mat-icon
+            <div class="flex justify-end pt-1">
+              <button
+                type="button"
+                (click)="limparPedidoOracao()"
+                class="flex items-center gap-1.5 text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
               >
-            </button>
-          } @else {
-            <mat-icon
-              matSuffix
-              class="text-sky-500 mr-2 !w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
-              >volunteer_activism</mat-icon
-            >
+                <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">delete_outline</mat-icon>
+                <span>Apagar pedido do mural</span>
+              </button>
+            </div>
           }
+        </div>
 
-          <mat-hint align="end" class="text-xs font-medium"
-            >{{ perfilForm.controls.pedido_oracao.value.length || 0 }}/160</mat-hint
-          >
-        </mat-form-field>
-
-        <div class="flex gap-3 pt-4">
+        <div class="flex gap-3 pt-2">
           <button
             mat-flat-button
             type="button"
             (click)="cancelar()"
-            class="w-full !rounded-xl !h-12 !bg-slate-100 hover:!bg-slate-200 !text-slate-600 !font-bold transition-all"
+            class="w-full !rounded-2xl !h-13 !bg-slate-100 hover:!bg-slate-200 !text-slate-600 !font-bold transition-all"
             [disabled]="carregando()"
           >
             Cancelar
           </button>
+
           <button
             mat-flat-button
             type="submit"
-            class="w-full !rounded-xl !h-12 !bg-sky-600 hover:!bg-sky-700 !text-white !font-bold transition-all"
+            class="w-full !rounded-2xl !h-13 !bg-sky-600 hover:!bg-sky-700 !text-white !font-bold shadow-lg shadow-sky-600/20 transition-all"
             [disabled]="carregando() || perfilForm.invalid"
           >
+            @if (carregando()) {
+              <mat-spinner diameter="18" class="!inline-block !mr-2"></mat-spinner>
+            }
             {{ carregando() ? 'Salvando...' : 'Salvar Alterações' }}
           </button>
         </div>
       </form>
     } @else {
-      <div class="flex justify-center py-10">
+      <div class="flex justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     }

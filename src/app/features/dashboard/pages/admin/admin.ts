@@ -17,6 +17,7 @@ import { PageLayoutComponent } from '../../../../shared/components/page-layout/p
 export class AdminComponent implements OnInit {
   membrosRaw = signal<Membro[]>([]);
   termoBusca = signal<string>('');
+  limiteExibicao = signal<number>(10);
   carregando = signal<boolean>(true);
   erroMembros = signal<string>('');
 
@@ -54,6 +55,14 @@ export class AdminComponent implements OnInit {
     });
   });
 
+  membrosExibidos = computed(() => {
+    return this.membrosFiltrados().slice(0, this.limiteExibicao());
+  });
+
+  mostrarBotaoCarregarMais = computed(() => {
+    return this.membrosFiltrados().length > this.limiteExibicao();
+  });
+
   ngOnInit() {
     this.carregarMembros();
   }
@@ -73,6 +82,15 @@ export class AdminComponent implements OnInit {
         this.carregando.set(false);
       },
     });
+  }
+
+  aoBuscarMembro(termo: string): void {
+    this.termoBusca.set(termo);
+    this.limiteExibicao.set(10);
+  }
+
+  carregarMaisMembros(): void {
+    this.limiteExibicao.update((valorAtual) => valorAtual + 10);
   }
 
   abrirEdicaoMembro(membro: any) {

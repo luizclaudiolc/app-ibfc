@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 import { adminGuard, authGuard, loginGuard } from './core/services/guards/auth.guard';
-import { PerfilMembroComponent } from './features/dashboard/pages/perfil-membro/perfil-membro.component';
-import { MuralOracoesComponent } from './features/dashboard/pages/mural-oracoes/mural-oracoes.component';
 
 export const routes: Routes = [
   {
@@ -32,8 +30,20 @@ export const routes: Routes = [
             (m) => m.PerfilComponent,
           ),
       },
-      { path: 'perfil/:id', component: PerfilMembroComponent },
-      { path: 'mural-oracoes', component: MuralOracoesComponent },
+      {
+        path: 'perfil/:id',
+        loadComponent: () =>
+          import('./features/dashboard/pages/perfil-membro/perfil-membro.component').then(
+            (m) => m.PerfilMembroComponent,
+          ),
+      },
+      {
+        path: 'mural-oracoes',
+        loadComponent: () =>
+          import('./features/dashboard/pages/mural-oracoes/mural-oracoes.component').then(
+            (m) => m.MuralOracoesComponent,
+          ),
+      },
       {
         path: 'escala',
         loadComponent: () =>
@@ -48,21 +58,11 @@ export const routes: Routes = [
             (c) => c.AvisosAdminComponent,
           ),
       },
-
       {
         path: 'estudos',
         loadComponent: () =>
           import('./features/dashboard/pages/estudos/estudos.component').then(
             (c) => c.EstudosComponent,
-          ),
-      },
-
-      {
-        path: 'admin/estudos',
-        canActivate: [adminGuard],
-        loadComponent: () =>
-          import('./features/dashboard/pages/admin/estudos/estudos-admin.component').then(
-            (c) => c.EstudosAdminComponent,
           ),
       },
       {
@@ -71,6 +71,14 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/pages/admin/dashboard-admin/dashboard-admin.component').then(
             (c) => c.DashboardAdminComponent,
+          ),
+      },
+      {
+        path: 'admin/estudos',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/dashboard/pages/admin/estudos/estudos-admin.component').then(
+            (c) => c.EstudosAdminComponent,
           ),
       },
       {
