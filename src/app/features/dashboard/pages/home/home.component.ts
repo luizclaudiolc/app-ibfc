@@ -41,6 +41,7 @@ import { CardAvisoComponent } from '../../../../shared/components/card-aviso/car
 import { CardAniversarianteComponent } from '../../../../shared/components/card-aniversariante/card-aniversariante.component';
 import { DevocionalService, VersiculoDia } from '../../../../core/services/devocional.service';
 import { VersiculoCardComponent } from '../../../../shared/components/card-versiculo/card-versiculo.component';
+import { PulsoCardComponent } from '../../../../shared/components/pulso-card/pulso-card.component';
 
 @Component({
   selector: 'app-home',
@@ -57,6 +58,7 @@ import { VersiculoCardComponent } from '../../../../shared/components/card-versi
     CardAvisoComponent,
     MembroListItemComponent,
     VersiculoCardComponent,
+    PulsoCardComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',

@@ -1,0 +1,76 @@
+@if (visivel()) {
+  @if (!jaVotou()) {
+    <div
+      class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-6 shadow-md relative overflow-hidden my-4 transition-all duration-500"
+    >
+      <div
+        class="absolute -right-6 -bottom-6 w-32 h-32 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"
+      ></div>
+
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 mb-2">
+          <span
+            class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/10 text-sky-400"
+          >
+            <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">favorite</mat-icon>
+          </span>
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+            Pulso da Comunidade
+          </h3>
+        </div>
+
+        <h2 class="text-base sm:text-lg font-extrabold tracking-tight mb-4 text-white">
+          Como está seu coração e sua caminhada esta semana?
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <button
+            type="button"
+            (click)="votar(1)"
+            [disabled]="carregando()"
+            class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-white/10 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/40 transition-all font-bold text-xs text-left group cursor-pointer active:scale-95"
+          >
+            <span class="w-3 h-3 rounded-full bg-emerald-400 shrink-0"></span>
+            <span class="flex-1 text-slate-100 group-hover:text-white">Em paz e animado</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="votar(2)"
+            [disabled]="carregando()"
+            class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-white/10 hover:bg-amber-500/20 border border-white/10 hover:border-amber-500/40 transition-all font-bold text-xs text-left group cursor-pointer active:scale-95"
+          >
+            <span class="w-3 h-3 rounded-full bg-amber-400 shrink-0"></span>
+            <span class="flex-1 text-slate-100 group-hover:text-white">Na correria, mas firme</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="votar(3)"
+            [disabled]="carregando()"
+            class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-white/10 hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 transition-all font-bold text-xs text-left group cursor-pointer active:scale-95"
+          >
+            <span class="w-3 h-3 rounded-full bg-rose-400 shrink-0"></span>
+            <span class="flex-1 text-slate-100 group-hover:text-white">Preciso de oração</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div
+      class="bg-emerald-50 border border-emerald-100 rounded-3xl p-5 flex items-center gap-4 text-emerald-800 shadow-sm my-4 transition-all duration-500 animate-fade-in"
+    >
+      <div
+        class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-600"
+      >
+        <mat-icon class="!w-[20px] !h-[20px] !text-[20px]">check_circle</mat-icon>
+      </div>
+      <div>
+        <h4 class="text-sm font-bold">Obrigado por compartilhar!</h4>
+        <p class="text-xs text-emerald-700 mt-0.5">
+          Sua resposta nos ajuda a cuidar melhor da nossa comunidade. Deus abençoe sua semana!
+        </p>
+      </div>
+    </div>
+  }
+}
