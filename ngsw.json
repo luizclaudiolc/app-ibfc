@@ -1,0 +1,131 @@
+{
+  "configVersion": 1,
+  "timestamp": 1786733643740,
+  "index": "/app-ibfc/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/app-ibfc/chunk-25ZEJHBV.js",
+        "/app-ibfc/chunk-3TB2AFRR.js",
+        "/app-ibfc/chunk-5KDUZWUH.js",
+        "/app-ibfc/chunk-5SD2Y7L3.js",
+        "/app-ibfc/chunk-64CWGN27.js",
+        "/app-ibfc/chunk-7VWXLKQP.js",
+        "/app-ibfc/chunk-BWZVA6DR.js",
+        "/app-ibfc/chunk-COG73SWY.js",
+        "/app-ibfc/chunk-E3E3TKW4.js",
+        "/app-ibfc/chunk-JWD6CI5W.js",
+        "/app-ibfc/chunk-K4GBR6AY.js",
+        "/app-ibfc/chunk-NEO22L34.js",
+        "/app-ibfc/chunk-ONOVXYFJ.js",
+        "/app-ibfc/chunk-OSMZRESR.js",
+        "/app-ibfc/chunk-QQJNI2GD.js",
+        "/app-ibfc/chunk-REE4KX4K.js",
+        "/app-ibfc/chunk-RLOECY2E.js",
+        "/app-ibfc/chunk-TRWTFQLL.js",
+        "/app-ibfc/chunk-VGANPHYS.js",
+        "/app-ibfc/chunk-VIFXVKIQ.js",
+        "/app-ibfc/chunk-XAIMSYWS.js",
+        "/app-ibfc/chunk-YJ3ICXN5.js",
+        "/app-ibfc/chunk-Z5DNLCBI.js",
+        "/app-ibfc/chunk-ZJJUGDXR.js",
+        "/app-ibfc/chunk-ZJO2DHPT.js",
+        "/app-ibfc/favicon.ico",
+        "/app-ibfc/index.html",
+        "/app-ibfc/main-ZHEELKTI.js",
+        "/app-ibfc/manifest.webmanifest",
+        "/app-ibfc/styles-WFHRLYBU.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/app-ibfc/icons/icon-128x128.png",
+        "/app-ibfc/icons/icon-144x144.png",
+        "/app-ibfc/icons/icon-152x152.png",
+        "/app-ibfc/icons/icon-192x192.png",
+        "/app-ibfc/icons/icon-384x384.png",
+        "/app-ibfc/icons/icon-512x512.png",
+        "/app-ibfc/icons/icon-72x72.png",
+        "/app-ibfc/icons/icon-96x96.png",
+        "/app-ibfc/img/logo-ibfc-dark.jpg",
+        "/app-ibfc/img/logo-ibfc.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/app-ibfc/chunk-25ZEJHBV.js": "47bff9c8a81292060e8d6ec31572303cae21db93",
+    "/app-ibfc/chunk-3TB2AFRR.js": "8270c9688cb417b795c403f6f6247a5f7a56b5e1",
+    "/app-ibfc/chunk-5KDUZWUH.js": "41a0ecc96d3cb1a98586eb5066eb2c6451ab99e3",
+    "/app-ibfc/chunk-5SD2Y7L3.js": "9a6356280fc28fdc39feb5423860af8d9c2fb262",
+    "/app-ibfc/chunk-64CWGN27.js": "9db46db48ac2893f5430881fcabc651e66cff8da",
+    "/app-ibfc/chunk-7VWXLKQP.js": "4292b5bf1755265235a3595dd9fb45df007f44a0",
+    "/app-ibfc/chunk-BWZVA6DR.js": "9b37f07bac0274a5a2b6ae20ffba5a4119673afe",
+    "/app-ibfc/chunk-COG73SWY.js": "3a7c16fbd291d4bb755c5947a1c48d02c9827590",
+    "/app-ibfc/chunk-E3E3TKW4.js": "d51afbcb8ea312969b0c8326da0bb7c287ddbdf5",
+    "/app-ibfc/chunk-JWD6CI5W.js": "dce88b2f866620e79afefb649c17f44eaa4175fc",
+    "/app-ibfc/chunk-K4GBR6AY.js": "e7f97ef9ea4db4d1e48badd6db2543b9871eb17c",
+    "/app-ibfc/chunk-NEO22L34.js": "93a076ad992f1edbd5e49410dafd1509024b5a22",
+    "/app-ibfc/chunk-ONOVXYFJ.js": "1a253d7dc131d986eecfdaadaae92fcac050d917",
+    "/app-ibfc/chunk-OSMZRESR.js": "5ee4b2b4a83a5f9f788195df38c593c9d53b1da7",
+    "/app-ibfc/chunk-QQJNI2GD.js": "095f4ae280e6b26cbaa6665701ba9207c88d6b36",
+    "/app-ibfc/chunk-REE4KX4K.js": "266786f0bb5b430044effcb03cb9416abb42a9e3",
+    "/app-ibfc/chunk-RLOECY2E.js": "584b22f705c8868440bc0e1e837c32fe8558a84a",
+    "/app-ibfc/chunk-TRWTFQLL.js": "6b629367e6f03e308376c2b28d9566541ef5c46c",
+    "/app-ibfc/chunk-VGANPHYS.js": "852439d56a6ac0b726cd26d0abb96391b5a2f929",
+    "/app-ibfc/chunk-VIFXVKIQ.js": "c950f8d52ad2f0de8acb79a9d97fac5b319d7e77",
+    "/app-ibfc/chunk-XAIMSYWS.js": "a18d3e6edc0b669a50c28d674b2f16adc1d84695",
+    "/app-ibfc/chunk-YJ3ICXN5.js": "693c4e2bfb44cd83575807c0536c9fd95fe1ff64",
+    "/app-ibfc/chunk-Z5DNLCBI.js": "04175e9e8e3ee762ee53b8e7fa248bde4c0cebcf",
+    "/app-ibfc/chunk-ZJJUGDXR.js": "9fe9765aee1990661c6e9d97aac8fb5b8fead8c9",
+    "/app-ibfc/chunk-ZJO2DHPT.js": "81ff129aaa8e299d62017983632bf993a35c6127",
+    "/app-ibfc/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
+    "/app-ibfc/icons/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
+    "/app-ibfc/icons/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
+    "/app-ibfc/icons/icon-152x152.png": "eae6e0f0c8afb8aaae339e2a569b43e9238e5e6c",
+    "/app-ibfc/icons/icon-192x192.png": "15c4180454633880d98674aa7394656196c91584",
+    "/app-ibfc/icons/icon-384x384.png": "94a915751ef6c9282df9aea405ad679230631814",
+    "/app-ibfc/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
+    "/app-ibfc/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
+    "/app-ibfc/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
+    "/app-ibfc/img/logo-ibfc-dark.jpg": "016ed575cd641c2a5da6f0ac72f82873e783e5a9",
+    "/app-ibfc/img/logo-ibfc.png": "ac40ab04b33bedba9281f5abb55350c5c27ede75",
+    "/app-ibfc/index.html": "932219d5ac03cb2c2ccf5bc0b1413215afb591de",
+    "/app-ibfc/main-ZHEELKTI.js": "28bb2d4d031e4144bd80f12410b5d214f236a03a",
+    "/app-ibfc/manifest.webmanifest": "ade0924bb6225a794320584618b3e551b8b48a79",
+    "/app-ibfc/styles-WFHRLYBU.css": "174cbbd11bfdd3cd8627672abfd34b8e05e33a5c"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
