@@ -130,8 +130,6 @@ export class AuthService {
   }
 
   private atualizarLocalStorage(perfil: Membro): void {
-    console.log({ perfil });
-
     localStorage.setItem('user_email', perfil.email);
     localStorage.setItem('user_nivel', perfil.nivel_acesso || ENiveisAcesso.User);
     localStorage.setItem('user_genero', perfil.genero?.toString() || '');

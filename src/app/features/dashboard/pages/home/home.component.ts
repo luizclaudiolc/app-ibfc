@@ -42,6 +42,7 @@ import { CardAniversarianteComponent } from '../../../../shared/components/card-
 import { DevocionalService, VersiculoDia } from '../../../../core/services/devocional.service';
 import { VersiculoCardComponent } from '../../../../shared/components/card-versiculo/card-versiculo.component';
 import { PulsoCardComponent } from '../../../../shared/components/pulso-card/pulso-card.component';
+import { NotificationService } from '../../../../core/services/notifications.service';
 
 @Component({
   selector: 'app-home',
@@ -71,6 +72,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly dialog = inject(MatDialog);
   private readonly authService = inject(AuthService);
   private readonly devocionalService = inject(DevocionalService);
+  private readonly notification = inject(NotificationService);
 
   nomeUsuario = this.authService.nomeUsuario$;
   emailUsuario = signal<string>(this.authService.obterUsuarioLogado().email || '');
@@ -327,5 +329,59 @@ export class HomeComponent implements OnInit, OnDestroy {
     const url = `https://wa.me/55${aniversariante.telefone}?text=${encodeURIComponent(mensagem)}`;
 
     window.open(url, '_blank');
+  }
+
+  solicitarTrocaEscala(escala: Escala): void {
+    const dialogRef = this.dialog.open(GenericDialogComponent, {
+      data: {
+        titulo: 'Solicitar Substituição',
+        mensagem:
+          'Tem certeza que não poderá comparecer? O líder do departamento será notificado para encontrar um substituto.',
+        textoConfirmar: 'Sim, avisar líder',
+        textoCancelar: 'Cancelar',
+        tipo: 'perigo',
+      },
+      panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+      width: '90%',
+      maxWidth: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado) {
+        const nome = this.nomeUsuario() || '';
+
+        const pedidosAtuais = escala.pedidos_substituicao
+          ? escala.pedidos_substituicao.split(',').map((p) => p.trim())
+          : [];
+
+        if (!pedidosAtuais.includes(nome)) {
+          pedidosAtuais.push(nome);
+        }
+
+        const payloadAtualizado = {
+          ...escala,
+          pedidos_substituicao: pedidosAtuais.join(', '),
+        };
+
+        this.escalaService.salvar(payloadAtualizado).subscribe({
+          next: (escalaAtualizada) => {
+            this.notification.sucesso('Líder notificado com sucesso!');
+
+            const listaEscalas = this.escalas();
+            const index = listaEscalas.findIndex((e) => e.id === escala.id);
+
+            if (index !== -1) {
+              const novaLista = [...listaEscalas];
+              novaLista[index] = escalaAtualizada;
+              this.escalas.set(novaLista);
+            }
+          },
+          error: (err) => {
+            console.error('Erro ao solicitar troca', err);
+            this.notification.erro('Ocorreu um erro ao notificar o líder. Tente novamente.');
+          },
+        });
+      }
+    });
   }
 }

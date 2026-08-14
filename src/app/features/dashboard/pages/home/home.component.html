@@ -35,7 +35,9 @@
                 <app-escala-card
                   [escala]="escala"
                   [nomeEvento]="eventosMap[escala.evento] || escala.evento"
-                />
+                  [nomeUsuario]="nomeUsuario() || ''"
+                  (solicitarSubstituicao)="solicitarTrocaEscala($event)"
+                ></app-escala-card>
               </div>
             }
           </app-scrollable-carousel>

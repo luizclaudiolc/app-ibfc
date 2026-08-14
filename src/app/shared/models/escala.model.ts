@@ -4,6 +4,7 @@ export interface Escala {
   evento: string;
   departamento: string;
   voluntarios: string;
+  pedidos_substituicao?: string;
 }
 
 export interface FormCriarEscala {
