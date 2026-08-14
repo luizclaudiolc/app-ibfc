@@ -8,11 +8,12 @@ import { NotificationService } from '../../../../../core/services/notifications.
 import { EstudoFormDialogComponent } from './modal/estudo-form-dialog.component';
 import { Estudo } from '../../../../../shared/models/estudos.model';
 import { EstudoService } from '../../../../../core/services/estudos.service';
+import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-estudos-admin',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent],
+  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
   templateUrl: './estudos-admin.component.html',
 })
 export class EstudosAdminComponent implements OnInit {

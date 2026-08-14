@@ -6,11 +6,12 @@ import { MembroService } from '../../../../core/services/membro.service';
 import { EditarMembroDialogComponent } from './editar-membro-modal/editar-membro-dialog.component';
 import { Membro } from '../../../../shared/models/membro.model';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent],
+  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })

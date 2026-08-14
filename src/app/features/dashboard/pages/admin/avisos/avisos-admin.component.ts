@@ -9,11 +9,12 @@ import { PageLayoutComponent } from '../../../../../shared/components/page-layou
 import { Aviso } from '../../../../../shared/models/aviso.model';
 import { NotificationService } from '../../../../../core/services/notifications.service';
 import { AvisoFormDialogComponent } from './modal/aviso-form-dialog.component';
+import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-avisos-admin',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent],
+  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
   templateUrl: './avisos-admin.component.html',
 })
 export class AvisosAdminComponent implements OnInit {

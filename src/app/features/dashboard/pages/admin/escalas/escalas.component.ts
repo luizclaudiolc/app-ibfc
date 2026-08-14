@@ -13,11 +13,12 @@ import { Escala } from '../../../../../shared/models/escala.model';
 import { PageLayoutComponent } from '../../../../../shared/components/page-layout/page-layout.component';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { NotificationService } from '../../../../../core/services/notifications.service';
+import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-escalas',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent],
+  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
   templateUrl: './escalas.component.html',
 })
 export class EscalasComponent implements OnInit {

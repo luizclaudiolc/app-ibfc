@@ -1,43 +1,28 @@
 <app-page-layout>
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Gestão de Avisos</h1>
-    <p class="text-slate-500 text-sm mt-0.5">Adicione ou remova banners da tela inicial da rede.</p>
-  </div>
-
-  <div
-    class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden p-4 pt-6 space-y-6"
-  >
-    <div
-      class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5"
+  <div class="max-w-4xl mx-auto space-y-6 pb-12">
+    <app-page-header
+      titulo="Gestão de Avisos"
+      subtitulo="Adicione ou remova banners da tela inicial da rede."
+      icone="collections"
     >
-      <div>
-        <h2 class="text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
-          <mat-icon
-            class="text-sky-500 !w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
-            >collections</mat-icon
-          >
-          <span class="pt-[1px]">Banners Ativos na Home</span>
-        </h2>
-        <p class="text-slate-500 text-xs mt-0.5">
-          Estes banners aparecem rotacionando na tela inicial.
-        </p>
+      <div class="flex justify-start pt-2">
+        <button
+          type="button"
+          (click)="fileInput.click()"
+          [disabled]="carregandoUpload()"
+          class="w-full sm:w-auto px-5 py-3 bg-sky-600 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-sm hover:bg-sky-700 hover:shadow-md transition-all active:scale-95 disabled:opacity-60 disabled:bg-slate-300 flex items-center justify-center gap-2 cursor-pointer"
+        >
+          @if (carregandoUpload()) {
+            <mat-spinner diameter="18" class="!stroke-white"></mat-spinner>
+            <span class="pt-[1px]">Enviando...</span>
+          } @else {
+            <mat-icon class="!w-[18px] !h-[18px] !text-[18px] !leading-none overflow-visible"
+              >add_photo_alternate</mat-icon
+            >
+            <span class="pt-[1px]">Novo Banner</span>
+          }
+        </button>
       </div>
-
-      <button
-        (click)="fileInput.click()"
-        [disabled]="carregandoUpload()"
-        class="w-full sm:w-auto px-5 py-2.5 bg-sky-600 text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-sky-700 hover:shadow-md transition-all active:scale-95 disabled:opacity-60 disabled:bg-slate-300 flex items-center justify-center gap-2"
-      >
-        @if (carregandoUpload()) {
-          <mat-spinner diameter="18" class="!stroke-white"></mat-spinner>
-          <span class="pt-[1px]">Enviando...</span>
-        } @else {
-          <mat-icon class="!w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
-            >add_photo_alternate</mat-icon
-          >
-          <span class="pt-[1px]">Novo Banner</span>
-        }
-      </button>
 
       <input
         #fileInput
@@ -46,91 +31,101 @@
         class="hidden"
         (change)="onFileSelected($event)"
       />
-    </div>
+    </app-page-header>
 
-    @if (carregandoAvisos()) {
-      <div class="flex flex-col items-center justify-center py-16 gap-3 text-slate-500">
-        <mat-spinner diameter="32" class="!stroke-sky-600"></mat-spinner>
-        <p class="text-sm font-medium">Carregando banners...</p>
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden p-4 sm:p-6">
+      <div class="mb-5 pb-4 border-b border-slate-100">
+        <h2
+          class="text-xs sm:text-sm font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2"
+        >
+          <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+          Banners Ativos na Home
+        </h2>
+        <p class="text-slate-400 text-xs mt-0.5">
+          Estes banners aparecem rotacionando na tela inicial do aplicativo.
+        </p>
       </div>
-    } @else {
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
-        @for (aviso of avisos(); track aviso.id) {
-          <div
-            class="relative group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden transition-all hover:shadow-lg hover:border-slate-200 flex flex-col"
-          >
-            <div class="relative aspect-[16/10] overflow-hidden">
-              <img
-                [src]="aviso.foto_url"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                alt="Banner de Aviso"
-              />
 
-              <div
-                class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent"
-              ></div>
-
-              <button
-                (click)="excluirAviso(aviso)"
-                class="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md text-red-600 font-bold text-[10px] uppercase tracking-wider rounded-lg shadow-sm border border-white/20 hover:bg-red-50 active:bg-red-100 transition-colors z-10"
-                title="Remover este banner"
-              >
-                <mat-icon class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible"
-                  >delete_outline</mat-icon
-                >
-                <span class="pt-[1px]">Remover</span>
-              </button>
-            </div>
-
+      @if (carregandoAvisos()) {
+        <div class="flex flex-col items-center justify-center py-20 gap-3 text-slate-500">
+          <mat-spinner diameter="36" class="!stroke-sky-600"></mat-spinner>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+            Carregando banners...
+          </p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-2">
+          @for (aviso of avisos(); track aviso.id) {
             <div
-              class="p-4 flex flex-col flex-1 justify-between bg-slate-50/50 border-t border-slate-100"
+              class="relative group bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden transition-all hover:shadow-md hover:border-sky-200 flex flex-col"
             >
-              <div
-                class="flex items-center gap-1.5 text-sky-700 font-bold text-[10px] uppercase tracking-wider mb-2 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100 self-start shadow-sm"
-              >
-                <mat-icon class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
-                  >calendar_today</mat-icon
+              <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                <img
+                  [src]="aviso.foto_url"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  alt="Banner de Aviso"
+                />
+
+                <div
+                  class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent"
+                ></div>
+
+                <button
+                  type="button"
+                  (click)="excluirAviso(aviso)"
+                  class="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md text-red-600 font-bold text-[10px] uppercase tracking-wider rounded-xl shadow-sm border border-white/20 hover:bg-red-50 active:scale-95 transition-all z-10 cursor-pointer"
+                  title="Remover este banner"
                 >
-                <span class="pt-[1px]"
-                  >Data: {{ aviso.data_evento | date: 'dd/MM/yyyy' : 'UTC' }}</span
-                >
+                  <mat-icon class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
+                    >delete_outline</mat-icon
+                  >
+                  <span class="pt-[1px]">Remover</span>
+                </button>
               </div>
 
-              @if (aviso.descricao) {
-                <p
-                  class="text-slate-600 text-xs mt-1 leading-relaxed font-medium line-clamp-2"
-                  [title]="aviso.descricao"
-                >
-                  {{ aviso.descricao }}
-                </p>
-              } @else {
-                <p class="text-slate-400 text-xs mt-1 italic font-normal">
-                  Sem descrição informada.
-                </p>
-              }
-            </div>
-          </div>
-        } @empty {
-          <div
-            class="col-span-full text-center py-20 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center gap-3"
-          >
-            <div
-              class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 shadow-sm"
-            >
-              <mat-icon
-                class="text-slate-400 !w-[32px] !h-[32px] !text-[32px] !leading-none overflow-visible"
-                >collections</mat-icon
+              <div
+                class="p-4 flex flex-col flex-1 justify-between bg-slate-50/50 border-t border-slate-100"
               >
+                <div
+                  class="flex items-center gap-1.5 text-sky-700 font-bold text-[10px] uppercase tracking-wider mb-2 bg-sky-50 px-2.5 py-1 rounded-lg border border-sky-100 self-start shadow-2xs"
+                >
+                  <mat-icon class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
+                    >calendar_today</mat-icon
+                  >
+                  <span class="pt-[1px]"
+                    >Data: {{ aviso.data_evento | date: 'dd/MM/yyyy' : 'UTC' }}</span
+                  >
+                </div>
+
+                @if (aviso.descricao) {
+                  <p
+                    class="text-slate-600 text-xs leading-relaxed font-medium line-clamp-2"
+                    [title]="aviso.descricao"
+                  >
+                    {{ aviso.descricao }}
+                  </p>
+                } @else {
+                  <p class="text-slate-400 text-xs italic font-normal">Sem descrição informada.</p>
+                }
+              </div>
             </div>
-            <p class="text-base font-semibold text-slate-700 tracking-tight mt-1">
-              Nenhum banner cadastrado
-            </p>
-            <p class="text-sm text-slate-500 -mt-1 max-w-xs">
-              Clique em "Novo Banner" acima para adicionar o primeiro aviso rotativo da Home.
-            </p>
-          </div>
-        }
-      </div>
-    }
+          } @empty {
+            <div
+              class="col-span-full text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200 flex flex-col items-center gap-3 p-6"
+            >
+              <div
+                class="w-12 h-12 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-1"
+              >
+                <mat-icon>collections</mat-icon>
+              </div>
+              <p class="text-sm font-bold text-slate-700">Nenhum banner cadastrado</p>
+              <p class="text-xs text-slate-400 max-w-xs">
+                Clique em "Novo Banner" acima para adicionar o primeiro aviso rotativo da Home.
+              </p>
+            </div>
+          }
+        </div>
+      }
+    </div>
   </div>
 </app-page-layout>

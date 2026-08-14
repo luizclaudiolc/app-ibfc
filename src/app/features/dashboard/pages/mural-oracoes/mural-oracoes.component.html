@@ -1,53 +1,53 @@
 <app-page-layout>
-  <button
-    (click)="voltar()"
-    class="flex items-center gap-2 text-slate-500 hover:text-sky-600 transition-colors font-semibold text-sm mb-6 -ml-1 px-2 py-1 rounded-lg"
-  >
-    <mat-icon class="text-[20px] w-5 h-5 flex justify-center items-center"
-      >arrow_back_ios_new</mat-icon
+  <div class="max-w-xl mx-auto space-y-6 pb-12">
+    <button
+      type="button"
+      (click)="voltar()"
+      class="inline-flex items-center gap-1.5 text-slate-500 hover:text-sky-600 transition-colors font-bold text-xs uppercase tracking-wider px-3 py-2 rounded-xl hover:bg-slate-100 cursor-pointer active:scale-95"
     >
-    Voltar
-  </button>
+      <mat-icon class="!w-4 !h-4 !text-[16px]">arrow_back_ios_new</mat-icon>
+      <span>Voltar</span>
+    </button>
 
-  <div class="mb-6">
-    <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
-      Mural de Intercessão
-    </h1>
-    <p class="text-sm text-slate-500 font-medium mt-1">
-      Apoie os irmãos em oração e acompanhe os motivos da nossa comunidade.
-    </p>
-  </div>
+    <app-page-header
+      titulo="Mural de Intercessão"
+      subtitulo="Apoie os irmãos em oração e acompanhe os motivos da nossa comunidade."
+      icone="volunteer_activism"
+    ></app-page-header>
 
-  @if (carregando()) {
-    <div class="space-y-4">
-      @for (i of [1, 2, 3]; track i) {
-        <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 animate-pulse">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-full bg-slate-200"></div>
-            <div class="space-y-2">
-              <div class="h-4 w-32 bg-slate-200 rounded"></div>
-              <div class="h-2 w-20 bg-slate-200 rounded"></div>
+    @if (carregando()) {
+      <div class="space-y-4 animate-pulse">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-slate-200"></div>
+              <div class="space-y-2">
+                <div class="h-4 w-32 bg-slate-200 rounded"></div>
+                <div class="h-2 w-20 bg-slate-200 rounded"></div>
+              </div>
             </div>
+            <div class="h-16 w-full bg-slate-100 rounded-2xl"></div>
           </div>
-          <div class="h-16 w-full bg-slate-100 rounded-2xl"></div>
-        </div>
-      }
-    </div>
-  } @else if (pedidos().length === 0) {
-    <div
-      class="bg-white border border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center text-center"
-    >
-      <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-        <mat-icon class="!w-8 !h-8 !text-[32px] text-slate-300">volunteer_activism</mat-icon>
+        }
       </div>
-      <h3 class="font-bold text-slate-700 mb-1">Nenhum pedido ativo</h3>
-      <p class="text-sm text-slate-500">Nenhum irmão compartilhou motivos de oração no momento.</p>
-    </div>
-  } @else {
-    <div class="space-y-1 pb-10">
-      @for (membro of pedidos(); track membro.id) {
-        <app-oracao-card [membroInput]="membro" />
-      }
-    </div>
-  }
+    } @else if (pedidos().length === 0) {
+      <div
+        class="bg-white border border-dashed border-slate-200 rounded-3xl p-12 flex flex-col items-center text-center shadow-2xs"
+      >
+        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+          <mat-icon class="!w-8 !h-8 !text-[32px] text-slate-300">volunteer_activism</mat-icon>
+        </div>
+        <h3 class="font-bold text-slate-700 text-sm mb-1">Nenhum pedido ativo</h3>
+        <p class="text-xs text-slate-400 max-w-xs">
+          Nenhum irmão compartilhou motivos de oração no momento.
+        </p>
+      </div>
+    } @else {
+      <div class="space-y-4 pb-4">
+        @for (membro of pedidos(); track membro.id) {
+          <app-oracao-card [membroInput]="membro" />
+        }
+      </div>
+    }
+  </div>
 </app-page-layout>

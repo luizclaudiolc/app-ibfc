@@ -1,26 +1,10 @@
 <app-page-layout>
   <div class="max-w-xl mx-auto space-y-6 pb-12">
-    <div
-      class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 relative overflow-hidden"
+    <app-page-header
+      titulo="Gestão de Membros"
+      subtitulo="Visualize, edite e gerencie os cadastros da rede."
+      icone="manage_accounts"
     >
-      <div
-        class="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-sky-500/10 to-indigo-500/15 pointer-events-none"
-      ></div>
-
-      <div class="relative z-10 flex items-center justify-between mb-4">
-        <div>
-          <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">Gestão de Membros</h1>
-          <p class="text-xs text-slate-500 font-medium mt-0.5">
-            Visualize, edite e gerencie os cadastros da rede.
-          </p>
-        </div>
-        <div
-          class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shadow-sm"
-        >
-          <mat-icon>manage_accounts</mat-icon>
-        </div>
-      </div>
-
       <div class="relative w-full">
         <input
           type="text"
@@ -30,10 +14,11 @@
         />
         <mat-icon
           class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 !w-5 !h-5 !text-[20px]"
-          >search</mat-icon
         >
+          search
+        </mat-icon>
       </div>
-    </div>
+    </app-page-header>
 
     @if (carregando()) {
       <div class="flex justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">

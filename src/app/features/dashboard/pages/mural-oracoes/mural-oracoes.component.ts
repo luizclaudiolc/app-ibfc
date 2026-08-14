@@ -6,11 +6,18 @@ import { OracaoCardComponent } from '../../../../shared/components/oracao-card/o
 import { MembroService } from '../../../../core/services/membro.service';
 import { Membro } from '../../../../shared/models/membro.model';
 import { NotificationService } from '../../../../core/services/notifications.service';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-mural-oracoes',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent, OracaoCardComponent],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    PageLayoutComponent,
+    OracaoCardComponent,
+    PageHeaderComponent,
+  ],
   templateUrl: './mural-oracoes.component.html',
 })
 export class MuralOracoesComponent implements OnInit {

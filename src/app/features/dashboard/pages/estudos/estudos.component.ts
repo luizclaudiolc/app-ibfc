@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { Estudo } from '../../../../shared/models/estudos.model';
 import { EstudoService } from '../../../../core/services/estudos.service';
@@ -9,13 +10,16 @@ import { EstudoService } from '../../../../core/services/estudos.service';
 @Component({
   selector: 'app-estudos',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent],
+  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
   templateUrl: './estudos.component.html',
 })
 export class EstudosComponent implements OnInit {
   estudosRaw = signal<Estudo[]>([]);
   carregando = signal<boolean>(true);
-  termoBusca = signal('');
+
+  // Controle de Busca e Paginação Infinita
+  termoBusca = signal<string>('');
+  limiteExibicao = signal<number>(10);
 
   private estudoService = inject(EstudoService);
   private notification = inject(NotificationService);
@@ -39,6 +43,7 @@ export class EstudosComponent implements OnInit {
     });
   }
 
+  // 1. Filtra os estudos com base no que foi digitado
   estudosFiltrados = computed(() => {
     const busca = this.termoBusca()
       .toLowerCase()
@@ -56,6 +61,28 @@ export class EstudosComponent implements OnInit {
     );
   });
 
+  // 2. Limita a quantidade de estudos renderizados na tela (Paginação)
+  estudosExibidos = computed(() => {
+    return this.estudosFiltrados().slice(0, this.limiteExibicao());
+  });
+
+  // 3. Controla a exibição do botão "Carregar mais estudos"
+  mostrarBotaoCarregarMais = computed(() => {
+    return this.estudosFiltrados().length > this.limiteExibicao();
+  });
+
+  // 4. Acionado quando o usuário digita no input de busca
+  aoBuscarEstudo(termo: string): void {
+    this.termoBusca.set(termo);
+    this.limiteExibicao.set(10); // Reseta a paginação ao realizar uma nova busca
+  }
+
+  // 5. Acionado ao clicar no botão "Carregar mais estudos"
+  carregarMaisEstudos(): void {
+    this.limiteExibicao.update((valorAtual) => valorAtual + 10);
+  }
+
+  // Lógica de download do arquivo PDF
   async baixarPdf(url: string, titulo: string): Promise<void> {
     try {
       this.notification.aviso('Preparando download do arquivo...', 2000);
@@ -64,7 +91,6 @@ export class EstudosComponent implements OnInit {
       if (!response.ok) throw new Error('Falha ao baixar o arquivo.');
 
       const blob = await response.blob();
-
       const blobUrl = window.URL.createObjectURL(blob);
 
       const link = document.createElement('a');
@@ -88,7 +114,6 @@ export class EstudosComponent implements OnInit {
       this.notification.sucesso('Download concluído!');
     } catch (error) {
       console.error('Erro no download:', error);
-
       window.open(url, '_blank');
     }
   }

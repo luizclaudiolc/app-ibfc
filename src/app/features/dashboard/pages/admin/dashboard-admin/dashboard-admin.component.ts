@@ -16,13 +16,20 @@ import {
   DashboardData,
   EstatisticasService,
 } from '../../../../../core/services/estatisticas.service';
+import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
 @Component({
   selector: 'app-dashboard-admin',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent, BaseChartDirective],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    PageLayoutComponent,
+    BaseChartDirective,
+    PageHeaderComponent,
+  ],
   templateUrl: './dashboard-admin.component.html',
 })
 export class DashboardAdminComponent implements OnInit {

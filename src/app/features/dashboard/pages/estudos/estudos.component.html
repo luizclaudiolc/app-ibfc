@@ -1,88 +1,105 @@
 <app-page-layout>
-  <div class="mb-6">
-    <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Biblioteca</h1>
-    <p class="text-slate-500 text-sm mt-0.5">
-      Estudos, apostilas e materiais de apoio da nossa igreja.
-    </p>
-  </div>
-
-  <div class="relative mb-6">
-    <input
-      type="text"
-      (input)="termoBusca.set($any($event.target).value)"
-      placeholder="Pesquisar por título ou assunto..."
-      class="w-full pl-12 pr-4 py-3.5 text-sm bg-white border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 transition-all shadow-sm placeholder-slate-400 font-medium"
-    />
-    <mat-icon
-      class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none w-5 h-5 flex justify-center items-center"
+  <div class="max-w-xl mx-auto space-y-6 pb-12">
+    <app-page-header
+      titulo="Biblioteca"
+      subtitulo="Estudos, apostilas e materiais de apoio da nossa igreja."
+      icone="menu_book"
     >
-      search
-    </mat-icon>
-  </div>
-
-  @if (carregando()) {
-    <div class="space-y-4 animate-pulse">
-      <div class="h-28 bg-white border border-slate-100 rounded-2xl"></div>
-      <div class="h-28 bg-white border border-slate-100 rounded-2xl"></div>
-      <div class="h-28 bg-white border border-slate-100 rounded-2xl"></div>
-    </div>
-  } @else {
-    <div class="space-y-4 pb-6">
-      @for (estudo of estudosFiltrados(); track estudo.id) {
-        <div
-          class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:items-center hover:border-sky-200 transition-colors"
+      <div class="relative w-full">
+        <input
+          type="text"
+          (input)="aoBuscarEstudo($any($event.target).value)"
+          placeholder="Pesquisar por título ou assunto..."
+          class="w-full pl-10 pr-4 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm"
+        />
+        <mat-icon
+          class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 !w-5 !h-5 !text-[20px]"
         >
+          search
+        </mat-icon>
+      </div>
+    </app-page-header>
+
+    @if (carregando()) {
+      <div class="space-y-4 animate-pulse">
+        <div class="h-28 bg-white border border-slate-100 rounded-3xl shadow-sm"></div>
+        <div class="h-28 bg-white border border-slate-100 rounded-3xl shadow-sm"></div>
+        <div class="h-28 bg-white border border-slate-100 rounded-3xl shadow-sm"></div>
+      </div>
+    } @else {
+      <div class="space-y-4 pb-6">
+        @for (estudo of estudosExibidos(); track estudo.id) {
           <div
-            class="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center shrink-0"
+            class="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:items-center hover:border-sky-300 transition-colors"
           >
-            <mat-icon class="text-red-500 !w-[28px] !h-[28px] !text-[28px]"
-              >picture_as_pdf</mat-icon
-            >
-          </div>
-
-          <div class="flex-1 min-w-0">
-            <h3 class="text-base font-bold text-slate-800 tracking-tight line-clamp-2">
-              {{ estudo.titulo }}
-            </h3>
-            @if (estudo.descricao) {
-              <p class="text-sm text-slate-500 font-medium mt-1 line-clamp-2">
-                {{ estudo.descricao }}
-              </p>
-            }
             <div
-              class="flex items-center gap-1.5 mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider"
+              class="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center shrink-0 shadow-sm"
             >
-              <mat-icon class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
-                >calendar_today</mat-icon
+              <mat-icon class="text-red-500 !w-[28px] !h-[28px] !text-[28px]"
+                >picture_as_pdf</mat-icon
               >
-              <span class="pt-[1px]">{{ estudo.created_at | date: 'dd/MM/yyyy' : 'UTC' }}</span>
             </div>
-          </div>
 
-          <button
-            (click)="baixarPdf(estudo.arquivo_url, estudo.titulo)"
-            class="w-full sm:w-auto px-6 py-3 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white hover:shadow-md border border-sky-100 rounded-xl text-sm font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shrink-0 group cursor-pointer"
-          >
-            <mat-icon
-              class="!w-[18px] !h-[18px] !text-[18px] !leading-none overflow-visible group-hover:animate-bounce"
-              >download</mat-icon
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm sm:text-base font-bold text-slate-800 tracking-tight line-clamp-2">
+                {{ estudo.titulo }}
+              </h3>
+              @if (estudo.descricao) {
+                <p class="text-[11px] sm:text-xs text-slate-500 font-medium mt-1 line-clamp-2">
+                  {{ estudo.descricao }}
+                </p>
+              }
+              <div
+                class="flex items-center gap-1.5 mt-2 text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider"
+              >
+                <mat-icon class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
+                  >calendar_today</mat-icon
+                >
+                <span class="pt-[1px]">{{ estudo.created_at | date: 'dd/MM/yyyy' : 'UTC' }}</span>
+              </div>
+            </div>
+
+            <button
+              (click)="baixarPdf(estudo.arquivo_url, estudo.titulo)"
+              class="w-full sm:w-auto px-5 py-3 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white border border-sky-100 hover:border-sky-600 rounded-2xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shrink-0 group cursor-pointer shadow-sm"
             >
-            <span class="pt-[1px]">Baixar PDF</span>
-          </button>
-        </div>
-      } @empty {
-        <div
-          class="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200 flex flex-col items-center gap-3"
-        >
-          <mat-icon class="text-slate-300 !w-[48px] !h-[48px] !text-[48px] !leading-none"
-            >search_off</mat-icon
+              <mat-icon
+                class="!w-[18px] !h-[18px] !text-[18px] !leading-none overflow-visible group-hover:animate-bounce"
+                >download</mat-icon
+              >
+              <span class="pt-[1px]">Baixar PDF</span>
+            </button>
+          </div>
+        } @empty {
+          <div
+            class="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 flex flex-col items-center gap-3 p-6"
           >
-          <p class="text-base font-semibold text-slate-600">Nenhum estudo encontrado.</p>
-          <p class="text-sm text-slate-400 max-w-xs">
-            Tente buscar por outras palavras ou volte mais tarde para novos materiais.
-          </p>
-        </div>
-      }
-    </div>
-  }
+            <div
+              class="w-12 h-12 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-1"
+            >
+              <mat-icon>search_off</mat-icon>
+            </div>
+            <p class="text-sm font-bold text-slate-700">Nenhum estudo encontrado.</p>
+            <p class="text-xs text-slate-400 max-w-xs">
+              Tente buscar por outras palavras ou volte mais tarde para novos materiais.
+            </p>
+          </div>
+        }
+
+        @if (mostrarBotaoCarregarMais()) {
+          <div class="flex justify-center pt-2">
+            <button
+              type="button"
+              (click)="carregarMaisEstudos()"
+              class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-xs px-6 py-3 rounded-2xl shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <mat-icon class="!w-4 !h-4 !text-[16px]">expand_more</mat-icon>
+              Carregar mais estudos ({{ estudosFiltrados().length - estudosExibidos().length }}
+              restantes)
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
 </app-page-layout>
