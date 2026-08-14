@@ -19,6 +19,7 @@ import {
 } from '../../../../shared/models/consts';
 import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
 import { CepService } from '../../../../core/services/busca-cep.service';
+import { PwaService } from '../../../../core/services/pwa.service';
 
 @Component({
   selector: 'app-perfil',
@@ -34,6 +35,7 @@ export class PerfilComponent implements OnInit {
   private authService = inject(AuthService);
   private notification = inject(NotificationService);
   private cepService = inject(CepService);
+  public pwaService = inject(PwaService);
 
   carregando = signal<boolean>(false);
   carregandoDados = signal<boolean>(true);
@@ -315,5 +317,9 @@ export class PerfilComponent implements OnInit {
 
   cancelar(): void {
     this.router.navigate(['dashboard/home']);
+  }
+
+  cliqueInstalar() {
+    this.pwaService.instalarApp();
   }
 }
