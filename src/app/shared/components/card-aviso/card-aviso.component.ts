@@ -4,6 +4,7 @@ import { Aviso } from '../../models/aviso.model';
 import { MaterialModule } from '../../../core/modules/material.module';
 import { AvisoService } from '../../../core/services/aviso.service';
 import { NotificationService } from '../../../core/services/notifications.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-aviso-card',
@@ -21,6 +22,7 @@ export class CardAvisoComponent implements OnInit {
 
   private avisoService = inject(AvisoService);
   private notification = inject(NotificationService);
+  private authService = inject(AuthService);
 
   ngOnInit() {
     this.avisoLocal.set(this.aviso());
@@ -28,20 +30,18 @@ export class CardAvisoComponent implements OnInit {
   }
 
   private verificarStatusLocal(): void {
-    const leiturasSalvas = JSON.parse(localStorage.getItem('avisos_confirmados') || '[]');
+    const leiturasSalvas = this.authService.obterAvisosConfirmados();
     const id = this.avisoLocal().id;
 
-    if (leiturasSalvas.includes(id)) {
+    if (id && leiturasSalvas.includes(id)) {
       this.jaConfirmou.set(true);
     }
   }
 
   private salvarLocal(): void {
     const id = this.avisoLocal().id;
-    const leiturasSalvas = JSON.parse(localStorage.getItem('avisos_confirmados') || '[]');
-    if (!leiturasSalvas.includes(id)) {
-      leiturasSalvas.push(id);
-      localStorage.setItem('avisos_confirmados', JSON.stringify(leiturasSalvas));
+    if (id) {
+      this.authService.adicionarAvisoConfirmado(id);
     }
   }
 
@@ -50,6 +50,7 @@ export class CardAvisoComponent implements OnInit {
 
     this.carregando.set(true);
     this.jaConfirmou.set(true);
+
     this.salvarLocal();
 
     const totalAtual = this.avisoLocal().total_confirmacoes || 0;
@@ -75,9 +76,12 @@ export class CardAvisoComponent implements OnInit {
 
   private reverter(totalAnterior: number): void {
     this.jaConfirmou.set(false);
-    const leiturasSalvas = JSON.parse(localStorage.getItem('avisos_confirmados') || '[]');
-    const novaLista = leiturasSalvas.filter((id: string) => id !== this.avisoLocal().id);
-    localStorage.setItem('avisos_confirmados', JSON.stringify(novaLista));
+
+    const id = this.avisoLocal().id;
+    if (id) {
+      this.authService.removerAvisoConfirmado(id);
+    }
+
     this.avisoLocal.update((a) => ({ ...a, total_confirmacoes: totalAnterior }));
   }
 }

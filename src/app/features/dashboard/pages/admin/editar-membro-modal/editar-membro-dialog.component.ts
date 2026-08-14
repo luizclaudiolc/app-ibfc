@@ -23,6 +23,7 @@ import {
   NivelAcesso,
   StatusMembro,
 } from '../../../../../shared/models/consts';
+import { AuthService } from '../../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-editar-membro-dialog',
@@ -43,6 +44,7 @@ export class EditarMembroDialogComponent {
   private dialog = inject(MatDialog);
   private cepService = inject(CepService);
   private notification = inject(NotificationService);
+  private readonly authService = inject(AuthService);
 
   public data = inject(MAT_DIALOG_DATA);
 
@@ -53,7 +55,7 @@ export class EditarMembroDialogComponent {
   cargosDisponiveis = CARGOS_DISPONIVEIS;
   departamentos = DEPARTAMENTOS_DISPONIVEIS;
 
-  meuNivel = localStorage.getItem('user_nivel') as NivelAcesso;
+  meuNivel = this.authService.obterUsuarioLogado().nivel;
 
   niveisAcesso = [
     { label: 'Administrador (Padrão)', value: 'ADMIN' satisfies NivelAcesso },

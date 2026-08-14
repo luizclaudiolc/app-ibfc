@@ -5,6 +5,7 @@ import { MaterialModule } from '../../../core/modules/material.module';
 import { Membro } from '../../models/membro.model';
 import { MembroService } from '../../../core/services/membro.service';
 import { NotificationService } from '../../../core/services/notifications.service';
+import { AuthService } from '../../../core/services/auth.service'; // <-- Importado aqui
 
 @Component({
   selector: 'app-oracao-card',
@@ -21,6 +22,7 @@ export class OracaoCardComponent implements OnInit {
 
   private membroService = inject(MembroService);
   private notification = inject(NotificationService);
+  private authService = inject(AuthService); // <-- Injetado aqui
 
   ngOnInit() {
     this.membroLocal.set(this.membroInput());
@@ -28,13 +30,12 @@ export class OracaoCardComponent implements OnInit {
   }
 
   private verificarStatusOracaoLocal(): void {
-    const oracoesSalvas = JSON.parse(localStorage.getItem('oracoes_realizadas') || '[]');
+    const oracoesSalvas = this.authService.obterOracoesRealizadas();
     const id = this.membroLocal().id!;
     const totalBanco = this.membroLocal().total_oracoes || 0;
 
     if (totalBanco === 0) {
-      const novaLista = oracoesSalvas.filter((savedId: string) => savedId !== id);
-      localStorage.setItem('oracoes_realizadas', JSON.stringify(novaLista));
+      this.authService.removerOracaoRealizada(id);
       this.jaOrou.set(false);
       return;
     }
@@ -45,19 +46,11 @@ export class OracaoCardComponent implements OnInit {
   }
 
   private salvarOracaoLocal(): void {
-    const id = this.membroLocal().id!;
-    const oracoesSalvas = JSON.parse(localStorage.getItem('oracoes_realizadas') || '[]');
-    if (!oracoesSalvas.includes(id)) {
-      oracoesSalvas.push(id);
-      localStorage.setItem('oracoes_realizadas', JSON.stringify(oracoesSalvas));
-    }
+    this.authService.adicionarOracaoRealizada(this.membroLocal().id!);
   }
 
   private removerOracaoLocal(): void {
-    const id = this.membroLocal().id!;
-    const oracoesSalvas = JSON.parse(localStorage.getItem('oracoes_realizadas') || '[]');
-    const novaLista = oracoesSalvas.filter((savedId: string) => savedId !== id);
-    localStorage.setItem('oracoes_realizadas', JSON.stringify(novaLista));
+    this.authService.removerOracaoRealizada(this.membroLocal().id!);
   }
 
   orarPorMembro(): void {

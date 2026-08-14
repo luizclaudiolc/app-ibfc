@@ -7,10 +7,12 @@ import {
 } from '../../shared/models/membro.model';
 import { SupabaseService } from './supabase';
 import { EStatusMembro } from '../../shared/models/consts';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class MembroService {
   private supabaseService = inject(SupabaseService);
+  private readonly authService = inject(AuthService);
 
   buscarTodos(todosStatus = false): Observable<Membro[]> {
     const promise = this.supabaseService.supabase
@@ -132,7 +134,7 @@ export class MembroService {
 
       if (error) throw error;
 
-      localStorage.setItem('user_nome', `${nome} ${sobrenome}`);
+      this.authService.atualizarNomeGlobal(`${nome} ${sobrenome}`);
 
       return { sucesso: true };
     } catch (error: any) {

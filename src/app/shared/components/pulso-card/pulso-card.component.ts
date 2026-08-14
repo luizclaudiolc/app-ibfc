@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../../core/modules/material.module';
 import { PulsoService } from '../../../core/services/pulso.service';
 import { NotificationService } from '../../../core/services/notifications.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Subject, take, takeUntil, timer } from 'rxjs';
 
 @Component({
@@ -19,12 +20,14 @@ export class PulsoCardComponent implements OnInit {
 
   private pulsoService = inject(PulsoService);
   private notification = inject(NotificationService);
+  private authService = inject(AuthService);
 
   ngOnInit() {
     const semanaAtual = this.pulsoService.getSemanaAtual();
-    const chaveCache = `pulso_voto_${semanaAtual}`;
 
-    if (localStorage.getItem(chaveCache)) {
+    const semanaVotadaNoCache = this.authService.obterSemanaVotadaPulso();
+
+    if (semanaVotadaNoCache === semanaAtual) {
       this.visivel.set(false);
     }
   }
@@ -39,7 +42,8 @@ export class PulsoCardComponent implements OnInit {
       next: (res) => {
         this.carregando.set(false);
         if (res.sucesso) {
-          localStorage.setItem(`pulso_voto_${semanaAtual}`, 'true');
+          this.authService.salvarSemanaVotadaPulso(semanaAtual);
+
           this.jaVotou.set(true);
 
           timer(4000)

@@ -2,10 +2,10 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { ENiveisAcesso } from '../../../shared/models/consts';
 import { SupabaseService } from '../supabase';
+import { AuthService } from '../auth.service';
 
 export const authGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
-
   const supabaseService = inject(SupabaseService);
 
   try {
@@ -17,7 +17,7 @@ export const authGuard: CanActivateFn = async (route, state) => {
     if (session && !error) {
       return true;
     } else {
-      localStorage.clear();
+      localStorage.removeItem('app_user_session');
       router.navigate(['/login']);
       return false;
     }
@@ -30,7 +30,9 @@ export const authGuard: CanActivateFn = async (route, state) => {
 
 export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
-  const nivelAcesso = localStorage.getItem('user_nivel');
+  const authService = inject(AuthService);
+
+  const nivelAcesso = authService.obterUsuarioLogado().nivel;
 
   if (nivelAcesso === ENiveisAcesso.Admin || nivelAcesso === ENiveisAcesso.SuperAdmin) {
     return true;

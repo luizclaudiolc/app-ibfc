@@ -4,12 +4,15 @@ import { Observable, from } from 'rxjs';
 import { Membro, UsuarioCadastro, UsuarioLogado } from '../../shared/models/membro.model';
 import { SupabaseService } from './supabase';
 import { ECargos, ENiveisAcesso, EStatusMembro } from '../../shared/models/consts';
+import { SessaoUsuario } from '../../shared/models/sessaoUsuario';
 
 export interface RespostaLogin {
   sucesso: boolean;
   usuario?: UsuarioLogado;
   mensagem?: string;
 }
+
+const SESSION_KEY = 'app_user_session';
 
 @Injectable({
   providedIn: 'root',
@@ -19,50 +22,116 @@ export class AuthService {
   private router = inject(Router);
   private ngZone = inject(NgZone);
 
-  fotoUsuario$ = signal<string | null>(localStorage.getItem('user_foto'));
-  nomeUsuario$ = signal<string>(localStorage.getItem('user_nome') || 'Irmão(ã)');
-  userGenero$ = signal<number | null>(
-    localStorage.getItem('user_genero') ? Number(localStorage.getItem('user_genero')) : null,
-  );
+  private sessaoInicial = this.getSessao();
+
+  fotoUsuario$ = signal<string | null>(this.sessaoInicial?.fotoUrl || null);
+  nomeUsuario$ = signal<string>(this.sessaoInicial?.nome || 'Irmão(ã)');
+  userGenero$ = signal<number | null>(this.sessaoInicial?.genero ?? null);
 
   constructor() {
     this.iniciarObservadorDeSessao();
   }
 
-  obterUsuarioLogado() {
-    const generoStr = localStorage.getItem('user_genero');
+  login(email: string, senha: string): Observable<RespostaLogin> {
+    return from(this.executarLoginSupabase(email, senha));
+  }
+
+  cadastrar(membro: UsuarioCadastro): Observable<{ sucesso: boolean; mensagem: string }> {
+    return from(this.executarCadastroSupabase(membro));
+  }
+
+  async logout(): Promise<void> {
+    await this.supabaseService.supabase.auth.signOut();
+    this.limparSessaoLocal();
+    this.router.navigate(['/login']);
+  }
+
+  obterUsuarioLogado(): SessaoUsuario {
+    const sessao = this.getSessao();
 
     return {
-      email: localStorage.getItem('user_email'),
-      nome: localStorage.getItem('user_nome'),
-      nivel: localStorage.getItem('user_nivel'),
-      setor: localStorage.getItem('user_setor'),
-      fotoUrl: localStorage.getItem('user_foto'),
-      genero: generoStr && generoStr !== '' ? Number(generoStr) : null,
+      email: sessao?.email || '',
+      nome: sessao?.nome || '',
+      nivel: sessao?.nivel || '',
+      setor: sessao?.setor || null,
+      fotoUrl: sessao?.fotoUrl || null,
+      genero: sessao?.genero ?? null,
     };
   }
 
   atualizarFotoGlobal(url: string | null): void {
     this.fotoUsuario$.set(url);
-    if (url) {
-      localStorage.setItem('user_foto', url);
-    } else {
-      localStorage.removeItem('user_foto');
-    }
+    this.atualizarPropriedadeSessao({ fotoUrl: url });
   }
 
   atualizarNomeGlobal(nome: string): void {
     this.nomeUsuario$.set(nome);
-    localStorage.setItem('user_nome', nome);
+    this.atualizarPropriedadeSessao({ nome });
   }
 
   atualizarGeneroGlobal(genero: number | null): void {
     this.userGenero$.set(genero);
-    if (genero !== null) {
-      localStorage.setItem('user_genero', genero.toString());
-    } else {
-      localStorage.removeItem('user_genero');
+    this.atualizarPropriedadeSessao({ genero });
+  }
+
+  obterVersiculoEmCache() {
+    const sessao = this.getSessao();
+    return sessao?.versiculoCache || null;
+  }
+
+  salvarVersiculoEmCache(versiculoCache: {
+    data: string;
+    texto: string;
+    referencia: string;
+  }): void {
+    this.atualizarPropriedadeSessao({ versiculoCache });
+  }
+
+  obterSemanaVotadaPulso(): string | null {
+    const sessao = this.getSessao();
+    return sessao?.pulsoSemanaVotada || null;
+  }
+
+  salvarSemanaVotadaPulso(semana: string): void {
+    this.atualizarPropriedadeSessao({ pulsoSemanaVotada: semana });
+  }
+
+  obterAvisosConfirmados(): string[] {
+    const sessao = this.getSessao();
+    return sessao?.avisosConfirmados || [];
+  }
+
+  adicionarAvisoConfirmado(idAviso: string): void {
+    const atuais = this.obterAvisosConfirmados();
+    if (!atuais.includes(idAviso)) {
+      atuais.push(idAviso);
+      this.atualizarPropriedadeSessao({ avisosConfirmados: atuais });
     }
+  }
+
+  removerAvisoConfirmado(idAviso: string): void {
+    const atuais = this.obterAvisosConfirmados();
+    const filtrados = atuais.filter((id) => id !== idAviso);
+    this.atualizarPropriedadeSessao({ avisosConfirmados: filtrados });
+  }
+
+  obterOracoesRealizadas(): string[] {
+    const sessao = this.getSessao();
+    return sessao?.oracoesRealizadas || [];
+  }
+
+  adicionarOracaoRealizada(idMembro: string): void {
+    const atuais = this.obterOracoesRealizadas();
+    if (!atuais.includes(idMembro)) {
+      atuais.push(idMembro);
+      this.atualizarPropriedadeSessao({ oracoesRealizadas: atuais });
+    }
+  }
+
+  removerOracaoRealizada(idMembro: string): void {
+    const atuais = this.obterOracoesRealizadas();
+    const filtrados = atuais.filter((id) => id !== idMembro);
+    this.atualizarPropriedadeSessao({ oracoesRealizadas: filtrados });
   }
 
   private iniciarObservadorDeSessao() {
@@ -79,23 +148,6 @@ export class AuthService {
         }
       });
     });
-  }
-
-  private limparSessaoLocal(): void {
-    localStorage.removeItem('user_email');
-    localStorage.removeItem('user_nome');
-    localStorage.removeItem('user_nivel');
-    localStorage.removeItem('user_setor');
-    localStorage.removeItem('user_foto');
-    localStorage.removeItem('user_genero');
-
-    this.fotoUsuario$.set(null);
-    this.nomeUsuario$.set('Irmão(ã)');
-    this.atualizarGeneroGlobal(null);
-  }
-
-  login(email: string, senha: string): Observable<RespostaLogin> {
-    return from(this.executarLoginSupabase(email, senha));
   }
 
   private async executarLoginSupabase(email: string, senha: string): Promise<RespostaLogin> {
@@ -127,26 +179,6 @@ export class AuthService {
     } catch (error: any) {
       return { sucesso: false, mensagem: error.message };
     }
-  }
-
-  private atualizarLocalStorage(perfil: Membro): void {
-    localStorage.setItem('user_email', perfil.email);
-    localStorage.setItem('user_nivel', perfil.nivel_acesso || ENiveisAcesso.User);
-    localStorage.setItem('user_genero', perfil.genero?.toString() || '');
-
-    if (perfil.setor_responsavel) {
-      localStorage.setItem('user_setor', perfil.setor_responsavel);
-    } else {
-      localStorage.removeItem('user_setor');
-    }
-
-    this.atualizarNomeGlobal(`${perfil.nome} ${perfil.sobrenome}`);
-    this.atualizarFotoGlobal(perfil.foto_url || null);
-    this.atualizarGeneroGlobal(perfil.genero || null);
-  }
-
-  cadastrar(membro: UsuarioCadastro): Observable<{ sucesso: boolean; mensagem: string }> {
-    return from(this.executarCadastroSupabase(membro));
   }
 
   private async executarCadastroSupabase(
@@ -221,9 +253,41 @@ export class AuthService {
     }
   }
 
-  async logout(): Promise<void> {
-    await this.supabaseService.supabase.auth.signOut();
-    this.limparSessaoLocal();
-    this.router.navigate(['/login']);
+  private getSessao(): any {
+    const data = localStorage.getItem(SESSION_KEY);
+    return data ? JSON.parse(data) : null;
+  }
+
+  private atualizarPropriedadeSessao(dadosParciais: any): void {
+    const sessaoAtual = this.getSessao() || {};
+    const sessaoAtualizada = { ...sessaoAtual, ...dadosParciais };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sessaoAtualizada));
+  }
+
+  private atualizarLocalStorage(perfil: Membro): void {
+    const nomeCompleto = `${perfil.nome} ${perfil.sobrenome}`;
+
+    const sessaoData = {
+      email: perfil.email,
+      nome: nomeCompleto,
+      nivel: perfil.nivel_acesso || ENiveisAcesso.User,
+      setor: perfil.setor_responsavel || null,
+      fotoUrl: perfil.foto_url || null,
+      genero: perfil.genero ?? null,
+    };
+
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sessaoData));
+
+    this.nomeUsuario$.set(nomeCompleto);
+    this.fotoUsuario$.set(perfil.foto_url || null);
+    this.userGenero$.set(perfil.genero ?? null);
+  }
+
+  private limparSessaoLocal(): void {
+    localStorage.removeItem(SESSION_KEY);
+
+    this.fotoUsuario$.set(null);
+    this.nomeUsuario$.set('Irmão(ã)');
+    this.userGenero$.set(null);
   }
 }

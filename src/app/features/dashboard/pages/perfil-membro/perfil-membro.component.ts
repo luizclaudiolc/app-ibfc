@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import { NotificationService } from '../../../../core/services/notifications.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-membro-perfil',
@@ -32,6 +33,7 @@ export class PerfilMembroComponent implements OnInit {
   private location = inject(Location);
   private dialog = inject(MatDialog);
   private notification = inject(NotificationService);
+  private authService = inject(AuthService);
 
   departamentos = DEPARTAMENTOS_DISPONIVEIS_MAP;
   gradientesPasteis = GRADIENTES_PASTEIS;
@@ -54,7 +56,6 @@ export class PerfilMembroComponent implements OnInit {
       next: (dados) => {
         if (dados) {
           this.membro.set(dados);
-
           this.verificarStatusOracaoLocal(dados.id!, dados.total_oracoes || 0);
         } else {
           this.erro.set(true);
@@ -117,7 +118,6 @@ export class PerfilMembroComponent implements OnInit {
     if (!membroAtual || !membroAtual.id || this.jaOrou()) return;
 
     this.jaOrou.set(true);
-
     this.salvarOracaoLocal(membroAtual.id);
 
     const totalAtual = membroAtual.total_oracoes || 0;
@@ -144,11 +144,10 @@ export class PerfilMembroComponent implements OnInit {
   }
 
   private verificarStatusOracaoLocal(membroId: string, totalOracoesBanco: number): void {
-    const oracoesSalvas = JSON.parse(localStorage.getItem('oracoes_realizadas') || '[]');
+    const oracoesSalvas = this.authService.obterOracoesRealizadas();
 
     if (totalOracoesBanco === 0) {
-      const novaLista = oracoesSalvas.filter((id: string) => id !== membroId);
-      localStorage.setItem('oracoes_realizadas', JSON.stringify(novaLista));
+      this.authService.removerOracaoRealizada(membroId);
       this.jaOrou.set(false);
       return;
     }
@@ -159,16 +158,10 @@ export class PerfilMembroComponent implements OnInit {
   }
 
   private salvarOracaoLocal(membroId: string): void {
-    const oracoesSalvas = JSON.parse(localStorage.getItem('oracoes_realizadas') || '[]');
-    if (!oracoesSalvas.includes(membroId)) {
-      oracoesSalvas.push(membroId);
-      localStorage.setItem('oracoes_realizadas', JSON.stringify(oracoesSalvas));
-    }
+    this.authService.adicionarOracaoRealizada(membroId);
   }
 
   private removerOracaoLocal(membroId: string): void {
-    const oracoesSalvas = JSON.parse(localStorage.getItem('oracoes_realizadas') || '[]');
-    const novaLista = oracoesSalvas.filter((id: string) => id !== membroId);
-    localStorage.setItem('oracoes_realizadas', JSON.stringify(novaLista));
+    this.authService.removerOracaoRealizada(membroId);
   }
 }

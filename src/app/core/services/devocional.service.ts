@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { referencias } from '../../shared/models/versiculos';
+import { AuthService } from './auth.service';
 
 export interface VersiculoDia {
   texto: string;
@@ -11,6 +12,7 @@ export interface VersiculoDia {
 @Injectable({ providedIn: 'root' })
 export class DevocionalService {
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
 
   private referenciasCuradas = referencias;
 
@@ -22,12 +24,9 @@ export class DevocionalService {
 
     const dataString = `${ano}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
 
-    const cache = localStorage.getItem('versiculo_dia');
-    if (cache) {
-      const parsed = JSON.parse(cache);
-      if (parsed.data === dataString) {
-        return of({ texto: parsed.texto, referencia: parsed.referencia });
-      }
+    const cache = this.authService.obterVersiculoEmCache();
+    if (cache && cache.data === dataString) {
+      return of({ texto: cache.texto, referencia: cache.referencia });
     }
 
     const semente = ano * 10000 + mes * 100 + dia;
@@ -42,14 +41,11 @@ export class DevocionalService {
         referencia: res.reference,
       })),
       tap((versiculo) => {
-        localStorage.setItem(
-          'versiculo_dia',
-          JSON.stringify({
-            data: dataString,
-            texto: versiculo.texto,
-            referencia: versiculo.referencia,
-          }),
-        );
+        this.authService.salvarVersiculoEmCache({
+          data: dataString,
+          texto: versiculo.texto,
+          referencia: versiculo.referencia,
+        });
       }),
       catchError(() => {
         return of({
