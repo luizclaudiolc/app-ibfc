@@ -5,13 +5,16 @@ import { Injectable, signal } from '@angular/core';
 })
 export class PwaService {
   private deferredPrompt: any = null;
-  // Forçamos como true temporariamente para validar o design e o layout na tela de Perfil
-  public mostrarBotaoInstalar = signal<boolean>(true);
+  // Começa falso e só fica true quando o navegador disparar o evento real de PWA
+  public mostrarBotaoInstalar = signal<boolean>(false);
 
   constructor() {
     window.addEventListener('beforeinstallprompt', (e: any) => {
+      // Impede o banner padrão do navegador
       e.preventDefault();
+      // Salva o evento real capturado pelo ambiente de produção (GitHub Pages)
       this.deferredPrompt = e;
+      // Exibe o nosso botão customizado na tela de perfil
       this.mostrarBotaoInstalar.set(true);
     });
 
@@ -22,20 +25,17 @@ export class PwaService {
   }
 
   async instalarApp(): Promise<void> {
-    if (!this.deferredPrompt) {
-      // Caso o evento nativo não esteja na memória, aciona o instalador nativo do navegador via prompt simulado ou orienta o usuário
-      window.alert(
-        'Para instalar o aplicativo, utilize o ícone de instalação localizado na barra de endereços do navegador (canto superior direito).',
-      );
-      return;
-    }
+    if (!this.deferredPrompt) return;
 
+    // Dispara o prompt nativo de instalação do celular/computador sem cair em alertas
     this.deferredPrompt.prompt();
+
     const { outcome } = await this.deferredPrompt.userChoice;
 
     if (outcome === 'accepted') {
       this.mostrarBotaoInstalar.set(false);
     }
+
     this.deferredPrompt = null;
   }
 }
