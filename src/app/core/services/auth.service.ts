@@ -266,6 +266,16 @@ export class AuthService {
 
   private atualizarLocalStorage(perfil: Membro): void {
     const nomeCompleto = `${perfil.nome} ${perfil.sobrenome}`;
+    let cachesRestaurados = {};
+
+    const backupStr = localStorage.getItem('app_cache_backup');
+    if (backupStr) {
+      const todosBackups = JSON.parse(backupStr);
+
+      if (todosBackups[perfil.email]) {
+        cachesRestaurados = todosBackups[perfil.email];
+      }
+    }
 
     const sessaoData = {
       email: perfil.email,
@@ -274,6 +284,7 @@ export class AuthService {
       setor: perfil.setor_responsavel || null,
       fotoUrl: perfil.foto_url || null,
       genero: perfil.genero ?? null,
+      ...cachesRestaurados,
     };
 
     localStorage.setItem(SESSION_KEY, JSON.stringify(sessaoData));
@@ -284,6 +295,22 @@ export class AuthService {
   }
 
   private limparSessaoLocal(): void {
+    const sessaoAtual = this.getSessao();
+
+    if (sessaoAtual && sessaoAtual.email) {
+      const backupStr = localStorage.getItem('app_cache_backup');
+      const todosBackups = backupStr ? JSON.parse(backupStr) : {};
+
+      todosBackups[sessaoAtual.email] = {
+        pulsoSemanaVotada: sessaoAtual.pulsoSemanaVotada,
+        avisosConfirmados: sessaoAtual.avisosConfirmados,
+        oracoesRealizadas: sessaoAtual.oracoesRealizadas,
+        versiculoCache: sessaoAtual.versiculoCache,
+      };
+
+      localStorage.setItem('app_cache_backup', JSON.stringify(todosBackups));
+    }
+
     localStorage.removeItem(SESSION_KEY);
 
     this.fotoUsuario$.set(null);
