@@ -105,6 +105,11 @@ export class AuthService {
     const atuais = this.obterAvisosConfirmados();
     if (!atuais.includes(idAviso)) {
       atuais.push(idAviso);
+
+      if (atuais.length > 100) {
+        atuais.unshift();
+      }
+
       this.atualizarPropriedadeSessao({ avisosConfirmados: atuais });
     }
   }
@@ -124,6 +129,9 @@ export class AuthService {
     const atuais = this.obterOracoesRealizadas();
     if (!atuais.includes(idMembro)) {
       atuais.push(idMembro);
+      if (atuais.length > 200) {
+        atuais.unshift();
+      }
       this.atualizarPropriedadeSessao({ oracoesRealizadas: atuais });
     }
   }

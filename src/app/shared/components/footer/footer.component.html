@@ -38,13 +38,4 @@
       <span class="font-medium text-slate-700">{{ overflow.label }}</span>
     </a>
   }
-
-  @if (overflowItems().length > 0) {
-    <mat-divider class="my-1"></mat-divider>
-  }
-
-  <button mat-menu-item (click)="efetuarLogout()" class="hover:bg-red-50">
-    <mat-icon class="!text-red-500 mr-2">logout</mat-icon>
-    <span class="font-bold text-red-500">Sair</span>
-  </button>
 </mat-menu>

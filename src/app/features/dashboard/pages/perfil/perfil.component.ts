@@ -322,4 +322,25 @@ export class PerfilComponent implements OnInit {
   cliqueInstalar() {
     this.pwaService.instalarApp();
   }
+
+  sairDoApp() {
+    const dialogRef = this.dialog.open(GenericDialogComponent, {
+      data: {
+        titulo: 'Sair do Aplicativo',
+        mensagem: 'Deseja realmente encerrar sua sessão atual?',
+        textoConfirmar: 'Sim, sair',
+        textoCancelar: 'Cancelar',
+        tipo: 'padrao',
+      },
+      panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+      width: '90%',
+      maxWidth: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado) {
+        this.authService.logout();
+      }
+    });
+  }
 }
