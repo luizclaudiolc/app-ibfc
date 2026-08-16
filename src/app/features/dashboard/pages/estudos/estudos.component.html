@@ -30,45 +30,63 @@
       <div class="space-y-4 pb-6">
         @for (estudo of estudosExibidos(); track estudo.id) {
           <div
-            class="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:items-center hover:border-sky-300 transition-colors"
+            class="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-5 flex flex-col gap-4 hover:border-sky-300 transition-colors"
           >
-            <div
-              class="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center shrink-0 shadow-sm"
-            >
-              <mat-icon class="text-red-500 !w-[28px] !h-[28px] !text-[28px]"
-                >picture_as_pdf</mat-icon
-              >
-            </div>
-
-            <div class="flex-1 min-w-0">
-              <h3 class="text-sm sm:text-base font-bold text-slate-800 tracking-tight line-clamp-2">
-                {{ estudo.titulo }}
-              </h3>
-              @if (estudo.descricao) {
-                <p class="text-[11px] sm:text-xs text-slate-500 font-medium mt-1 line-clamp-2">
-                  {{ estudo.descricao }}
-                </p>
-              }
+            <div class="flex items-start gap-3.5">
               <div
-                class="flex items-center gap-1.5 mt-2 text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider"
+                class="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center shrink-0 shadow-sm"
               >
-                <mat-icon class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
-                  >calendar_today</mat-icon
+                <mat-icon class="text-red-500 !w-[28px] !h-[28px] !text-[28px]"
+                  >picture_as_pdf</mat-icon
                 >
-                <span class="pt-[1px]">{{ estudo.created_at | date: 'dd/MM/yyyy' : 'UTC' }}</span>
+              </div>
+
+              <div class="flex-1 min-w-0 pt-0.5">
+                <h3
+                  class="text-sm sm:text-base font-bold text-slate-800 tracking-tight line-clamp-2"
+                >
+                  {{ estudo.titulo }}
+                </h3>
+                @if (estudo.descricao) {
+                  <p class="text-[11px] sm:text-xs text-slate-500 font-medium mt-1 line-clamp-2">
+                    {{ estudo.descricao }}
+                  </p>
+                }
+                <div
+                  class="flex items-center gap-1.5 mt-2 text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider"
+                >
+                  <mat-icon class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
+                    >calendar_today</mat-icon
+                  >
+                  <span class="pt-[1px]">{{ estudo.created_at | date: 'dd/MM/yyyy' : 'UTC' }}</span>
+                </div>
               </div>
             </div>
 
-            <button
-              (click)="baixarPdf(estudo.arquivo_url, estudo.titulo)"
-              class="w-full sm:w-auto px-5 py-3 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white border border-sky-100 hover:border-sky-600 rounded-2xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shrink-0 group cursor-pointer shadow-sm"
-            >
-              <mat-icon
-                class="!w-[18px] !h-[18px] !text-[18px] !leading-none overflow-visible group-hover:animate-bounce"
-                >download</mat-icon
+            <div class="flex gap-2 pt-3 border-t border-slate-100">
+              <a
+                [href]="estudo.arquivo_url"
+                target="_blank"
+                class="flex-1 flex items-center justify-center gap-1.5 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
               >
-              <span class="pt-[1px]">Baixar PDF</span>
-            </button>
+                <mat-icon class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible"
+                  >visibility</mat-icon
+                >
+                <span>Ver PDF</span>
+              </a>
+
+              <button
+                type="button"
+                (click)="baixarPdf(estudo.arquivo_url, estudo.titulo)"
+                class="flex-1 flex items-center justify-center gap-1.5 py-3 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white border border-sky-100 hover:border-sky-600 rounded-2xl text-xs font-bold transition-all shadow-2xs cursor-pointer group"
+              >
+                <mat-icon
+                  class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible group-hover:animate-bounce"
+                  >download</mat-icon
+                >
+                <span>Baixar PDF</span>
+              </button>
+            </div>
           </div>
         } @empty {
           <div
