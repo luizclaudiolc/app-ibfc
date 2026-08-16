@@ -1,6 +1,5 @@
 <app-page-layout>
   <div class="max-w-xl mx-auto space-y-6 pb-12">
-    <!-- 1. BOTÃO DE INSTALAÇÃO DO PWA (Exibido apenas se o navegador permitir) -->
     @if (pwaService.mostrarBotaoInstalar()) {
       <div
         class="bg-gradient-to-r from-sky-600 to-indigo-600 rounded-3xl p-5 shadow-md text-white flex items-center justify-between gap-4 relative overflow-hidden"
@@ -249,49 +248,6 @@
               <input matInput formControlName="uf" maxlength="2" class="uppercase" />
             </mat-form-field>
           </div>
-        </div>
-
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
-          <div class="flex items-center gap-2 pb-2 border-b border-slate-50">
-            <mat-icon class="text-rose-500 !w-5 !h-5 !text-[20px]">volunteer_activism</mat-icon>
-            <h3 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
-              Mural de Intercessão
-            </h3>
-          </div>
-
-          <p class="text-xs text-slate-500 leading-relaxed">
-            Compartilhe um motivo de fé. Este pedido será publicado publicamente no
-            <strong class="text-slate-700">Mural de Orações (Aba Orações)</strong> para que a
-            comunidade possa interceder por você, além de ser exibido no seu próprio perfil.
-          </p>
-
-          <mat-form-field appearance="outline" class="w-full !mt-1">
-            <mat-label>Pedido de Oração / Motivo de Fé</mat-label>
-            <textarea
-              matInput
-              formControlName="pedido_oracao"
-              rows="3"
-              placeholder="Ex: Peço oração pela minha saúde e família..."
-              maxlength="160"
-            ></textarea>
-
-            <mat-hint align="end" class="text-xs font-medium"
-              >{{ perfilForm.controls.pedido_oracao.value.length || 0 }}/160</mat-hint
-            >
-          </mat-form-field>
-
-          @if (perfilForm.controls.pedido_oracao.value) {
-            <div class="flex justify-end pt-1">
-              <button
-                type="button"
-                (click)="limparPedidoOracao()"
-                class="flex items-center gap-1.5 text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
-              >
-                <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">delete_outline</mat-icon>
-                <span>Apagar pedido do mural</span>
-              </button>
-            </div>
-          }
         </div>
 
         <div class="flex gap-3 pt-2">

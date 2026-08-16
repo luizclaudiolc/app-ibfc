@@ -88,43 +88,41 @@ export class MembroService {
     }
   }
 
-  atualizarPerfil(dados: UsuarioAtualizacao): Observable<{ sucesso: boolean; mensagem?: string }> {
+  atualizarPerfil(
+    dados: Partial<UsuarioAtualizacao>,
+  ): Observable<{ sucesso: boolean; mensagem?: string }> {
     return from(this.executarAtualizacaoPerfil(dados));
   }
 
-  private async executarAtualizacaoPerfil({
-    nome,
-    sobrenome,
-    telefone,
-    data_nascimento,
-    cargo,
-    genero,
-    estado_civil,
-    nivel_escolaridade,
-    endereco,
-    pedido_oracao,
-  }: UsuarioAtualizacao): Promise<{ sucesso: boolean; mensagem?: string }> {
+  private async executarAtualizacaoPerfil(
+    dados: Partial<UsuarioAtualizacao>,
+  ): Promise<{ sucesso: boolean; mensagem?: string }> {
     try {
       const {
         data: { user },
       } = await this.supabaseService.supabase.auth.getUser();
       if (!user) throw new Error('Usuário não encontrado.');
 
-      const payloadParaSalvar: any = {
-        nome,
-        sobrenome,
-        telefone,
-        cargo,
-        data_nascimento,
-        genero: genero ?? null,
-        estado_civil: estado_civil ?? null,
-        nivel_escolaridade: nivel_escolaridade ?? null,
-        endereco: endereco || null,
-        pedido_oracao: pedido_oracao || null,
-      };
+      const payloadParaSalvar: any = {};
 
-      if (!pedido_oracao || pedido_oracao.trim() === '') {
-        payloadParaSalvar.total_oracoes = 0;
+      if (dados.nome !== undefined) payloadParaSalvar.nome = dados.nome;
+      if (dados.sobrenome !== undefined) payloadParaSalvar.sobrenome = dados.sobrenome;
+      if (dados.telefone !== undefined) payloadParaSalvar.telefone = dados.telefone;
+      if (dados.cargo !== undefined) payloadParaSalvar.cargo = dados.cargo;
+      if (dados.data_nascimento !== undefined)
+        payloadParaSalvar.data_nascimento = dados.data_nascimento;
+      if (dados.genero !== undefined) payloadParaSalvar.genero = dados.genero ?? null;
+      if (dados.estado_civil !== undefined)
+        payloadParaSalvar.estado_civil = dados.estado_civil ?? null;
+      if (dados.nivel_escolaridade !== undefined)
+        payloadParaSalvar.nivel_escolaridade = dados.nivel_escolaridade ?? null;
+      if (dados.endereco !== undefined) payloadParaSalvar.endereco = dados.endereco || null;
+
+      if (dados.pedido_oracao !== undefined) {
+        payloadParaSalvar.pedido_oracao = dados.pedido_oracao || null;
+        if (!dados.pedido_oracao || dados.pedido_oracao.trim() === '') {
+          payloadParaSalvar.total_oracoes = 0;
+        }
       }
 
       const { error } = await this.supabaseService.supabase
@@ -134,7 +132,9 @@ export class MembroService {
 
       if (error) throw error;
 
-      this.authService.atualizarNomeGlobal(`${nome} ${sobrenome}`);
+      if (dados.nome && dados.sobrenome) {
+        this.authService.atualizarNomeGlobal(`${dados.nome} ${dados.sobrenome}`);
+      }
 
       return { sucesso: true };
     } catch (error: any) {
@@ -270,8 +270,8 @@ export class MembroService {
       .select('id, nome, sobrenome, foto_url, pedido_oracao, total_oracoes')
       .not('pedido_oracao', 'is', null)
       .neq('pedido_oracao', '')
-
-      .order('total_oracoes', { ascending: true });
+      .order('total_oracoes', { ascending: true })
+      .order('id', { ascending: true });
 
     return from(promise).pipe(map((res) => res.data as Membro[]));
   }
