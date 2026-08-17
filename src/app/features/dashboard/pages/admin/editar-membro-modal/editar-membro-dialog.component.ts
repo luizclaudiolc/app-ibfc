@@ -65,6 +65,7 @@ export class EditarMembroDialogComponent {
   statusOpcoes = [
     { label: 'Ativo', value: 'ATIVO' satisfies StatusMembro },
     { label: 'Inativo / Bloqueado', value: 'INATIVO' satisfies StatusMembro },
+    { label: 'Pendente (Aguardando)', value: 'PENDENTE' satisfies StatusMembro },
   ];
 
   opcoesGenero = Object.entries(GENERO_MAP).map(([value, label]) => ({ value: +value, label }));

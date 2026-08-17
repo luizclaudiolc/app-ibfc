@@ -5,6 +5,7 @@ export interface SessaoUsuario {
   setor: string | null;
   fotoUrl: string | null;
   genero: number | null;
+  status: string;
   versiculoCache?: {
     data: string;
     texto: string;

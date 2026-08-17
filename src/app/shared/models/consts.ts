@@ -1,4 +1,3 @@
-export type StatusMembro = 'ATIVO' | 'INATIVO';
 export enum ECargos {
   Membro = 'membro',
 }
@@ -14,7 +13,10 @@ export enum ENiveisAcesso {
 export enum EStatusMembro {
   ATIVO = 'ATIVO',
   INATIVO = 'INATIVO',
+  PENDENTE = 'PENDENTE',
 }
+
+export type StatusMembro = 'ATIVO' | 'INATIVO' | 'PENDENTE';
 
 export type Genero = 'Masculino' | 'Feminino';
 export type EstadoCivil = 'Solteiro(a)' | 'Casado(a)' | 'Divorciado(a)' | 'Viúvo(a)';

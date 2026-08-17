@@ -1,5 +1,10 @@
 import { Routes } from '@angular/router';
-import { adminGuard, authGuard, loginGuard } from './core/services/guards/auth.guard';
+import {
+  adminGuard,
+  aguardandoGuard,
+  authGuard,
+  loginGuard,
+} from './core/services/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -13,6 +18,14 @@ export const routes: Routes = [
     canActivate: [loginGuard],
     loadComponent: () =>
       import('./features/auth/pages/cadastro/cadastro.component').then((m) => m.CadastroComponent),
+  },
+  {
+    path: 'aguardando-aprovacao',
+    loadComponent: () =>
+      import('./features/dashboard/pages/aguardando-aprovacao/aguardando-aprovacao.component').then(
+        (c) => c.AguardandoAprovacaoComponent,
+      ),
+    canActivate: [aguardandoGuard],
   },
   {
     path: 'dashboard',

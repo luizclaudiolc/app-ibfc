@@ -39,6 +39,21 @@
   </ng-container>
 
   <form [formGroup]="editForm" class="space-y-4 pt-2">
+    @if (data.status === 'PENDENTE') {
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-start gap-3">
+        <div class="bg-amber-100 text-amber-600 rounded-full p-1 mt-0.5 shrink-0">
+          <mat-icon class="!w-4 !h-4 !text-[16px]">how_to_reg</mat-icon>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold text-amber-800">Novo Cadastro Aguardando Aprovação</h4>
+          <p class="text-[10px] text-amber-700 leading-tight mt-0.5">
+            Revise os dados abaixo. Para liberar o acesso deste membro ao aplicativo, altere o
+            "Status da Conta" para <strong>Ativo</strong>.
+          </p>
+        </div>
+      </div>
+    }
+
     <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/60">
       <h3 class="text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-3">
         Controle de Acesso

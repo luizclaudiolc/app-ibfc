@@ -7,6 +7,7 @@ import { EditarMembroDialogComponent } from './editar-membro-modal/editar-membro
 import { Membro } from '../../../../shared/models/membro.model';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { StatusMembro } from '../../../../shared/models/consts';
 
 @Component({
   selector: 'app-admin',
@@ -18,6 +19,7 @@ import { PageHeaderComponent } from '../../../../shared/components/page-header/p
 export class AdminComponent implements OnInit {
   membrosRaw = signal<Membro[]>([]);
   termoBusca = signal<string>('');
+  filtroStatus = signal<StatusMembro | 'TODOS'>('TODOS');
   limiteExibicao = signal<number>(10);
   carregando = signal<boolean>(true);
   erroMembros = signal<string>('');
@@ -25,12 +27,21 @@ export class AdminComponent implements OnInit {
   private dialog = inject(MatDialog);
   private membroService = inject(MembroService);
 
+  qtdPendentes = computed(() => this.membrosRaw().filter((m) => m.status === 'PENDENTE').length);
+  qtdAtivos = computed(() => this.membrosRaw().filter((m) => m.status === 'ATIVO').length);
+  qtdInativos = computed(() => this.membrosRaw().filter((m) => m.status === 'INATIVO').length);
+
   membrosFiltrados = computed(() => {
     const busca = this.termoBusca()
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
-    const lista = this.membrosRaw();
+    const statusAtual = this.filtroStatus();
+    let lista = this.membrosRaw();
+
+    if (statusAtual !== 'TODOS') {
+      lista = lista.filter((m) => m.status === statusAtual);
+    }
 
     let resultadoBusca = lista;
 
@@ -50,8 +61,15 @@ export class AdminComponent implements OnInit {
     }
 
     return [...resultadoBusca].sort((a, b) => {
-      if (a.status === 'ATIVO' && b.status === 'INATIVO') return -1;
-      if (a.status === 'INATIVO' && b.status === 'ATIVO') return 1;
+      const prioridade = { PENDENTE: 1, ATIVO: 2, INATIVO: 3 };
+
+      const pA = prioridade[a.status as keyof typeof prioridade] || 99;
+      const pB = prioridade[b.status as keyof typeof prioridade] || 99;
+
+      if (pA !== pB) {
+        return pA - pB;
+      }
+
       return a.nome.localeCompare(b.nome);
     });
   });
@@ -87,6 +105,11 @@ export class AdminComponent implements OnInit {
 
   aoBuscarMembro(termo: string): void {
     this.termoBusca.set(termo);
+    this.limiteExibicao.set(10);
+  }
+
+  definirFiltroStatus(status: StatusMembro | 'TODOS') {
+    this.filtroStatus.set(status);
     this.limiteExibicao.set(10);
   }
 

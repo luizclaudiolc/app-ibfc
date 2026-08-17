@@ -56,6 +56,7 @@ export class AuthService {
       setor: sessao?.setor || null,
       fotoUrl: sessao?.fotoUrl || null,
       genero: sessao?.genero ?? null,
+      status: sessao?.status || EStatusMembro.ATIVO,
     };
   }
 
@@ -235,7 +236,7 @@ export class AuthService {
           data_nascimento: membro.dataNascimento || null,
           cargo: membro.cargo || ECargos.Membro,
           nivel_acesso: ENiveisAcesso.User,
-          status: EStatusMembro.ATIVO,
+          status: EStatusMembro.PENDENTE,
           foto_url: urlDaFoto,
 
           genero: membro.genero || null,
@@ -292,6 +293,7 @@ export class AuthService {
       setor: perfil.setor_responsavel || null,
       fotoUrl: perfil.foto_url || null,
       genero: perfil.genero ?? null,
+      status: perfil.status,
       ...cachesRestaurados,
     };
 

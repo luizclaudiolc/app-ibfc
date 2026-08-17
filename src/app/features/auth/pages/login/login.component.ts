@@ -41,8 +41,13 @@ export class LoginComponent {
 
     this.authService.login(email.trim(), senha).subscribe({
       next: (res) => {
-        if (res.sucesso) {
-          const generoId = this.authService.obterUsuarioLogado().genero;
+        if (res.sucesso && res.usuario) {
+          if (res.usuario.status === 'PENDENTE') {
+            this.router.navigate(['/aguardando-aprovacao']);
+            return;
+          }
+
+          const generoId = res.usuario.genero;
           const generoText = generoId != null ? GENERO_MAP[generoId] : null;
           const saudacao =
             generoText === 'Masculino'

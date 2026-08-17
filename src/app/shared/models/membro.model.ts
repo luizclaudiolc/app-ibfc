@@ -1,4 +1,4 @@
-import { NivelAcesso } from './consts';
+import { EGenero, EStatusMembro, NivelAcesso } from './consts';
 
 export interface PerfilBase {
   nome: string;
@@ -47,5 +47,7 @@ export interface UsuarioLogado {
   nome: string;
   email: string;
   nivel: NivelAcesso;
+  status: EStatusMembro;
+  genero: EGenero;
   setorResponsavel?: string;
 }
