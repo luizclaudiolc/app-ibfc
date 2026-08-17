@@ -327,4 +327,30 @@ export class AuthService {
     this.nomeUsuario$.set('Irmão(ã)');
     this.userGenero$.set(null);
   }
+
+  recuperarSenha(email: string): Observable<{ sucesso: boolean; mensagem: string }> {
+    return from(this.executarRecuperacaoSupabase(email));
+  }
+
+  private async executarRecuperacaoSupabase(
+    email: string,
+  ): Promise<{ sucesso: boolean; mensagem: string }> {
+    try {
+      const { error } = await this.supabaseService.supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/atualizar-senha`,
+      });
+
+      if (error) throw new Error(error.message);
+
+      return {
+        sucesso: true,
+        mensagem: 'E-mail de recuperação enviado! Verifique sua caixa de entrada.',
+      };
+    } catch (error: any) {
+      return {
+        sucesso: false,
+        mensagem: error.message || 'Erro ao enviar e-mail de recuperação.',
+      };
+    }
+  }
 }

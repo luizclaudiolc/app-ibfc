@@ -20,6 +20,22 @@ export const routes: Routes = [
       import('./features/auth/pages/cadastro/cadastro.component').then((m) => m.CadastroComponent),
   },
   {
+    path: 'recuperar-senha',
+    canActivate: [loginGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/recuperar-senha/recuperar-senha.component').then(
+        (m) => m.RecuperarSenhaComponent,
+      ),
+  },
+  {
+    path: 'atualizar-senha',
+    loadComponent: () =>
+      import('./features/auth/pages/atualizar-senha/atualizar-senha.component').then(
+        (m) => m.AtualizarSenhaComponent,
+      ),
+  },
+
+  {
     path: 'aguardando-aprovacao',
     loadComponent: () =>
       import('./features/dashboard/pages/aguardando-aprovacao/aguardando-aprovacao.component').then(

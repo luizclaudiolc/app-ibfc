@@ -1,0 +1,47 @@
+<div class="min-vh-100 flex items-center justify-center bg-slate-100 px-4 py-12">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-md p-6">
+    <div class="text-center mb-6">
+      <h3 class="text-2xl font-bold text-slate-800 tracking-tight">Nova Senha</h3>
+      <p class="text-slate-500 text-sm mt-0.5">Insira sua nova senha de acesso.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="salvarNovaSenha()" class="flex flex-col gap-4">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Nova Senha</mat-label>
+        <input
+          matInput
+          [type]="esconderSenha() ? 'password' : 'text'"
+          formControlName="novaSenha"
+          placeholder="Mínimo 6 caracteres"
+          [readonly]="carregando()"
+        />
+        <button
+          type="button"
+          mat-icon-button
+          matSuffix
+          (click)="esconderSenha.set(!esconderSenha())"
+          class="text-slate-400"
+        >
+          <mat-icon>{{ esconderSenha() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (form.controls.novaSenha.hasError('required')) {
+          <mat-error>A senha é obrigatória.</mat-error>
+        } @else if (form.controls.novaSenha.hasError('minlength')) {
+          <mat-error>A senha deve ter pelo menos 6 caracteres.</mat-error>
+        }
+      </mat-form-field>
+
+      <button
+        mat-flat-button
+        type="submit"
+        class="w-full !rounded-xl !h-12 !text-sm !font-bold !bg-sky-600 hover:!bg-sky-700 !text-white"
+        [disabled]="carregando() || form.invalid"
+      >
+        @if (carregando()) {
+          <mat-spinner diameter="20" class="stroke-white inline-block mr-2"></mat-spinner>
+        }
+        {{ carregando() ? 'Salvando...' : 'Salvar Nova Senha' }}
+      </button>
+    </form>
+  </div>
+</div>
