@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import imageCompression from 'browser-image-compression';
 import { MaterialModule } from '../../../../../core/modules/material.module';
@@ -10,11 +10,18 @@ import { Aviso } from '../../../../../shared/models/aviso.model';
 import { NotificationService } from '../../../../../core/services/notifications.service';
 import { AvisoFormDialogComponent } from './modal/aviso-form-dialog.component';
 import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
+import { BotaoCarregarMaisComponent } from '../../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 
 @Component({
   selector: 'app-avisos-admin',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    PageLayoutComponent,
+    PageHeaderComponent,
+    BotaoCarregarMaisComponent,
+  ],
   templateUrl: './avisos-admin.component.html',
 })
 export class AvisosAdminComponent implements OnInit {
@@ -22,9 +29,19 @@ export class AvisosAdminComponent implements OnInit {
   carregandoAvisos = signal<boolean>(true);
   carregandoUpload = signal<boolean>(false);
 
+  limiteExibicao = signal<number>(2);
+
   private avisoService = inject(AvisoService);
   private dialog = inject(MatDialog);
   private notification = inject(NotificationService);
+
+  avisosExibidos = computed(() => {
+    return this.avisos().slice(0, this.limiteExibicao());
+  });
+
+  mostrarBotaoCarregarMais = computed(() => {
+    return this.avisos().length > this.limiteExibicao();
+  });
 
   ngOnInit() {
     this.verificarEExecutarLimpezaMensal();
@@ -44,6 +61,10 @@ export class AvisosAdminComponent implements OnInit {
         this.carregandoAvisos.set(false);
       },
     });
+  }
+
+  carregarMaisAvisos(): void {
+    this.limiteExibicao.update((valorAtual) => valorAtual + 10);
   }
 
   async onFileSelected(event: Event) {
@@ -95,6 +116,7 @@ export class AvisosAdminComponent implements OnInit {
           );
 
           this.avisos.update((atual) => [novoAviso, ...atual]);
+          this.limiteExibicao.set(10);
           this.notification.sucesso('Novo banner de aviso publicado!');
         } catch (error) {
           console.error('Erro no upload ou compressão', error);

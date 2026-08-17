@@ -7,12 +7,19 @@ import { EditarMembroDialogComponent } from './editar-membro-modal/editar-membro
 import { Membro } from '../../../../shared/models/membro.model';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
-import { StatusMembro } from '../../../../shared/models/consts';
+import { LIMITE_CARREGAMENTO_INICIAL, StatusMembro } from '../../../../shared/models/consts';
+import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    PageLayoutComponent,
+    PageHeaderComponent,
+    BotaoCarregarMaisComponent,
+  ],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
@@ -20,7 +27,7 @@ export class AdminComponent implements OnInit {
   membrosRaw = signal<Membro[]>([]);
   termoBusca = signal<string>('');
   filtroStatus = signal<StatusMembro | 'TODOS'>('TODOS');
-  limiteExibicao = signal<number>(10);
+  limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
   carregando = signal<boolean>(true);
   erroMembros = signal<string>('');
 
@@ -105,16 +112,16 @@ export class AdminComponent implements OnInit {
 
   aoBuscarMembro(termo: string): void {
     this.termoBusca.set(termo);
-    this.limiteExibicao.set(10);
+    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
   }
 
   definirFiltroStatus(status: StatusMembro | 'TODOS') {
     this.filtroStatus.set(status);
-    this.limiteExibicao.set(10);
+    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
   }
 
   carregarMaisMembros(): void {
-    this.limiteExibicao.update((valorAtual) => valorAtual + 10);
+    this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
   }
 
   abrirEdicaoMembro(membro: any) {

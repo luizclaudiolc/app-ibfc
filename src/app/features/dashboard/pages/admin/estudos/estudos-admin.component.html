@@ -55,7 +55,7 @@
         </div>
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-2">
-          @for (estudo of estudos(); track estudo.id) {
+          @for (estudo of estudosExibidos(); track estudo.id) {
             <div
               class="group bg-slate-50/50 border border-slate-200/80 rounded-3xl p-4 sm:p-5 flex flex-col justify-between hover:border-sky-300 transition-all hover:shadow-sm relative"
             >
@@ -127,6 +127,14 @@
             </div>
           }
         </div>
+
+        @if (mostrarBotaoCarregarMais()) {
+          <app-botao-carregar-mais
+            texto="Carregar mais estudos"
+            [restantes]="estudos().length - estudosExibidos().length"
+            (carregarMais)="carregarMaisEstudos()"
+          />
+        }
       }
     </div>
   </div>

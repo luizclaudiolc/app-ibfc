@@ -154,8 +154,16 @@
       </div>
     } @else {
       <div class="space-y-4 pb-4">
-        @for (membro of pedidosFiltrados(); track membro.id) {
+        @for (membro of pedidosExibidos(); track membro.id) {
           <app-oracao-card [membroInput]="membro" />
+        }
+
+        @if (mostrarBotaoCarregarMais()) {
+          <app-botao-carregar-mais
+            texto="Carregar mais pedidos"
+            [restantes]="pedidosFiltrados().length - pedidosExibidos().length"
+            (carregarMais)="carregarMaisPedidos()"
+          />
         }
       </div>
     }

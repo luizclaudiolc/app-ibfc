@@ -160,3 +160,5 @@ export const GRADIENTES_PASTEIS = [
   'bg-gradient-to-r from-purple-200 to-fuchsia-200',
   'bg-gradient-to-r from-pink-200 to-rose-200',
 ];
+
+export const LIMITE_CARREGAMENTO_INICIAL = 10;

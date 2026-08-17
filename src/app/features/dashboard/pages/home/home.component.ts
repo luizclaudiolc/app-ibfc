@@ -31,6 +31,7 @@ import {
   DEPARTAMENTOS_DISPONIVEIS_MAP,
   EVENTOS_MAP,
   GENERO_MAP,
+  LIMITE_CARREGAMENTO_INICIAL,
 } from '../../../../shared/models/consts';
 
 import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
@@ -44,6 +45,7 @@ import { VersiculoCardComponent } from '../../../../shared/components/card-versi
 import { PulsoCardComponent } from '../../../../shared/components/pulso-card/pulso-card.component';
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { PwaService } from '../../../../core/services/pwa.service';
+import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 
 @Component({
   selector: 'app-home',
@@ -61,6 +63,7 @@ import { PwaService } from '../../../../core/services/pwa.service';
     MembroListItemComponent,
     VersiculoCardComponent,
     PulsoCardComponent,
+    BotaoCarregarMaisComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -86,7 +89,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   versiculoDiario = signal<VersiculoDia | null>(null);
 
   termoBusca = signal('');
-  limiteExibicao = signal(10);
+  limiteExibicao = signal(LIMITE_CARREGAMENTO_INICIAL);
 
   currentIndex = signal(0);
 
@@ -195,11 +198,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   aoBuscarMembro(termo: string): void {
     this.termoBusca.set(termo);
-    this.limiteExibicao.set(10);
+    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
   }
 
   carregarMaisMembros(): void {
-    this.limiteExibicao.update((valorAtual) => valorAtual + 10);
+    this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
   }
 
   escalasPessoais = computed(() => {

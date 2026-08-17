@@ -251,17 +251,11 @@
         </div>
 
         @if (mostrarBotaoCarregarMais()) {
-          <div class="pt-4 flex justify-center pb-4">
-            <button
-              (click)="carregarMaisMembros()"
-              class="flex items-center gap-1.5 px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-wider rounded-full transition-colors active:scale-95"
-            >
-              <mat-icon class="!w-[18px] !h-[18px] !text-[18px] !leading-none overflow-visible"
-                >keyboard_arrow_down</mat-icon
-              >
-              <span class="pt-[1px]">Carregar mais irmãos</span>
-            </button>
-          </div>
+          <app-botao-carregar-mais
+            texto="Carregar mais membros"
+            [restantes]="membrosFiltrados().length - membrosExibidos().length"
+            (carregarMais)="carregarMaisMembros()"
+          />
         }
       </section>
     }

@@ -10,6 +10,8 @@ import { MembroService } from '../../../../core/services/membro.service';
 import { Membro } from '../../../../shared/models/membro.model';
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
+import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/models/consts';
 
 @Component({
   selector: 'app-mural-oracoes',
@@ -21,6 +23,7 @@ import { PageHeaderComponent } from '../../../../shared/components/page-header/p
     PageLayoutComponent,
     OracaoCardComponent,
     PageHeaderComponent,
+    BotaoCarregarMaisComponent,
   ],
   templateUrl: './mural-oracoes.component.html',
 })
@@ -28,6 +31,8 @@ export class MuralOracoesComponent implements OnInit {
   pedidos = signal<Membro[]>([]);
   carregando = signal<boolean>(true);
   salvando = signal<boolean>(false);
+
+  limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
 
   private membroService = inject(MembroService);
   private notification = inject(NotificationService);
@@ -43,7 +48,10 @@ export class MuralOracoesComponent implements OnInit {
   termoBusca = toSignal(
     this.buscaControl.valueChanges.pipe(
       debounceTime(150),
-      map((termo) => termo.trim().toLowerCase()),
+      map((termo) => {
+        this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
+        return termo.trim().toLowerCase();
+      }),
     ),
     { initialValue: '' },
   );
@@ -60,6 +68,14 @@ export class MuralOracoesComponent implements OnInit {
 
       return nomeCompleto.includes(termo) || pedido.includes(termo);
     });
+  });
+
+  pedidosExibidos = computed(() => {
+    return this.pedidosFiltrados().slice(0, this.limiteExibicao());
+  });
+
+  mostrarBotaoCarregarMais = computed(() => {
+    return this.pedidosFiltrados().length > this.limiteExibicao();
   });
 
   ngOnInit() {
@@ -120,6 +136,10 @@ export class MuralOracoesComponent implements OnInit {
   limparPedido() {
     this.oracaoForm.controls.pedido_oracao.setValue('');
     this.salvarPedidoOracao();
+  }
+
+  carregarMaisPedidos(): void {
+    this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
   }
 
   voltar(): void {

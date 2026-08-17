@@ -6,20 +6,27 @@ import { PageHeaderComponent } from '../../../../shared/components/page-header/p
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { Estudo } from '../../../../shared/models/estudos.model';
 import { EstudoService } from '../../../../core/services/estudos.service';
+import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
+import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/models/consts';
 
 @Component({
   selector: 'app-estudos',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    PageLayoutComponent,
+    PageHeaderComponent,
+    BotaoCarregarMaisComponent,
+  ],
   templateUrl: './estudos.component.html',
 })
 export class EstudosComponent implements OnInit {
   estudosRaw = signal<Estudo[]>([]);
   carregando = signal<boolean>(true);
 
-  // Controle de Busca e Paginação Infinita
   termoBusca = signal<string>('');
-  limiteExibicao = signal<number>(10);
+  limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
 
   private estudoService = inject(EstudoService);
   private notification = inject(NotificationService);
@@ -43,7 +50,6 @@ export class EstudosComponent implements OnInit {
     });
   }
 
-  // 1. Filtra os estudos com base no que foi digitado
   estudosFiltrados = computed(() => {
     const busca = this.termoBusca()
       .toLowerCase()
@@ -61,28 +67,23 @@ export class EstudosComponent implements OnInit {
     );
   });
 
-  // 2. Limita a quantidade de estudos renderizados na tela (Paginação)
   estudosExibidos = computed(() => {
     return this.estudosFiltrados().slice(0, this.limiteExibicao());
   });
 
-  // 3. Controla a exibição do botão "Carregar mais estudos"
   mostrarBotaoCarregarMais = computed(() => {
     return this.estudosFiltrados().length > this.limiteExibicao();
   });
 
-  // 4. Acionado quando o usuário digita no input de busca
   aoBuscarEstudo(termo: string): void {
     this.termoBusca.set(termo);
-    this.limiteExibicao.set(10); // Reseta a paginação ao realizar uma nova busca
+    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
   }
 
-  // 5. Acionado ao clicar no botão "Carregar mais estudos"
   carregarMaisEstudos(): void {
-    this.limiteExibicao.update((valorAtual) => valorAtual + 10);
+    this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
   }
 
-  // Lógica de download do arquivo PDF
   async baixarPdf(url: string, titulo: string): Promise<void> {
     try {
       this.notification.aviso('Preparando download do arquivo...', 2000);

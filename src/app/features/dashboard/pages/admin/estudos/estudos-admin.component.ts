@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../../core/modules/material.module';
 import { PageLayoutComponent } from '../../../../../shared/components/page-layout/page-layout.component';
@@ -9,11 +9,19 @@ import { EstudoFormDialogComponent } from './modal/estudo-form-dialog.component'
 import { Estudo } from '../../../../../shared/models/estudos.model';
 import { EstudoService } from '../../../../../core/services/estudos.service';
 import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
+import { BotaoCarregarMaisComponent } from '../../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
+import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../../shared/models/consts';
 
 @Component({
   selector: 'app-estudos-admin',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    PageLayoutComponent,
+    PageHeaderComponent,
+    BotaoCarregarMaisComponent,
+  ],
   templateUrl: './estudos-admin.component.html',
 })
 export class EstudosAdminComponent implements OnInit {
@@ -21,9 +29,19 @@ export class EstudosAdminComponent implements OnInit {
   carregandoEstudos = signal<boolean>(true);
   carregandoUpload = signal<boolean>(false);
 
+  limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
+
   private estudoService = inject(EstudoService);
   private dialog = inject(MatDialog);
   private notification = inject(NotificationService);
+
+  estudosExibidos = computed(() => {
+    return this.estudos().slice(0, this.limiteExibicao());
+  });
+
+  mostrarBotaoCarregarMais = computed(() => {
+    return this.estudos().length > this.limiteExibicao();
+  });
 
   ngOnInit() {
     this.carregarEstudos();
@@ -42,6 +60,10 @@ export class EstudosAdminComponent implements OnInit {
         this.carregandoEstudos.set(false);
       },
     });
+  }
+
+  carregarMaisEstudos(): void {
+    this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
   }
 
   formatarBytes(bytes: number): string {
@@ -123,6 +145,7 @@ export class EstudosAdminComponent implements OnInit {
         );
 
         this.estudos.update((atual) => [novoEstudo, ...atual]);
+        this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
         this.notification.sucesso('Estudo publicado com sucesso!');
       } catch (error) {
         console.error('Erro no upload', error);
