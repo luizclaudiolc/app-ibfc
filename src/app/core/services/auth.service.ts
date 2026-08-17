@@ -336,8 +336,13 @@ export class AuthService {
     email: string,
   ): Promise<{ sucesso: boolean; mensagem: string }> {
     try {
+      const redirectUrl =
+        window.location.hostname === 'localhost'
+          ? 'http://localhost:4200/atualizar-senha'
+          : 'https://luizclaudiolc.github.io/app-ibfc/atualizar-senha';
+
       const { error } = await this.supabaseService.supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/atualizar-senha`,
+        redirectTo: redirectUrl,
       });
 
       if (error) throw new Error(error.message);

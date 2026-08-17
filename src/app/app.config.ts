@@ -1,13 +1,13 @@
 import {
   ApplicationConfig,
+  isDevMode,
   LOCALE_ID,
   provideBrowserGlobalErrorListeners,
-  isDevMode,
 } from '@angular/core';
-import { provideRouter, withHashLocation } from '@angular/router'; // 1. Importe o withHashLocation
+import { provideRouter } from '@angular/router';
 
-import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
+import { routes } from './app.routes';
 
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
@@ -18,7 +18,7 @@ registerLocaleData(localePt);
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes, withHashLocation()),
+    provideRouter(routes),
     provideHttpClient(),
     { provide: LOCALE_ID, useValue: 'pt-BR' },
     provideServiceWorker('ngsw-worker.js', {
