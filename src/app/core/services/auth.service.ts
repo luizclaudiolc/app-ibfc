@@ -3,7 +3,12 @@ import { Router } from '@angular/router';
 import { Observable, from } from 'rxjs';
 import { Membro, UsuarioCadastro, UsuarioLogado } from '../../shared/models/membro.model';
 import { SupabaseService } from './supabase';
-import { ECargos, ENiveisAcesso, EStatusMembro } from '../../shared/models/consts';
+import {
+  ECargos,
+  EMotivoInativacao,
+  ENiveisAcesso,
+  EStatusMembro,
+} from '../../shared/models/consts';
 import { SessaoUsuario } from '../../shared/models/sessaoUsuario';
 
 export interface RespostaLogin {
@@ -355,6 +360,45 @@ export class AuthService {
       return {
         sucesso: false,
         mensagem: error.message || 'Erro ao enviar e-mail de recuperação.',
+      };
+    }
+  }
+
+  solicitarExclusaoConta(): Observable<{ sucesso: boolean; mensagem: string }> {
+    return from(this.executarSolicitacaoExclusao());
+  }
+
+  private async executarSolicitacaoExclusao(): Promise<{ sucesso: boolean; mensagem: string }> {
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await this.supabaseService.supabase.auth.getUser();
+
+      if (userError || !user) {
+        throw new Error('Usuário não autenticado.');
+      }
+
+      const { error: updateError } = await this.supabaseService.supabase
+        .from('membros')
+        .update({
+          status: EStatusMembro.INATIVO,
+          motivo_inativacao: EMotivoInativacao.EXCLUSAO_SOLICITADA,
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        throw new Error('Erro ao registrar a solicitação de exclusão no banco de dados.');
+      }
+
+      await this.supabaseService.supabase.auth.signOut();
+      this.limparSessaoLocal();
+
+      return { sucesso: true, mensagem: 'Solicitação de exclusão processada com sucesso.' };
+    } catch (error: any) {
+      return {
+        sucesso: false,
+        mensagem: error.message || 'Erro ao processar sua solicitação de exclusão.',
       };
     }
   }

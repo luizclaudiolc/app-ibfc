@@ -244,14 +244,45 @@
         </div>
       </form>
 
-      <div class="mt-8 flex justify-center border-t border-slate-100 pt-6 mb-10">
-        <button
-          (click)="sairDoApp()"
-          class="flex items-center gap-2 text-rose-500 hover:text-rose-700 font-bold text-xs transition-all px-4 py-2 rounded-xl hover:bg-rose-50"
+      <div class="mt-8 border-t border-slate-100 pt-8 mb-10 space-y-6">
+        <div class="flex items-center gap-2 pb-2">
+          <mat-icon class="text-rose-500 !w-5 !h-5 !text-[20px]">warning</mat-icon>
+          <h3 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+            Zona de Perigo
+          </h3>
+        </div>
+
+        <div
+          class="bg-rose-50/50 border border-rose-100 rounded-3xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         >
-          <mat-icon class="!w-4 !h-4 !text-[16px]">logout</mat-icon>
-          Sair da minha conta
-        </button>
+          <div>
+            <h4 class="text-sm font-bold text-rose-800">Excluir minha conta</h4>
+            <p class="text-xs text-rose-600/80 mt-1 max-w-sm leading-relaxed">
+              Ao solicitar a exclusão, seus dados, histórico e acessos serão apagados
+              permanentemente da comunidade.
+            </p>
+          </div>
+          <button
+            type="button"
+            (click)="solicitarExclusaoConta()"
+            class="shrink-0 bg-white border border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white hover:border-rose-600 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
+            [disabled]="carregando()"
+          >
+            Solicitar Exclusão
+          </button>
+        </div>
+
+        <div class="flex justify-center pt-2">
+          <button
+            type="button"
+            (click)="sairDoApp()"
+            class="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-xs transition-all px-4 py-2 rounded-xl hover:bg-slate-50 cursor-pointer"
+            [disabled]="carregando()"
+          >
+            <mat-icon class="!w-4 !h-4 !text-[16px]">logout</mat-icon>
+            Sair do aplicativo
+          </button>
+        </div>
       </div>
     } @else {
       <div class="flex justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">

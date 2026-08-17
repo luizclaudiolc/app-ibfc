@@ -18,6 +18,12 @@ export enum EStatusMembro {
 
 export type StatusMembro = 'ATIVO' | 'INATIVO' | 'PENDENTE';
 
+export enum EMotivoInativacao {
+  EXCLUSAO_SOLICITADA = 'EXCLUSAO_SOLICITADA',
+  DECISAO_ADMIN = 'DECISAO_ADMIN',
+  FALTA_DE_ACESSO = 'FALTA_DE_ACESSO',
+}
+
 export type Genero = 'Masculino' | 'Feminino';
 export type EstadoCivil = 'Solteiro(a)' | 'Casado(a)' | 'Divorciado(a)' | 'Viúvo(a)';
 export type Escolaridade =

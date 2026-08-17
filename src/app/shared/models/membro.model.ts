@@ -1,4 +1,4 @@
-import { EGenero, EStatusMembro, NivelAcesso } from './consts';
+import { EGenero, EMotivoInativacao, EStatusMembro, NivelAcesso } from './consts';
 
 export interface PerfilBase {
   nome: string;
@@ -11,6 +11,7 @@ export interface PerfilBase {
   estado_civil?: number | string;
   pedido_oracao?: string;
   total_oracoes?: number;
+  motivo_inativacao?: EMotivoInativacao | null;
 }
 
 export interface Membro extends PerfilBase {

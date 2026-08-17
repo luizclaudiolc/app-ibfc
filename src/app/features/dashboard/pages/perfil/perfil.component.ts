@@ -328,4 +328,45 @@ export class PerfilComponent implements OnInit {
       }
     });
   }
+
+  solicitarExclusaoConta() {
+    const dialogRef = this.dialog.open(GenericDialogComponent, {
+      data: {
+        titulo: 'Excluir Conta',
+        mensagem:
+          'Você tem certeza que deseja solicitar a exclusão da sua conta? Após a confirmação dos administradores, todos os seus dados, histórico e acessos serão apagados permanentemente.',
+        textoConfirmar: 'Sim, solicitar exclusão',
+        textoCancelar: 'Cancelar',
+        tipo: 'perigo',
+      },
+      panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+      width: '90%',
+      maxWidth: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (confirmado) {
+        this.carregando.set(true);
+
+        this.authService.solicitarExclusaoConta().subscribe({
+          next: (res: any) => {
+            this.carregando.set(false);
+            if (res.sucesso) {
+              this.notification.sucesso(
+                'Sua solicitação de exclusão foi enviada aos administradores.',
+              );
+
+              this.router.navigate(['/login']);
+            } else {
+              this.notification.erro(res.mensagem || 'Erro ao processar sua solicitação.');
+            }
+          },
+          error: () => {
+            this.carregando.set(false);
+            this.notification.erro('Ocorreu um erro inesperado. Tente novamente mais tarde.');
+          },
+        });
+      }
+    });
+  }
 }
