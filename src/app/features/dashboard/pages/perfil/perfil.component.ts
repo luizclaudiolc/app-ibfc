@@ -35,7 +35,6 @@ export class PerfilComponent implements OnInit {
   private authService = inject(AuthService);
   private notification = inject(NotificationService);
   private cepService = inject(CepService);
-  public pwaService = inject(PwaService);
 
   carregando = signal<boolean>(false);
   carregandoDados = signal<boolean>(true);

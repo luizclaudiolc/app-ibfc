@@ -13,6 +13,91 @@
 
       <app-pulso-card />
 
+      @if (pwaService.mostrarBotaoInstalar()) {
+        <div
+          class="bg-gradient-to-r from-sky-600 to-indigo-600 rounded-3xl p-5 shadow-sm text-white flex items-center justify-between gap-4 relative overflow-hidden"
+        >
+          <div
+            class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full pointer-events-none blur-sm"
+          ></div>
+          <div class="flex items-center gap-3.5 relative z-10">
+            <div
+              class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 shadow-inner"
+            >
+              <mat-icon class="!w-6 !h-6 !text-[24px]">install_mobile</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-xs sm:text-sm font-extrabold tracking-tight">Instalar Aplicativo</h3>
+              <p class="text-[11px] text-sky-100 font-medium">
+                Acesso rápido na tela inicial do celular.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="pwaService.instalarApp()"
+            class="relative z-10 px-4 py-2.5 bg-white text-sky-700 hover:bg-sky-50 font-extrabold text-xs rounded-2xl shadow-sm transition-all active:scale-95 cursor-pointer shrink-0"
+          >
+            Instalar
+          </button>
+        </div>
+      }
+
+      @if (pwaService.mostrarInstrucoesIos()) {
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 relative mt-3 mb-3">
+          <button
+            type="button"
+            (click)="pwaService.dispensarInstrucoesIos()"
+            class="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors"
+            title="Fechar dica"
+          >
+            <mat-icon class="!w-4 !h-4 !text-[16px]">close</mat-icon>
+          </button>
+
+          <div class="flex items-center gap-3 mb-3 pr-6">
+            <div
+              class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 border border-slate-200 shrink-0"
+            >
+              <mat-icon class="!w-5 !h-5 !text-[20px]">phone_iphone</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-xs font-bold text-slate-800 uppercase tracking-tight">
+                Instale no iPhone
+              </h3>
+              <p class="text-[10px] text-slate-500 font-medium">
+                Acesse o app direto da tela inicial.
+              </p>
+            </div>
+          </div>
+
+          <ol
+            class="text-[11px] text-slate-600 space-y-2.5 font-medium bg-slate-50 p-3 rounded-xl border border-slate-100"
+          >
+            <li class="flex items-center gap-2">
+              <span
+                class="flex items-center justify-center w-4 h-4 rounded-full bg-sky-100 text-sky-700 font-bold text-[9px] shrink-0"
+                >1</span
+              >
+              <span>Toque no botão Compartilhar</span>
+              <mat-icon class="!w-4 !h-4 !text-[16px] text-sky-600 ml-auto shrink-0"
+                >ios_share</mat-icon
+              >
+            </li>
+            <li class="flex items-center gap-2">
+              <span
+                class="flex items-center justify-center w-4 h-4 rounded-full bg-sky-100 text-sky-700 font-bold text-[9px] shrink-0"
+                >2</span
+              >
+              <span>Role e toque em <strong>"Adicionar à Tela de Início"</strong></span>
+              <mat-icon class="!w-4 !h-4 !text-[16px] text-slate-400 ml-auto shrink-0"
+                >add_box</mat-icon
+              >
+            </li>
+          </ol>
+        </div>
+      }
+
       @if (escalasPessoais().length > 0) {
         <section class="space-y-3">
           <app-section-header

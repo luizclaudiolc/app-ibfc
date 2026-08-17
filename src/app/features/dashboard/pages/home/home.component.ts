@@ -43,6 +43,7 @@ import { DevocionalService, VersiculoDia } from '../../../../core/services/devoc
 import { VersiculoCardComponent } from '../../../../shared/components/card-versiculo/card-versiculo.component';
 import { PulsoCardComponent } from '../../../../shared/components/pulso-card/pulso-card.component';
 import { NotificationService } from '../../../../core/services/notifications.service';
+import { PwaService } from '../../../../core/services/pwa.service';
 
 @Component({
   selector: 'app-home',
@@ -73,6 +74,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly devocionalService = inject(DevocionalService);
   private readonly notification = inject(NotificationService);
+  public pwaService = inject(PwaService);
 
   nomeUsuario = this.authService.nomeUsuario$;
   emailUsuario = signal<string>(this.authService.obterUsuarioLogado().email || '');

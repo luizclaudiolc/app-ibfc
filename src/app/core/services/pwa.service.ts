@@ -1,41 +1,50 @@
 import { Injectable, signal } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class PwaService {
-  private deferredPrompt: any = null;
-  // Começa falso e só fica true quando o navegador disparar o evento real de PWA
-  public mostrarBotaoInstalar = signal<boolean>(false);
+  private promptEvent: any;
+
+  mostrarBotaoInstalar = signal<boolean>(false);
+  mostrarInstrucoesIos = signal<boolean>(false);
 
   constructor() {
-    window.addEventListener('beforeinstallprompt', (e: any) => {
-      // Impede o banner padrão do navegador
+    this.iniciarLógicaPwa();
+  }
+
+  private iniciarLógicaPwa() {
+    window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
-      // Salva o evento real capturado pelo ambiente de produção (GitHub Pages)
-      this.deferredPrompt = e;
-      // Exibe o nosso botão customizado na tela de perfil
+      this.promptEvent = e;
       this.mostrarBotaoInstalar.set(true);
     });
 
-    window.addEventListener('appinstalled', () => {
-      this.mostrarBotaoInstalar.set(false);
-      this.deferredPrompt = null;
-    });
+    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true;
+
+    const instrucoesDispensadas = localStorage.getItem('ios_pwa_dismissed') === 'true';
+
+    if (isIos && !isStandalone && !instrucoesDispensadas) {
+      this.mostrarInstrucoesIos.set(true);
+    }
   }
 
-  async instalarApp(): Promise<void> {
-    if (!this.deferredPrompt) return;
-
-    // Dispara o prompt nativo de instalação do celular/computador sem cair em alertas
-    this.deferredPrompt.prompt();
-
-    const { outcome } = await this.deferredPrompt.userChoice;
-
-    if (outcome === 'accepted') {
-      this.mostrarBotaoInstalar.set(false);
+  instalarApp() {
+    if (this.promptEvent) {
+      this.promptEvent.prompt();
+      this.promptEvent.userChoice.then((choiceResult: any) => {
+        if (choiceResult.outcome === 'accepted') {
+          this.mostrarBotaoInstalar.set(false);
+        }
+        this.promptEvent = null;
+      });
     }
+  }
 
-    this.deferredPrompt = null;
+  dispensarInstrucoesIos() {
+    localStorage.setItem('ios_pwa_dismissed', 'true');
+    this.mostrarInstrucoesIos.set(false);
   }
 }

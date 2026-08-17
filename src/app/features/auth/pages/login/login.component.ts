@@ -6,6 +6,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { GENERO_MAP } from '../../../../shared/models/consts';
+import { PwaService } from '../../../../core/services/pwa.service';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,7 @@ export class LoginComponent {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
+  public pwaService = inject(PwaService);
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
