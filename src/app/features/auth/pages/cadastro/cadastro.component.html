@@ -233,14 +233,25 @@
 
       <!-- ================= ETAPA 3: ACESSO & SEGURANÇA ================= -->
       @if (etapaAtual() === 3) {
-        <mat-form-field appearance="outline" class="w-full animate-fade-in">
-          <mat-label>Cargo na Igreja</mat-label>
-          <mat-select formControlName="cargo">
-            @for (item of cargosDisponiveis; track item.value) {
-              <mat-option [value]="item.value">{{ item.label }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-fade-in">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Cargo na Igreja</mat-label>
+            <mat-select formControlName="cargo">
+              @for (item of cargosDisponiveis; track item.value) {
+                <mat-option [value]="item.value">{{ item.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Ministérios (Opcional)</mat-label>
+            <mat-select formControlName="ministerios" multiple>
+              @for (item of ministeriosDisponiveis; track item.value) {
+                <mat-option [value]="item.value">{{ item.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
 
         <div class="flex flex-col gap-2 pt-3 border-t border-slate-100 animate-fade-in">
           <mat-form-field appearance="outline" class="w-full">

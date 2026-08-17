@@ -111,6 +111,16 @@ export const EVENTOS_MAP: Record<string, string> = {
   OUTRO: 'Outro',
 };
 
+export const MINISTERIOS_DISPONIVEIS = [
+  { label: 'Louvor e Adoração', value: 'LOUVOR' },
+  { label: 'Mídia e Comunicação', value: 'MIDIA' },
+  { label: 'Infantil (Kids)', value: 'INFANTIL' },
+  { label: 'Recepção e Diaconia', value: 'RECEPCAO' },
+  { label: 'Intercessão', value: 'INTERCESSAO' },
+  { label: 'Jovens', value: 'JOVENS' },
+  { label: 'Casais e Família', value: 'CASAIS_FAMILIA' },
+];
+
 export enum EGenero {
   MASCULINO = 1,
   FEMININO = 2,

@@ -16,10 +16,10 @@ import {
   GENERO_MAP,
   ESTADO_CIVIL_MAP,
   ESCOLARIDADE_MAP,
+  MINISTERIOS_DISPONIVEIS,
 } from '../../../../shared/models/consts';
 import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
 import { CepService } from '../../../../core/services/busca-cep.service';
-import { PwaService } from '../../../../core/services/pwa.service';
 
 @Component({
   selector: 'app-perfil',
@@ -42,6 +42,7 @@ export class PerfilComponent implements OnInit {
 
   previewFoto = signal<string | null>(this.authService.fotoUsuario$());
   cargosDisponiveis = CARGOS_DISPONIVEIS;
+  ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
 
   opcoesGenero = Object.entries(GENERO_MAP).map(([value, label]) => ({
     value: +value,
@@ -62,6 +63,7 @@ export class PerfilComponent implements OnInit {
     email: [{ value: '', disabled: true }],
     telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
     cargo: ['membro', [Validators.required]],
+    ministerios: [[] as string[]],
     data_nascimento: ['', [Validators.required]],
 
     genero: [null as number | null, [Validators.required]],
@@ -102,6 +104,7 @@ export class PerfilComponent implements OnInit {
             email: res.email || '',
             telefone: res.telefone || '',
             cargo: res.cargo || 'membro',
+            ministerios: res.ministerios || [],
             data_nascimento: res.data_nascimento || '',
 
             genero: res.genero !== undefined && res.genero !== null ? Number(res.genero) : null,
@@ -192,6 +195,7 @@ export class PerfilComponent implements OnInit {
       sobrenome: formValues.sobrenome,
       telefone: formValues.telefone,
       cargo: formValues.cargo,
+      ministerios: formValues.ministerios,
       data_nascimento: formValues.data_nascimento,
       genero: formValues.genero !== null ? Number(formValues.genero) : undefined,
       estado_civil: formValues.estado_civil !== null ? Number(formValues.estado_civil) : undefined,

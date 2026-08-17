@@ -12,6 +12,7 @@ export interface PerfilBase {
   pedido_oracao?: string;
   total_oracoes?: number;
   motivo_inativacao?: EMotivoInativacao | null;
+  ministerios?: string[];
 }
 
 export interface Membro extends PerfilBase {

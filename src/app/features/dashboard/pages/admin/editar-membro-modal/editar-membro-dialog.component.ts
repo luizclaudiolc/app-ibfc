@@ -20,6 +20,7 @@ import {
   ESCOLARIDADE_MAP,
   ESTADO_CIVIL_MAP,
   GENERO_MAP,
+  MINISTERIOS_DISPONIVEIS,
   NivelAcesso,
   StatusMembro,
 } from '../../../../../shared/models/consts';
@@ -54,6 +55,7 @@ export class EditarMembroDialogComponent {
 
   cargosDisponiveis = CARGOS_DISPONIVEIS;
   departamentos = DEPARTAMENTOS_DISPONIVEIS;
+  ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
 
   meuNivel = this.authService.obterUsuarioLogado().nivel;
 
@@ -116,6 +118,7 @@ export class EditarMembroDialogComponent {
       data_nascimento: [this.data.data_nascimento, [Validators.required]],
       cargo: [this.data.cargo, [Validators.required]],
       setor_responsavel: [this.data.setor_responsavel || ''],
+      ministerios: [this.data.ministerios || []],
       nivel_acesso: [this.data.nivel_acesso, [Validators.required]],
       status: [this.data.status, [Validators.required]],
 
@@ -211,6 +214,7 @@ export class EditarMembroDialogComponent {
       data_nascimento: formValues.data_nascimento,
       cargo: formValues.cargo,
       setor_responsavel: formValues.setor_responsavel || null,
+      ministerios: formValues.ministerios,
       nivel_acesso: formValues.nivel_acesso,
       status: formValues.status,
 

@@ -243,7 +243,7 @@ export class AuthService {
           nivel_acesso: ENiveisAcesso.User,
           status: EStatusMembro.PENDENTE,
           foto_url: urlDaFoto,
-
+          ministerios: membro.ministerios || [],
           genero: membro.genero || null,
           estado_civil: membro.estado_civil || null,
           nivel_escolaridade: membro.nivel_escolaridade || null,

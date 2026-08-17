@@ -104,6 +104,15 @@
           </mat-select>
         </mat-form-field>
       </div>
+
+      <mat-form-field appearance="outline" class="w-full mt-3 mb-0">
+        <mat-label>Ministérios Participantes</mat-label>
+        <mat-select formControlName="ministerios" multiple>
+          @for (item of ministeriosDisponiveis; track item.value) {
+            <mat-option [value]="item.value">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     </div>
 
     <div class="pt-2">

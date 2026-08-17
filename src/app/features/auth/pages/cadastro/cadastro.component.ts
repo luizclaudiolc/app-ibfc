@@ -8,7 +8,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { timer } from 'rxjs';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -18,6 +17,7 @@ import {
   ESCOLARIDADE_MAP,
   ESTADO_CIVIL_MAP,
   GENERO_MAP,
+  MINISTERIOS_DISPONIVEIS,
 } from '../../../../shared/models/consts';
 import { UsuarioCadastro } from '../../../../shared/models/membro.model';
 import { CepService } from '../../../../core/services/busca-cep.service';
@@ -48,6 +48,7 @@ export class CadastroComponent {
   private buscacepService = inject(CepService);
 
   cargosDisponiveis = CARGOS_DISPONIVEIS;
+  ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
 
   opcoesGenero = Object.entries(GENERO_MAP).map(([value, label]) => ({ value: +value, label }));
   opcoesEstadoCivil = Object.entries(ESTADO_CIVIL_MAP).map(([value, label]) => ({
@@ -66,6 +67,7 @@ export class CadastroComponent {
       email: ['', [Validators.required, Validators.email]],
       telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
       cargo: ['membro', [Validators.required]],
+      ministerios: [[] as string[]],
       dataNascimento: ['', [Validators.required]],
 
       genero: [null as number | null, [Validators.required]],
@@ -99,7 +101,7 @@ export class CadastroComponent {
       'cidade',
       'uf',
     ],
-    3: ['cargo', 'senha', 'confirmarSenha'],
+    3: ['cargo', 'ministerios', 'senha', 'confirmarSenha'],
   };
 
   consultarCep() {
@@ -222,6 +224,7 @@ export class CadastroComponent {
       telefone: formValues.telefone.replace(/\D/g, ''),
       dataNascimento: formValues.dataNascimento,
       cargo: formValues.cargo,
+      ministerios: formValues.ministerios,
       foto: this.arquivoFotoSelecionado,
 
       genero: formValues.genero ? +formValues.genero : undefined,

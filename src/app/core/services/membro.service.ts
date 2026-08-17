@@ -118,6 +118,8 @@ export class MembroService {
         payloadParaSalvar.nivel_escolaridade = dados.nivel_escolaridade ?? null;
       if (dados.endereco !== undefined) payloadParaSalvar.endereco = dados.endereco || null;
 
+      if (dados.ministerios !== undefined) payloadParaSalvar.ministerios = dados.ministerios;
+
       if (dados.pedido_oracao !== undefined) {
         payloadParaSalvar.pedido_oracao = dados.pedido_oracao || null;
         if (!dados.pedido_oracao || dados.pedido_oracao.trim() === '') {
@@ -152,8 +154,6 @@ export class MembroService {
   }
 
   atualizarSetor(id: string, novoSetor: string): Observable<any> {
-    console.log(novoSetor);
-
     return from(
       this.supabaseService.supabase
         .from('membros')

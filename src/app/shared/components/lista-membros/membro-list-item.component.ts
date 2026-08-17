@@ -48,15 +48,30 @@ import { MaterialModule } from '../../../core/modules/material.module';
             }
           </p>
 
-          <div class="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium pt-0.5">
-            <mat-icon
-              class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible text-slate-400"
-            >
-              cake
-            </mat-icon>
-            <span class="pt-[1px]"
-              >Aniversário: {{ membro().data_nascimento | date: 'dd/MM' : 'UTC' }}</span
-            >
+          <div class="flex items-center gap-2.5 text-[10px] text-slate-400 font-medium pt-0.5">
+            <div class="flex items-center gap-1">
+              <mat-icon
+                class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible text-slate-400"
+                >cake</mat-icon
+              >
+              <span class="pt-[1px]">{{ membro().data_nascimento | date: 'dd/MM' : 'UTC' }}</span>
+            </div>
+
+            @if (membro().ministerios && membro().ministerios!.length > 0) {
+              <div class="flex items-center gap-2.5">
+                <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                <div class="flex items-center gap-1 text-slate-500">
+                  <mat-icon
+                    class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible text-sky-400"
+                    >diversity_3</mat-icon
+                  >
+                  <span class="pt-[1px]"
+                    >{{ membro().ministerios!.length }}
+                    {{ membro().ministerios!.length > 1 ? 'ministérios' : 'ministério' }}</span
+                  >
+                </div>
+              </div>
+            }
           </div>
         </div>
       </div>

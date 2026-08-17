@@ -7,6 +7,7 @@ import { MaterialModule } from '../../../../core/modules/material.module';
 import {
   DEPARTAMENTOS_DISPONIVEIS_MAP,
   GRADIENTES_PASTEIS,
+  MINISTERIOS_DISPONIVEIS,
 } from '../../../../shared/models/consts';
 import { MatDialog } from '@angular/material/dialog';
 import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
@@ -27,6 +28,7 @@ export class PerfilMembroComponent implements OnInit {
   jaOrou = signal<boolean>(false);
 
   corFundoCard = signal<string>('');
+  ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
 
   private route = inject(ActivatedRoute);
   private membroService = inject(MembroService);
@@ -163,5 +165,12 @@ export class PerfilMembroComponent implements OnInit {
 
   private removerOracaoLocal(membroId: string): void {
     this.authService.removerOracaoRealizada(membroId);
+  }
+
+  obterNomesMinisterios(valores: string[] | undefined): string {
+    if (!valores || valores.length === 0) return '';
+    return valores
+      .map((val) => this.ministeriosDisponiveis.find((m) => m.value === val)?.label || val)
+      .join(', ');
   }
 }
