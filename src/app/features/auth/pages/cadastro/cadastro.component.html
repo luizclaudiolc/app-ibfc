@@ -127,13 +127,21 @@
 
       <!-- ================= ETAPA 2: CONTATO & COMPLEMENTO ================= -->
       @if (etapaAtual() === 2) {
-        <mat-form-field appearance="outline" class="w-full animate-fade-in">
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="dynamic"
+          class="w-full animate-fade-in mb-8"
+        >
           <mat-label>E-mail</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="exemplo@email.com" />
+          <input matInput type="email" formControlName="email" placeholder="exemplo@gmail.com" />
           @if (cadastroForm.controls.email.hasError('required')) {
             <mat-error>O e-mail é obrigatório.</mat-error>
-          } @else if (cadastroForm.controls.email.hasError('email')) {
-            <mat-error>Formato inválido.</mat-error>
+          } @else if (cadastroForm.controls.email.hasError('dominioNaoPermitido')) {
+            <mat-error
+              >Use um provedor válido (ex: Gmail, Outlook, Hotmail, Yahoo, iCloud).</mat-error
+            >
+          } @else if (cadastroForm.controls.email.invalid) {
+            <mat-error>Informe um endereço de e-mail válido.</mat-error>
           }
         </mat-form-field>
 
@@ -234,7 +242,7 @@
       <!-- ================= ETAPA 3: ACESSO & SEGURANÇA ================= -->
       @if (etapaAtual() === 3) {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-fade-in">
-          <mat-form-field appearance="outline" class="w-full">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
             <mat-label>Cargo na Igreja</mat-label>
             <mat-select formControlName="cargo">
               @for (item of cargosDisponiveis; track item.value) {
@@ -243,7 +251,7 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="w-full">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
             <mat-label>Ministérios (Opcional)</mat-label>
             <mat-select formControlName="ministerios" multiple>
               @for (item of ministeriosDisponiveis; track item.value) {
@@ -253,14 +261,14 @@
           </mat-form-field>
         </div>
 
-        <div class="flex flex-col gap-2 pt-3 border-t border-slate-100 animate-fade-in">
-          <mat-form-field appearance="outline" class="w-full">
+        <div class="flex flex-col gap-4 pt-3 border-t border-slate-100 animate-fade-in">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
             <mat-label>Senha</mat-label>
             <input
               matInput
               [type]="esconderSenha() ? 'password' : 'text'"
               formControlName="senha"
-              placeholder="Crie uma senha"
+              placeholder="Crie uma senha forte"
             />
             <button
               type="button"
@@ -272,12 +280,15 @@
             >
               <mat-icon>{{ esconderSenha() ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
-            @if (cadastroForm.controls.senha.hasError('minlength')) {
-              <mat-error>Mínimo 6 caracteres.</mat-error>
+
+            @if (cadastroForm.controls.senha.hasError('required')) {
+              <mat-error>A senha é obrigatória.</mat-error>
+            } @else if (cadastroForm.controls.senha.hasError('senhaFraca')) {
+              <mat-error>Mínimo 8 chars: maiúscula, minúscula, número e símbolo.</mat-error>
             }
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="w-full">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
             <mat-label>Repetir Senha</mat-label>
             <input
               matInput
@@ -296,7 +307,7 @@
               <mat-icon>{{ esconderConfirmarSenha() ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
             @if (cadastroForm.controls.confirmarSenha.hasError('senhasDiferentes')) {
-              <mat-error>Não coincidem.</mat-error>
+              <mat-error>As senhas não coincidem.</mat-error>
             }
           </mat-form-field>
         </div>
@@ -304,7 +315,6 @@
 
       <!-- ================= BOTÕES DE AÇÃO ================= -->
       <div class="flex items-center gap-3 mt-6 pt-4 border-t border-slate-100">
-        <!-- Botão Voltar (Aparece apenas nas etapas 2 e 3) -->
         @if (etapaAtual() > 1) {
           <button
             type="button"
@@ -316,7 +326,6 @@
           </button>
         }
 
-        <!-- Botão Avançar / Finalizar -->
         @if (etapaAtual() < totalEtapas) {
           <button
             type="button"

@@ -30,6 +30,61 @@ import { CepService } from '../../../../core/services/busca-cep.service';
   styleUrl: './cadastro.component.css',
 })
 export class CadastroComponent {
+  validarEmailReal(control: AbstractControl): ValidationErrors | null {
+    const email = control.value?.trim().toLowerCase();
+    if (!email) return null;
+
+    const partes = email.split('@');
+    if (partes.length !== 2 || !partes[1].includes('.')) {
+      return { emailInvalido: true };
+    }
+
+    const dominio = partes[1].trim();
+
+    const dominiosPermitidos = [
+      'gmail.com',
+      'googlemail.com',
+      'outlook.com',
+      'hotmail.com',
+      'live.com',
+      'msn.com',
+      'yahoo.com',
+      'yahoo.com.br',
+      'icloud.com',
+      'me.com',
+      'uol.com.br',
+      'bol.com.br',
+      'ig.com.br',
+      'proton.me',
+      'protonmail.com',
+    ];
+
+    if (!dominiosPermitidos.includes(dominio)) {
+      return { dominioNaoPermitido: true };
+    }
+
+    return null;
+  }
+
+  validarSenhaForte(control: AbstractControl): ValidationErrors | null {
+    const senha = control.value;
+    if (!senha) return null;
+
+    const temMaiuscula = /[A-Z]/.test(senha);
+    const temMinuscula = /[a-z]/.test(senha);
+    const temNumero = /[0-9]/.test(senha);
+    const temEspecial = /[!@#$%^&*(),.?":{}|<>\-_#]/.test(senha);
+    const tamanhoMinimo = senha.length >= 8;
+
+    const senhaValida = temMaiuscula && temMinuscula && temNumero && temEspecial && tamanhoMinimo;
+
+    if (!senhaValida) {
+      return { senhaFraca: true };
+    }
+
+    return null;
+  }
+
   carregando = signal<boolean>(false);
   buscandoCep = signal<boolean>(false);
   esconderSenha = signal(true);
@@ -64,7 +119,7 @@ export class CadastroComponent {
     {
       nome: ['', [Validators.required]],
       sobrenome: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email, this.validarEmailReal]],
       telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
       cargo: ['membro', [Validators.required]],
       ministerios: [[] as string[]],
@@ -82,7 +137,7 @@ export class CadastroComponent {
       cidade: [''],
       uf: [''],
 
-      senha: ['', [Validators.required, Validators.minLength(6)]],
+      senha: ['', [Validators.required, this.validarSenhaForte]],
       confirmarSenha: ['', [Validators.required]],
     },
     { validators: this.validarSenhasIguais },
