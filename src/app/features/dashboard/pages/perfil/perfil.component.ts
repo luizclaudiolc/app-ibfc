@@ -219,6 +219,10 @@ export class PerfilComponent implements OnInit {
           if (dadosEnvio.genero !== undefined) {
             this.authService.atualizarGeneroGlobal(dadosEnvio.genero);
           }
+
+          if (dadosEnvio.ministerios !== undefined) {
+            this.authService.atualizarMinisteriosGlobal(dadosEnvio.ministerios);
+          }
         } else {
           this.notification.erro(res.mensagem || 'Erro ao salvar.');
         }
@@ -310,6 +314,10 @@ export class PerfilComponent implements OnInit {
 
   cancelar(): void {
     this.router.navigate(['dashboard/home']);
+  }
+
+  irParaCarteirinha(): void {
+    this.router.navigate(['dashboard/carteirinha']);
   }
 
   sairDoApp() {

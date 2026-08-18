@@ -62,6 +62,7 @@ export class AuthService {
       fotoUrl: sessao?.fotoUrl || null,
       genero: sessao?.genero ?? null,
       status: sessao?.status || EStatusMembro.ATIVO,
+      ministerios: sessao?.ministerios || [],
     };
   }
 
@@ -78,6 +79,10 @@ export class AuthService {
   atualizarGeneroGlobal(genero: number | null): void {
     this.userGenero$.set(genero);
     this.atualizarPropriedadeSessao({ genero });
+  }
+
+  atualizarMinisteriosGlobal(ministerios: string[]): void {
+    this.atualizarPropriedadeSessao({ ministerios });
   }
 
   obterVersiculoEmCache() {
@@ -299,6 +304,7 @@ export class AuthService {
       fotoUrl: perfil.foto_url || null,
       genero: perfil.genero ?? null,
       status: perfil.status,
+      ministerios: perfil.ministerios || [],
       ...cachesRestaurados,
     };
 

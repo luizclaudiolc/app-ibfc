@@ -6,6 +6,7 @@ export interface SessaoUsuario {
   fotoUrl: string | null;
   genero: number | null;
   status: string;
+  ministerios?: string[];
   versiculoCache?: {
     data: string;
     texto: string;

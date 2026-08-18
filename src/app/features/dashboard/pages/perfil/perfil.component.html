@@ -17,15 +17,9 @@
         }
       </div>
 
-      <h2 class="text-base font-extrabold text-slate-800 tracking-tight">
-        {{ perfilForm.controls.nome.value || 'Meu' }}
-        {{ perfilForm.controls.sobrenome.value || 'Perfil' }}
-      </h2>
-      <p class="text-xs text-slate-400 font-medium mb-4">Atualize suas informações na comunidade</p>
-
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 mb-4">
         <label
-          class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
+          class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
         >
           <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">photo_camera</mat-icon>
           Alterar Foto
@@ -41,13 +35,46 @@
         @if (previewFoto()) {
           <button
             (click)="removerFoto()"
-            class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1"
+            class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1"
             [disabled]="carregando()"
           >
             <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">delete_outline</mat-icon>
             Remover
           </button>
         }
+      </div>
+
+      <h2 class="text-base font-extrabold text-slate-800 tracking-tight">
+        {{ perfilForm.controls.nome.value || 'Meu' }}
+        {{ perfilForm.controls.sobrenome.value || 'Perfil' }}
+      </h2>
+      <p class="text-xs text-slate-400 font-medium mb-5">Atualize suas informações na comunidade</p>
+
+      <div
+        (click)="irParaCarteirinha()"
+        class="w-full bg-gradient-to-r from-sky-600 to-sky-800 text-white p-4 rounded-2xl shadow-md shadow-sky-600/15 flex items-center justify-between cursor-pointer hover:scale-[1.01] active:scale-[0.99] transition-all group"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center border border-white/20 backdrop-blur-sm group-hover:bg-white/25 transition-colors"
+          >
+            <mat-icon class="!w-5 !h-5 !text-[20px]">badge</mat-icon>
+          </div>
+          <div class="text-left">
+            <span
+              class="text-[10px] font-bold uppercase tracking-wider text-sky-200 block leading-tight"
+              >Membro Ativo</span
+            >
+            <h4 class="text-sm font-extrabold text-white leading-tight">Credencial Digital</h4>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center gap-1.5 bg-white/10 group-hover:bg-white/20 px-3 py-1.5 rounded-xl border border-white/15 text-xs font-bold transition-colors"
+        >
+          <mat-icon class="!w-4 !h-4 !text-[16px]">qr_code_2</mat-icon>
+          <span>Abrir</span>
+        </div>
       </div>
 
       @if (carregando()) {

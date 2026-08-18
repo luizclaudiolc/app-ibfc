@@ -34,7 +34,6 @@ export const routes: Routes = [
         (m) => m.AtualizarSenhaComponent,
       ),
   },
-
   {
     path: 'aguardando-aprovacao',
     loadComponent: () =>
@@ -57,6 +56,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/pages/perfil/perfil.component').then(
             (m) => m.PerfilComponent,
+          ),
+      },
+      {
+        path: 'carteirinha',
+        loadComponent: () =>
+          import('./features/dashboard/pages/carteirinha/carteirinha.component').then(
+            (c) => c.CarteirinhaComponent,
           ),
       },
       {
