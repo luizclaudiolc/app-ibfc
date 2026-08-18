@@ -47,6 +47,7 @@ import { PulsoCardComponent } from '../../../../shared/components/pulso-card/pul
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { PwaService } from '../../../../core/services/pwa.service';
 import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
+import { PixCardComponent } from '../../../../shared/components/pix/pix-card.component';
 
 @Component({
   selector: 'app-home',
@@ -65,6 +66,7 @@ import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-
     VersiculoCardComponent,
     PulsoCardComponent,
     BotaoCarregarMaisComponent,
+    PixCardComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',

@@ -1,0 +1,46 @@
+<div
+  class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-5 mb-8 text-white shadow-sm relative overflow-hidden"
+>
+  <div
+    class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full pointer-events-none blur-md"
+  ></div>
+
+  <div class="flex items-center gap-3.5 mb-3 relative z-10">
+    <div
+      class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 shadow-inner"
+    >
+      <mat-icon class="!w-6 !h-6 !text-[24px]">pix</mat-icon>
+    </div>
+    <div>
+      <h3 class="text-xs sm:text-sm font-extrabold tracking-tight">Dízimos e Ofertas</h3>
+      <p class="text-[11px] text-emerald-100 font-medium">Contribua com a nossa obra via PIX.</p>
+    </div>
+  </div>
+
+  <div
+    class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 flex items-center justify-between gap-3 relative z-10"
+  >
+    <div class="min-w-0 flex-1">
+      <span class="text-[10px] uppercase tracking-wider text-emerald-200 font-bold block"
+        >Chave PIX (CNPJ)</span
+      >
+      <p class="text-xs sm:text-sm font-mono font-bold text-white truncate">00.000.000/0001-00</p>
+    </div>
+
+    <button
+      type="button"
+      (click)="copiarChavePix('00.000.000/0001-00')"
+      class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer active:scale-95 shadow-xs"
+      [ngClass]="
+        copiado()
+          ? 'bg-emerald-400 text-slate-900'
+          : 'bg-white text-emerald-800 hover:bg-emerald-50'
+      "
+    >
+      <mat-icon class="!w-4 !h-4 !text-[16px]">
+        {{ copiado() ? 'check' : 'content_copy' }}
+      </mat-icon>
+      <span>{{ copiado() ? 'Copiado!' : 'Copiar' }}</span>
+    </button>
+  </div>
+</div>
