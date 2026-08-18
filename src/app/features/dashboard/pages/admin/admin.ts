@@ -7,7 +7,11 @@ import { EditarMembroDialogComponent } from './editar-membro-modal/editar-membro
 import { Membro } from '../../../../shared/models/membro.model';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
-import { LIMITE_CARREGAMENTO_INICIAL, StatusMembro } from '../../../../shared/models/consts';
+import {
+  LIMITE_CARREGAMENTO_INICIAL,
+  MINISTERIOS_DISPONIVEIS,
+  StatusMembro,
+} from '../../../../shared/models/consts';
 import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 
 @Component({
@@ -38,20 +42,29 @@ export class AdminComponent implements OnInit {
   qtdAtivos = computed(() => this.membrosRaw().filter((m) => m.status === 'ATIVO').length);
   qtdInativos = computed(() => this.membrosRaw().filter((m) => m.status === 'INATIVO').length);
 
+  mostrarFiltrosAvancados = signal<boolean>(false);
+  filtroMinisterio = signal<string | 'TODOS'>('TODOS');
+  ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
+
   membrosFiltrados = computed(() => {
     const busca = this.termoBusca()
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
     const statusAtual = this.filtroStatus();
+    const ministerioAtual = this.filtroMinisterio();
+
     let lista = this.membrosRaw();
 
     if (statusAtual !== 'TODOS') {
       lista = lista.filter((m) => m.status === statusAtual);
     }
 
-    let resultadoBusca = lista;
+    if (ministerioAtual !== 'TODOS') {
+      lista = lista.filter((m) => m.ministerios?.includes(ministerioAtual));
+    }
 
+    let resultadoBusca = lista;
     if (busca) {
       resultadoBusca = lista.filter((membro) => {
         const nomeCompleto = `${membro.nome} ${membro.sobrenome}`
@@ -69,14 +82,9 @@ export class AdminComponent implements OnInit {
 
     return [...resultadoBusca].sort((a, b) => {
       const prioridade = { PENDENTE: 1, ATIVO: 2, INATIVO: 3 };
-
       const pA = prioridade[a.status as keyof typeof prioridade] || 99;
       const pB = prioridade[b.status as keyof typeof prioridade] || 99;
-
-      if (pA !== pB) {
-        return pA - pB;
-      }
-
+      if (pA !== pB) return pA - pB;
       return a.nome.localeCompare(b.nome);
     });
   });
@@ -122,6 +130,11 @@ export class AdminComponent implements OnInit {
 
   carregarMaisMembros(): void {
     this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
+  }
+
+  definirFiltroMinisterio(ministerio: string | 'TODOS') {
+    this.filtroMinisterio.set(ministerio);
+    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
   }
 
   abrirEdicaoMembro(membro: any) {

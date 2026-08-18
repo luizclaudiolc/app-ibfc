@@ -206,7 +206,7 @@
         }
       </section>
 
-      <section class="space-y-3 pb-6">
+      <section class="space-y-3">
         <app-section-header
           title="Membros da Família"
           icon="groups"
@@ -214,20 +214,95 @@
           [badgeText]="membrosFiltrados().length + ' ativos'"
         />
 
-        <div class="relative mt-1">
-          <input
-            type="text"
-            (input)="aoBuscarMembro($any($event.target).value)"
-            placeholder="Pesquisar irmão, líder ou ministério..."
-            class="w-full pl-5 pr-12 py-3 text-sm bg-white border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm placeholder-slate-400"
-          />
+        <div class="flex items-center gap-2 w-full mt-1">
+          <div class="relative flex-1">
+            <input
+              type="text"
+              (input)="aoBuscarMembro($any($event.target).value)"
+              placeholder="Pesquisar irmão, líder ou ministério..."
+              class="w-full pl-5 pr-12 py-3 text-sm bg-white border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm placeholder-slate-400"
+            />
+            <mat-icon
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none w-5 h-5 flex justify-center items-center"
+            >
+              search
+            </mat-icon>
+          </div>
 
-          <mat-icon
-            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none w-5 h-5 flex justify-center items-center"
+          <button
+            type="button"
+            (click)="mostrarFiltrosAvancados.set(!mostrarFiltrosAvancados())"
+            class="shrink-0 h-[46px] w-[46px] rounded-2xl border flex items-center justify-center transition-all relative cursor-pointer shadow-sm"
+            [ngClass]="
+              filtroMinisterio() !== 'TODOS'
+                ? 'bg-sky-50 border-sky-300 text-sky-600 shadow-sky-100'
+                : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+            "
           >
-            search
-          </mat-icon>
+            <mat-icon class="!w-5 !h-5 !text-[20px]">tune</mat-icon>
+
+            @if (filtroMinisterio() !== 'TODOS') {
+              <span
+                class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-sky-500 shadow-sm border border-white"
+              ></span>
+            }
+          </button>
         </div>
+
+        @if (mostrarFiltrosAvancados()) {
+          <div class="animate-fade-in bg-white border border-slate-200 rounded-2xl p-3 shadow-sm">
+            <div class="flex items-center justify-between mb-2 px-1">
+              <p
+                class="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1"
+              >
+                <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">groups</mat-icon> Filtrar por
+                Ministério
+              </p>
+              @if (filtroMinisterio() !== 'TODOS') {
+                <button
+                  type="button"
+                  (click)="definirFiltroMinisterio('TODOS')"
+                  class="text-[10px] font-bold text-sky-600 hover:underline cursor-pointer"
+                >
+                  Limpar filtro
+                </button>
+              }
+            </div>
+
+            <div class="flex gap-2 overflow-x-auto no-scrollbar items-center pb-1">
+              <button
+                type="button"
+                (click)="definirFiltroMinisterio('TODOS')"
+                class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer"
+                [ngClass]="
+                  filtroMinisterio() === 'TODOS'
+                    ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                "
+              >
+                Todos
+              </button>
+
+              @for (min of ministeriosDisponiveis; track min.value) {
+                <button
+                  type="button"
+                  (click)="definirFiltroMinisterio(min.value)"
+                  class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer flex items-center gap-1"
+                  [ngClass]="
+                    filtroMinisterio() === min.value
+                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-200'
+                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-sky-600'
+                  "
+                >
+                  @if (filtroMinisterio() === min.value) {
+                    <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">check</mat-icon>
+                  }
+                  {{ min.label }}
+                </button>
+              }
+            </div>
+          </div>
+        }
 
         <div class="space-y-2.5">
           @for (membro of membrosExibidos(); track membro.id) {
@@ -245,7 +320,7 @@
             <div
               class="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm"
             >
-              Nenhum membro encontrado com esse nome.
+              Nenhum membro encontrado com esse filtro.
             </div>
           }
         </div>

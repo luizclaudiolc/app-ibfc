@@ -32,6 +32,7 @@ import {
   EVENTOS_MAP,
   GENERO_MAP,
   LIMITE_CARREGAMENTO_INICIAL,
+  MINISTERIOS_DISPONIVEIS,
 } from '../../../../shared/models/consts';
 
 import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
@@ -87,6 +88,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   escalas = signal<Escala[]>([]);
   membrosRaw = signal<Membro[]>([]);
   versiculoDiario = signal<VersiculoDia | null>(null);
+
+  mostrarFiltrosAvancados = signal<boolean>(false);
+  filtroMinisterio = signal<string | 'TODOS'>('TODOS');
+  ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
 
   termoBusca = signal('');
   limiteExibicao = signal(LIMITE_CARREGAMENTO_INICIAL);
@@ -234,8 +239,16 @@ export class HomeComponent implements OnInit, OnDestroy {
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
-    if (!busca) return this.membrosRaw();
-    return this.membrosRaw().filter((m) =>
+    const ministerioAtual = this.filtroMinisterio();
+    let lista = this.membrosRaw();
+
+    if (ministerioAtual !== 'TODOS') {
+      lista = lista.filter((m) => m.ministerios && m.ministerios.includes(ministerioAtual));
+    }
+
+    if (!busca) return lista;
+
+    return lista.filter((m) =>
       `${m.nome} ${m.sobrenome} ${m.cargo} ${m.setor_responsavel}`
         .toLowerCase()
         .normalize('NFD')
@@ -388,5 +401,10 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  definirFiltroMinisterio(ministerio: string | 'TODOS') {
+    this.filtroMinisterio.set(ministerio);
+    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
   }
 }

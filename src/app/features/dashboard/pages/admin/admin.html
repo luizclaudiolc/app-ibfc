@@ -6,21 +6,81 @@
       icone="manage_accounts"
     >
       <div class="space-y-4">
-        <div class="relative w-full">
-          <input
-            type="text"
-            (input)="aoBuscarMembro($any($event.target).value)"
-            placeholder="Buscar por nome, e-mail ou cargo..."
-            class="w-full pl-10 pr-4 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm"
-          />
-          <mat-icon
-            class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 !w-5 !h-5 !text-[20px]"
+        <div class="flex items-center gap-2 w-full">
+          <div class="relative flex-1">
+            <input
+              type="text"
+              (input)="aoBuscarMembro($any($event.target).value)"
+              placeholder="Buscar por nome, e-mail ou cargo..."
+              class="w-full pl-10 pr-4 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm"
+            />
+            <mat-icon
+              class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 !w-5 !h-5 !text-[20px]"
+            >
+              search
+            </mat-icon>
+          </div>
+
+          <button
+            (click)="mostrarFiltrosAvancados.set(!mostrarFiltrosAvancados())"
+            class="shrink-0 h-[46px] w-[46px] rounded-2xl border flex items-center justify-center transition-all relative cursor-pointer"
+            [ngClass]="
+              filtroMinisterio() !== 'TODOS'
+                ? 'bg-sky-50 border-sky-300 text-sky-600 shadow-sm shadow-sky-100'
+                : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
+            "
           >
-            search
-          </mat-icon>
+            <mat-icon class="!w-5 !h-5 !text-[20px]">tune</mat-icon>
+
+            @if (filtroMinisterio() !== 'TODOS') {
+              <span
+                class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-sky-500 shadow-sm border border-white"
+              ></span>
+            }
+          </button>
         </div>
 
-        <div class="flex gap-2 overflow-x-auto pt-2 pr-2 pb-2 no-scrollbar items-center">
+        @if (mostrarFiltrosAvancados()) {
+          <div
+            class="animate-fade-in bg-slate-50/50 border border-slate-100 rounded-2xl p-3 shadow-inner"
+          >
+            <p
+              class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1 flex items-center gap-1"
+            >
+              <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">groups</mat-icon> Filtrar por Ministério
+            </p>
+
+            <div class="flex gap-2 overflow-x-auto no-scrollbar items-center pb-1">
+              <button
+                (click)="definirFiltroMinisterio('TODOS')"
+                class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border"
+                [ngClass]="
+                  filtroMinisterio() === 'TODOS'
+                    ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+                    : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                "
+              >
+                Todos
+              </button>
+
+              @for (min of ministeriosDisponiveis; track min.value) {
+                <button
+                  (click)="definirFiltroMinisterio(min.value)"
+                  class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border"
+                  [ngClass]="
+                    filtroMinisterio() === min.value
+                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-200'
+                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-sky-600'
+                  "
+                >
+                  {{ min.label }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="flex gap-2 overflow-x-auto pt-1 pr-2 pb-2 no-scrollbar items-center">
           <button
             (click)="definirFiltroStatus('TODOS')"
             class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-colors border"
@@ -201,9 +261,9 @@
             <p class="text-sm font-bold text-slate-700">Nenhum membro encontrado</p>
             <p class="text-xs text-slate-400 mt-1">
               {{
-                filtroStatus() === 'TODOS'
+                filtroStatus() === 'TODOS' && filtroMinisterio() === 'TODOS'
                   ? 'Tente buscar por outro termo ou nome.'
-                  : 'Nenhum membro com o status selecionado.'
+                  : 'Nenhum membro com os filtros selecionados.'
               }}
             </p>
           </div>
