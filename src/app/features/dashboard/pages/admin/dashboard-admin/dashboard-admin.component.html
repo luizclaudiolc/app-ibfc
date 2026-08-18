@@ -11,6 +11,34 @@
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     } @else if (dados(); as d) {
+      @if (d.membrosPendentes > 0) {
+        <div
+          (click)="irParaAdminMembros()"
+          class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl p-4 sm:p-5 text-white shadow-sm flex items-center justify-between gap-4 cursor-pointer hover:shadow-md transition-all active:scale-[0.99]"
+        >
+          <div class="flex items-center gap-3.5">
+            <div
+              class="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0"
+            >
+              <mat-icon class="!w-6 !h-6 !text-[24px]">person_add</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-xs sm:text-sm font-extrabold tracking-tight">Aprovações Pendentes</h3>
+              <p class="text-[11px] text-amber-100 font-medium">
+                Existem <strong>{{ d.membrosPendentes }}</strong> novos irmãos aguardando liberação
+                de acesso.
+              </p>
+            </div>
+          </div>
+          <div
+            class="bg-white text-amber-700 text-xs font-bold px-4 py-2 rounded-xl shadow-xs shrink-0 flex items-center gap-1"
+          >
+            <span>Aprovar</span>
+            <mat-icon class="!w-4 !h-4 !text-[16px]">chevron_right</mat-icon>
+          </div>
+        </div>
+      }
+
       <div class="grid grid-cols-3 gap-3 sm:gap-4">
         <div
           class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center"
@@ -25,7 +53,7 @@
           }}</span>
           <span
             class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5"
-            >Membros</span
+            >Membros Ativos</span
           >
         </div>
 
@@ -43,7 +71,7 @@
           >
           <span
             class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5"
-            >Média Idade</span
+            >Média de Idade</span
           >
         </div>
 
@@ -60,7 +88,7 @@
           }}</span>
           <span
             class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5"
-            >Orações</span
+            >Pedidos Oração</span
           >
         </div>
       </div>
@@ -118,7 +146,7 @@
           <h2
             class="text-xs font-extrabold text-slate-800 uppercase tracking-wider mb-4 text-center"
           >
-            Gênero
+            Distribuição por Gênero
           </h2>
           <div class="h-48 relative flex items-center justify-center">
             <canvas baseChart [data]="chartDataGenero" [options]="chartOptions" [type]="'doughnut'">
@@ -142,16 +170,22 @@
           <h2
             class="text-xs font-extrabold text-slate-800 uppercase tracking-wider mb-4 text-center"
           >
-            Nível de Escolaridade
+            Membros por Ministério
           </h2>
           <div class="h-56 relative flex items-center justify-center">
-            <canvas
-              baseChart
-              [data]="chartDataEscolaridade"
-              [options]="chartOptions"
-              [type]="'doughnut'"
-            >
-            </canvas>
+            @if (chartDataMinisterios?.datasets?.[0]?.data?.length) {
+              <canvas
+                baseChart
+                [data]="chartDataMinisterios"
+                [options]="chartOptions"
+                [type]="'doughnut'"
+              >
+              </canvas>
+            } @else {
+              <p class="text-xs text-slate-400 italic">
+                Nenhum membro vinculado a ministérios ainda.
+              </p>
+            }
           </div>
         </div>
       </div>

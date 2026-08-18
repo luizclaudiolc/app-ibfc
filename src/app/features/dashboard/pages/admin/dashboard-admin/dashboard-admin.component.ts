@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
 import {
   Chart,
@@ -34,6 +35,7 @@ Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 })
 export class DashboardAdminComponent implements OnInit {
   private estatisticasService = inject(EstatisticasService);
+  private router = inject(Router);
 
   carregando = signal(true);
   dados = signal<DashboardData | null>(null);
@@ -64,7 +66,7 @@ export class DashboardAdminComponent implements OnInit {
 
   chartDataGenero!: ChartConfiguration<'doughnut'>['data'];
   chartDataCivil!: ChartConfiguration<'doughnut'>['data'];
-  chartDataEscolaridade!: ChartConfiguration<'doughnut'>['data'];
+  chartDataMinisterios!: ChartConfiguration<'doughnut'>['data'];
 
   ngOnInit() {
     this.estatisticasService.obterEstatisticas().subscribe((res) => {
@@ -90,17 +92,21 @@ export class DashboardAdminComponent implements OnInit {
         ],
       };
 
-      this.chartDataEscolaridade = {
-        labels: res.escolaridade.labels,
+      this.chartDataMinisterios = {
+        labels: res.ministeriosCount.labels,
         datasets: [
           {
-            data: res.escolaridade.data,
-            backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'],
+            data: res.ministeriosCount.data,
+            backgroundColor: ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#3b82f6'],
           },
         ],
       };
 
       this.carregando.set(false);
     });
+  }
+
+  irParaAdminMembros() {
+    this.router.navigate(['/admin']);
   }
 }

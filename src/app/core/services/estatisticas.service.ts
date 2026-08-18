@@ -2,15 +2,16 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, forkJoin, from, map } from 'rxjs';
 import { SupabaseService } from './supabase';
 import { PulsoService } from './pulso.service';
-import { ESCOLARIDADE_MAP } from '../../shared/models/consts';
+import { ESCOLARIDADE_MAP, MINISTERIOS_DISPONIVEIS } from '../../shared/models/consts';
 
 export interface DashboardData {
   totalMembros: number;
+  membrosPendentes: number;
   oracoesAtivas: number;
   mediaIdade: number;
   genero: { labels: string[]; data: number[] };
   estadoCivil: { labels: string[]; data: number[] };
-  escolaridade: { labels: string[]; data: number[] };
+  ministeriosCount: { labels: string[]; data: number[] };
   pulsoSemana: { paz: number; correria: number; oracao: number; total: number };
 }
 
@@ -25,8 +26,7 @@ export class EstatisticasService {
     const membros$ = from(
       this.supabase.supabase
         .from('membros')
-        .select('genero, estado_civil, total_oracoes, status, data_nascimento, nivel_escolaridade')
-        .eq('status', 'ATIVO'),
+        .select('genero, estado_civil, pedido_oracao, status, data_nascimento, ministerios'),
     );
 
     const pulso$ = from(
@@ -38,8 +38,11 @@ export class EstatisticasService {
 
     return forkJoin({ membros: membros$, pulso: pulso$ }).pipe(
       map(({ membros, pulso }) => {
-        const listaMembros = membros.data || [];
+        const todosMembros = membros.data || [];
         const listaPulso = pulso.data || [];
+
+        const ativos = todosMembros.filter((m) => m.status === 'ATIVO');
+        const pendentes = todosMembros.filter((m) => m.status === 'PENDENTE');
 
         let masc = 0,
           fem = 0,
@@ -47,15 +50,18 @@ export class EstatisticasService {
           solteiros = 0,
           div = 0,
           viuvos = 0;
-        let totalOracoes = 0;
+
+        let qtdOracoesAtivas = 0;
         let somaIdades = 0;
         let qtdMembrosComIdade = 0;
         const hoje = new Date();
 
-        const escolaridadeContagem: { [key: number]: number } = {};
+        const ministerioContagem: { [key: string]: number } = {};
 
-        listaMembros.forEach((m) => {
-          totalOracoes += m.total_oracoes || 0;
+        ativos.forEach((m) => {
+          if (m.pedido_oracao && m.pedido_oracao.trim() !== '') {
+            qtdOracoesAtivas++;
+          }
 
           if (m.genero === 1) masc++;
           if (m.genero === 2) fem++;
@@ -65,9 +71,10 @@ export class EstatisticasService {
           if (m.estado_civil === 3) div++;
           if (m.estado_civil === 4) viuvos++;
 
-          if (m.nivel_escolaridade !== null && m.nivel_escolaridade !== undefined) {
-            escolaridadeContagem[m.nivel_escolaridade] =
-              (escolaridadeContagem[m.nivel_escolaridade] || 0) + 1;
+          if (Array.isArray(m.ministerios)) {
+            m.ministerios.forEach((min: string) => {
+              ministerioContagem[min] = (ministerioContagem[min] || 0) + 1;
+            });
           }
 
           if (m.data_nascimento) {
@@ -86,17 +93,21 @@ export class EstatisticasService {
 
         const mediaIdade = qtdMembrosComIdade > 0 ? Math.round(somaIdades / qtdMembrosComIdade) : 0;
 
-        const escolaridadeLabels: string[] = [];
-        const escolaridadeData: number[] = [];
+        const minLabels: string[] = [];
+        const minData: number[] = [];
 
-        Object.entries(ESCOLARIDADE_MAP).forEach(([key, label]) => {
-          const numKey = +key;
-          const qtd = escolaridadeContagem[numKey] || 0;
+        const ministerioMapObj = MINISTERIOS_DISPONIVEIS.reduce(
+          (acc, curr) => {
+            acc[curr.value] = curr.label;
+            return acc;
+          },
+          {} as { [key: string]: string },
+        );
 
-          if (qtd > 0) {
-            escolaridadeLabels.push(label);
-            escolaridadeData.push(qtd);
-          }
+        Object.entries(ministerioContagem).forEach(([key, count]) => {
+          const labelAmigavel = ministerioMapObj[key] || key;
+          minLabels.push(labelAmigavel);
+          minData.push(count);
         });
 
         let paz = 0,
@@ -109,8 +120,9 @@ export class EstatisticasService {
         });
 
         return {
-          totalMembros: listaMembros.length,
-          oracoesAtivas: totalOracoes,
+          totalMembros: ativos.length,
+          membrosPendentes: pendentes.length,
+          oracoesAtivas: qtdOracoesAtivas,
           mediaIdade,
           genero: {
             labels: ['Masculino', 'Feminino'],
@@ -120,9 +132,9 @@ export class EstatisticasService {
             labels: ['Solteiros', 'Casados', 'Divorciados', 'Viúvos'],
             data: [solteiros, casados, div, viuvos],
           },
-          escolaridade: {
-            labels: escolaridadeLabels,
-            data: escolaridadeData,
+          ministeriosCount: {
+            labels: minLabels,
+            data: minData,
           },
           pulsoSemana: {
             paz,
