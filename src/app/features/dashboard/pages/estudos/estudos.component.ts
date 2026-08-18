@@ -28,7 +28,7 @@ export class EstudosComponent implements OnInit {
   termoBusca = signal<string>('');
   limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
 
-  private estudoService = inject(EstudoService);
+  public estudoService = inject(EstudoService);
   private notification = inject(NotificationService);
 
   ngOnInit() {
@@ -84,7 +84,20 @@ export class EstudosComponent implements OnInit {
     this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
   }
 
+  abrirEstudo(url: string) {
+    const urlVisualizacao = this.estudoService.obterUrlVisualizacao(url);
+    window.open(urlVisualizacao, '_blank', 'noopener,noreferrer');
+  }
+
   async baixarPdf(url: string, titulo: string): Promise<void> {
+    if (this.estudoService.isLinkExterno(url)) {
+      const urlDownload = this.estudoService.obterUrlDownload(url);
+
+      window.open(urlDownload, '_blank', 'noopener,noreferrer');
+      this.notification.sucesso('Iniciando download do material...');
+      return;
+    }
+
     try {
       this.notification.aviso('Preparando download do arquivo...', 2000);
 

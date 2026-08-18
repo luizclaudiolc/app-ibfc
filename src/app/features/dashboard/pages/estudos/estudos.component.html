@@ -33,13 +33,23 @@
             class="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-5 flex flex-col gap-4 hover:border-sky-300 transition-colors"
           >
             <div class="flex items-start gap-3.5">
-              <div
-                class="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center shrink-0 shadow-sm"
-              >
-                <mat-icon class="text-red-500 !w-[28px] !h-[28px] !text-[28px]"
-                  >picture_as_pdf</mat-icon
+              @if (estudoService.isLinkExterno(estudo.arquivo_url)) {
+                <div
+                  class="w-14 h-14 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0 shadow-sm"
                 >
-              </div>
+                  <mat-icon class="text-sky-500 !w-[28px] !h-[28px] !text-[28px]"
+                    >add_to_drive</mat-icon
+                  >
+                </div>
+              } @else {
+                <div
+                  class="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center shrink-0 shadow-sm"
+                >
+                  <mat-icon class="text-red-500 !w-[28px] !h-[28px] !text-[28px]"
+                    >picture_as_pdf</mat-icon
+                  >
+                </div>
+              }
 
               <div class="flex-1 min-w-0 pt-0.5">
                 <h3
@@ -64,16 +74,20 @@
             </div>
 
             <div class="flex gap-2 pt-3 border-t border-slate-100">
-              <a
-                [href]="estudo.arquivo_url"
-                target="_blank"
+              <button
+                type="button"
+                (click)="abrirEstudo(estudo.arquivo_url)"
                 class="flex-1 flex items-center justify-center gap-1.5 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
               >
-                <mat-icon class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible"
-                  >visibility</mat-icon
-                >
-                <span>Ver PDF</span>
-              </a>
+                <mat-icon class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible">
+                  {{
+                    estudoService.isLinkExterno(estudo.arquivo_url) ? 'open_in_new' : 'visibility'
+                  }}
+                </mat-icon>
+                <span>{{
+                  estudoService.isLinkExterno(estudo.arquivo_url) ? 'Acessar' : 'Ver PDF'
+                }}</span>
+              </button>
 
               <button
                 type="button"
@@ -84,7 +98,7 @@
                   class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible group-hover:animate-bounce"
                   >download</mat-icon
                 >
-                <span>Baixar PDF</span>
+                <span>Baixar</span>
               </button>
             </div>
           </div>

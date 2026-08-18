@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
 import { MaterialModule } from '../../../../../core/modules/material.module';
 import { PageLayoutComponent } from '../../../../../shared/components/page-layout/page-layout.component';
 import { GenericDialogComponent } from '../../../../../shared/components/modal-generico/modal-generico.component';
@@ -18,6 +19,7 @@ import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../../shared/models/consts
   imports: [
     CommonModule,
     MaterialModule,
+    MatMenuModule,
     PageLayoutComponent,
     PageHeaderComponent,
     BotaoCarregarMaisComponent,
@@ -31,7 +33,7 @@ export class EstudosAdminComponent implements OnInit {
 
   limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
 
-  private estudoService = inject(EstudoService);
+  public estudoService = inject(EstudoService);
   private dialog = inject(MatDialog);
   private notification = inject(NotificationService);
 
@@ -106,11 +108,10 @@ export class EstudosAdminComponent implements OnInit {
       return;
     }
 
-    let arquivoBlindadoEmMemoria: Blob;
+    let arquivoBlindadoEmMemoria: File;
     try {
       this.notification.aviso('Carregando PDF...', 1000);
-      const buffer = await file.arrayBuffer();
-      arquivoBlindadoEmMemoria = new Blob([buffer], { type: 'application/pdf' });
+      arquivoBlindadoEmMemoria = new File([file], file.name, { type: file.type });
     } catch (e) {
       console.error('Erro ao blindar arquivo', e);
       this.notification.erro('Erro ao processar arquivo no celular. Tente novamente.');
@@ -123,6 +124,7 @@ export class EstudosAdminComponent implements OnInit {
       maxWidth: '450px',
       panelClass: ['!p-0', '!rounded-3xl', '!overflow-hidden'],
       data: {
+        modo: 'PDF',
         fileName: file.name,
         fileSize: this.formatarBytes(file.size),
       },
@@ -188,5 +190,86 @@ export class EstudosAdminComponent implements OnInit {
         }
       }
     });
+  }
+
+  abrirModalLink() {
+    const dialogRef = this.dialog.open(EstudoFormDialogComponent, {
+      width: '90%',
+      maxWidth: '450px',
+      panelClass: ['!p-0', '!rounded-3xl', '!overflow-hidden'],
+      data: { modo: 'LINK' },
+    });
+
+    dialogRef.afterClosed().subscribe(async (dadosFormulario) => {
+      if (!dadosFormulario) return;
+
+      try {
+        this.carregandoUpload.set(true);
+        this.notification.aviso('Salvando link do estudo...', 2000);
+
+        const novoEstudo = await this.estudoService.criarComLink(
+          dadosFormulario.url,
+          dadosFormulario.titulo,
+          dadosFormulario.descricao,
+        );
+
+        this.estudos.update((atual) => [novoEstudo, ...atual]);
+        this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
+        this.notification.sucesso('Estudo publicado com sucesso!');
+      } catch (error) {
+        console.error('Erro ao salvar link', error);
+        this.notification.erro('Falha ao salvar o link. Tente novamente.');
+      } finally {
+        this.carregandoUpload.set(false);
+      }
+    });
+  }
+
+  abrirEstudo(url: string) {
+    const urlVisualizacao = this.estudoService.obterUrlVisualizacao(url);
+    window.open(urlVisualizacao, '_blank', 'noopener,noreferrer');
+  }
+
+  async baixarPdf(url: string, titulo: string): Promise<void> {
+    const urlDownload = this.estudoService.obterUrlDownload(url);
+
+    if (this.estudoService.isLinkExterno(urlDownload)) {
+      window.open(urlDownload, '_blank', 'noopener,noreferrer');
+      this.notification.sucesso('Iniciando download do material...');
+      return;
+    }
+
+    try {
+      this.notification.aviso('Preparando download do arquivo...', 2000);
+
+      const response = await fetch(urlDownload);
+      if (!response.ok) throw new Error('Falha ao baixar o arquivo.');
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+
+      const nomeFormatado = titulo
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '_')
+        .replace(/_+/g, '_');
+
+      link.download = `${nomeFormatado}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+      this.notification.sucesso('Download concluído!');
+    } catch (error) {
+      console.error('Erro no download:', error);
+      window.open(urlDownload, '_blank');
+    }
   }
 }

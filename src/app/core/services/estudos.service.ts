@@ -35,9 +35,21 @@ export class EstudoService {
       .from(this.bucketName)
       .getPublicUrl(filePath);
 
+    return this.salvarRegistroNoBanco(publicUrlData.publicUrl, titulo, descricao);
+  }
+
+  async criarComLink(url: string, titulo: string, descricao?: string | null): Promise<Estudo> {
+    return this.salvarRegistroNoBanco(url, titulo, descricao);
+  }
+
+  private async salvarRegistroNoBanco(
+    url: string,
+    titulo: string,
+    descricao?: string | null,
+  ): Promise<Estudo> {
     const payloadParaSalvar: any = {
       titulo: titulo.trim(),
-      arquivo_url: publicUrlData.publicUrl,
+      arquivo_url: url.trim(),
     };
 
     if (descricao && descricao.trim() !== '') {
@@ -62,12 +74,41 @@ export class EstudoService {
 
     if (dbError) throw dbError;
 
-    const urlParts = arquivo_url.split('/');
-    const fileName = urlParts.pop()?.split('?')[0];
+    if (arquivo_url.includes('supabase.co/storage')) {
+      const urlParts = arquivo_url.split('/');
+      const fileName = urlParts.pop()?.split('?')[0];
 
-    if (fileName) {
-      const filePath = `estudos/${fileName}`;
-      await this.supabaseService.supabase.storage.from(this.bucketName).remove([filePath]);
+      if (fileName) {
+        const filePath = `estudos/${fileName}`;
+        await this.supabaseService.supabase.storage.from(this.bucketName).remove([filePath]);
+      }
     }
+  }
+
+  public isLinkExterno(url: string): boolean {
+    return !url.includes('supabase.co/storage');
+  }
+
+  private extrairDriveId(url: string): string | null {
+    const match = url.match(/(?:\/file\/d\/|[?&]id=)([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : null;
+  }
+
+  public obterUrlVisualizacao(url: string): string {
+    if (!this.isLinkExterno(url)) return url;
+    const id = this.extrairDriveId(url);
+    if (id) {
+      return `https://drive.google.com/file/d/${id}/view`;
+    }
+    return url;
+  }
+
+  public obterUrlDownload(url: string): string {
+    if (!this.isLinkExterno(url)) return url;
+    const id = this.extrairDriveId(url);
+    if (id) {
+      return `https://drive.google.com/uc?id=${id}&export=download`;
+    }
+    return url;
   }
 }

@@ -1,30 +1,47 @@
-<app-dialog-layout title="Novo Estudo (PDF)">
+<app-dialog-layout [title]="data.modo === 'LINK' ? 'Novo Estudo (Link)' : 'Novo Estudo (PDF)'">
   <div
     dialog-icon
-    class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center border border-red-100 shadow-sm"
+    class="w-12 h-12 rounded-full flex items-center justify-center border shadow-sm"
+    [ngClass]="
+      data.modo === 'LINK'
+        ? 'bg-sky-50 text-sky-600 border-sky-100'
+        : 'bg-red-50 text-red-600 border-red-100'
+    "
   >
     <mat-icon class="!w-[24px] !h-[24px] !text-[24px] !leading-none overflow-visible">
-      picture_as_pdf
+      {{ data.modo === 'LINK' ? 'add_to_drive' : 'picture_as_pdf' }}
     </mat-icon>
   </div>
 
   <form [formGroup]="form" class="space-y-4 pt-2">
-    <div class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-4">
-      <div
-        class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0"
-      >
-        <mat-icon class="text-red-500 !w-[20px] !h-[20px] !text-[20px] !leading-none"
-          >description</mat-icon
+    @if (data.modo === 'PDF') {
+      <div class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-4">
+        <div
+          class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0"
         >
+          <mat-icon class="text-red-500 !w-[20px] !h-[20px] !text-[20px] !leading-none"
+            >description</mat-icon
+          >
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-bold text-slate-700 truncate">{{ data.fileName }}</p>
+          <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+            {{ data.fileSize }}
+          </p>
+        </div>
+        <mat-icon class="text-emerald-500 !w-[20px] !h-[20px] !text-[20px]">check_circle</mat-icon>
       </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-xs font-bold text-slate-700 truncate">{{ data.fileName }}</p>
-        <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-          {{ data.fileSize }}
-        </p>
-      </div>
-      <mat-icon class="text-emerald-500 !w-[20px] !h-[20px] !text-[20px]">check_circle</mat-icon>
-    </div>
+    } @else {
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Link do Estudo (Google Drive, etc.)</mat-label>
+        <input matInput formControlName="url" placeholder="https://drive.google.com/..." />
+        @if (form.controls.url.hasError('required')) {
+          <mat-error>O link é obrigatório.</mat-error>
+        } @else if (form.controls.url.hasError('pattern')) {
+          <mat-error>Insira um link válido iniciado com http:// ou https://</mat-error>
+        }
+      </mat-form-field>
+    }
 
     <mat-form-field appearance="outline" class="w-full">
       <mat-label>Título do Estudo</mat-label>
@@ -45,11 +62,11 @@
         matInput
         formControlName="descricao"
         rows="3"
-        placeholder="Ex: Material de apoio sobre a carta aos Romanos..."
+        placeholder="Ex: Material de apoio..."
         maxlength="250"
       ></textarea>
       <mat-hint align="end" class="text-xs font-medium"
-        >{{ form.controls.descricao.value.length }}/250</mat-hint
+        >{{ form.controls.descricao.value.length || 0 }}/250</mat-hint
       >
     </mat-form-field>
   </form>
