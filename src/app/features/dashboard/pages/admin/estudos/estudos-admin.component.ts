@@ -11,7 +11,9 @@ import { Estudo } from '../../../../../shared/models/estudos.model';
 import { EstudoService } from '../../../../../core/services/estudos.service';
 import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
 import { BotaoCarregarMaisComponent } from '../../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
-import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../../shared/models/consts';
+import { ENiveisAcesso, LIMITE_CARREGAMENTO_INICIAL } from '../../../../../shared/models/consts';
+import { AcoesEstudoComponent } from '../../../../../shared/components/botoes-acoes-estudo/acoes-estudo.component';
+import { AuthService } from '../../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-estudos-admin',
@@ -23,6 +25,7 @@ import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../../shared/models/consts
     PageLayoutComponent,
     PageHeaderComponent,
     BotaoCarregarMaisComponent,
+    AcoesEstudoComponent,
   ],
   templateUrl: './estudos-admin.component.html',
 })
@@ -36,6 +39,7 @@ export class EstudosAdminComponent implements OnInit {
   public estudoService = inject(EstudoService);
   private dialog = inject(MatDialog);
   private notification = inject(NotificationService);
+  private authService = inject(AuthService);
 
   estudosExibidos = computed(() => {
     return this.estudos().slice(0, this.limiteExibicao());
@@ -45,8 +49,18 @@ export class EstudosAdminComponent implements OnInit {
     return this.estudos().length > this.limiteExibicao();
   });
 
+  ehAdminOuLider = computed(() => {
+    const usuario = this.authService.obterUsuarioLogado();
+
+    const isAdmin =
+      usuario.nivel === ENiveisAcesso.Admin || usuario.nivel === ENiveisAcesso.SuperAdmin;
+
+    return isAdmin;
+  });
+
   ngOnInit() {
     this.carregarEstudos();
+    console.log(this.ehAdminOuLider());
   }
 
   carregarEstudos() {

@@ -111,51 +111,13 @@
                 </p>
               }
 
-              <div class="mt-4 flex flex-col gap-2 pt-3.5 border-t border-slate-200/60">
-                <div class="flex gap-2">
-                  <button
-                    type="button"
-                    (click)="abrirEstudo(estudo.arquivo_url)"
-                    class="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
-                  >
-                    <mat-icon
-                      class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible"
-                    >
-                      {{
-                        estudoService.isLinkExterno(estudo.arquivo_url)
-                          ? 'open_in_new'
-                          : 'visibility'
-                      }}
-                    </mat-icon>
-                    <span>{{
-                      estudoService.isLinkExterno(estudo.arquivo_url) ? 'Acessar' : 'Ver PDF'
-                    }}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    (click)="baixarPdf(estudo.arquivo_url, estudo.titulo)"
-                    class="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white border border-sky-100 hover:border-sky-600 rounded-2xl text-xs font-bold transition-all shadow-2xs cursor-pointer group"
-                  >
-                    <mat-icon
-                      class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible group-hover:animate-bounce"
-                      >download</mat-icon
-                    >
-                    <span>Baixar</span>
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  (click)="excluirEstudo(estudo)"
-                  class="w-full flex items-center justify-center gap-1.5 py-2 bg-white border border-red-100 text-red-500 rounded-2xl text-xs font-bold hover:bg-red-50 transition-colors shadow-2xs cursor-pointer"
-                >
-                  <mat-icon class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible"
-                    >delete_outline</mat-icon
-                  >
-                  <span>Apagar Material</span>
-                </button>
-              </div>
+              <app-acoes-estudo
+                [isLinkExterno]="estudoService.isLinkExterno(estudo.arquivo_url)"
+                [podeApagar]="ehAdminOuLider()"
+                (aoAbrir)="abrirEstudo(estudo.arquivo_url)"
+                (aoBaixar)="baixarPdf(estudo.arquivo_url, estudo.titulo)"
+                (aoExcluir)="excluirEstudo(estudo)"
+              />
             </div>
           } @empty {
             <div

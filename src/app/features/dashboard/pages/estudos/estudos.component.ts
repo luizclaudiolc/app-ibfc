@@ -8,6 +8,7 @@ import { Estudo } from '../../../../shared/models/estudos.model';
 import { EstudoService } from '../../../../core/services/estudos.service';
 import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/models/consts';
+import { AcoesEstudoComponent } from '../../../../shared/components/botoes-acoes-estudo/acoes-estudo.component';
 
 @Component({
   selector: 'app-estudos',
@@ -18,6 +19,7 @@ import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/models/consts';
     PageLayoutComponent,
     PageHeaderComponent,
     BotaoCarregarMaisComponent,
+    AcoesEstudoComponent,
   ],
   templateUrl: './estudos.component.html',
 })

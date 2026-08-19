@@ -73,34 +73,12 @@
               </div>
             </div>
 
-            <div class="flex gap-2 pt-3 border-t border-slate-100">
-              <button
-                type="button"
-                (click)="abrirEstudo(estudo.arquivo_url)"
-                class="flex-1 flex items-center justify-center gap-1.5 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
-              >
-                <mat-icon class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible">
-                  {{
-                    estudoService.isLinkExterno(estudo.arquivo_url) ? 'open_in_new' : 'visibility'
-                  }}
-                </mat-icon>
-                <span>{{
-                  estudoService.isLinkExterno(estudo.arquivo_url) ? 'Acessar' : 'Ver PDF'
-                }}</span>
-              </button>
-
-              <button
-                type="button"
-                (click)="baixarPdf(estudo.arquivo_url, estudo.titulo)"
-                class="flex-1 flex items-center justify-center gap-1.5 py-3 bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white border border-sky-100 hover:border-sky-600 rounded-2xl text-xs font-bold transition-all shadow-2xs cursor-pointer group"
-              >
-                <mat-icon
-                  class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible group-hover:animate-bounce"
-                  >download</mat-icon
-                >
-                <span>Baixar</span>
-              </button>
-            </div>
+            <app-acoes-estudo
+              [isLinkExterno]="estudoService.isLinkExterno(estudo.arquivo_url)"
+              [podeApagar]="false"
+              (aoAbrir)="abrirEstudo(estudo.arquivo_url)"
+              (aoBaixar)="baixarPdf(estudo.arquivo_url, estudo.titulo)"
+            />
           </div>
         } @empty {
           <div
