@@ -8,6 +8,7 @@
   </div>
 
   <div
+    #carteirinhaCard
     class="relative w-full max-w-[340px] bg-gradient-to-b from-sky-700 to-sky-900 rounded-[32px] shadow-2xl overflow-hidden animate-fade-in border border-sky-600/30"
   >
     <div class="absolute top-0 left-0 w-full h-full bg-white/5 pointer-events-none"></div>
@@ -31,13 +32,23 @@
             [src]="dadosMembro()?.fotoUrl"
             alt="Foto de perfil"
             class="w-full h-full object-cover"
+            crossorigin="anonymous"
           />
         } @else {
-          <mat-icon
-            class="text-sky-300 !w-[72px] !h-[72px] !text-[72px] flex items-center justify-center"
-          >
-            person
-          </mat-icon>
+          <div class="flex items-center justify-center w-full h-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="text-sky-300 w-[72px] h-[72px]"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
         }
       </div>
 
@@ -48,10 +59,18 @@
       <div
         class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-sky-950/40 rounded-full border border-sky-500/30"
       >
-        <mat-icon class="text-sky-300 text-[16px] w-4 h-4 flex items-center justify-center"
-          >verified</mat-icon
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="text-sky-300 w-4 h-4"
         >
-        <span class="text-sky-100 text-xs font-semibold uppercase tracking-wider">
+          <path
+            d="M23 11.99l-2.44-2.79.34-3.69-3.61-.82-1.89-3.2-3.4.14L10 0 6.6 1.64 4.71 4.84l-3.61.82.34 3.69L.99 12l2.45 2.79-.34 3.7 3.61.82 1.89 3.2 3.4-.14L12 24l3.4-1.64 1.89-3.2 3.61-.82-.34-3.69L23 11.99zm-12.96 4.97l-4.24-4.24 1.41-1.41 2.83 2.83 7.07-7.07 1.41 1.41-8.48 8.48z"
+          />
+        </svg>
+
+        <span class="text-sky-100 text-xs font-semibold uppercase tracking-wider mt-0.5">
           {{ dadosMembro()?.setor ? departamentos[dadosMembro()?.setor!] : 'Membro' }}
         </span>
       </div>
@@ -93,5 +112,22 @@
 
       <p class="text-slate-400 text-xs font-medium">Rede Interna de Membros</p>
     </div>
+  </div>
+
+  <div class="w-full max-w-[340px] mt-6">
+    <button
+      type="button"
+      (click)="exportarPdf()"
+      [disabled]="gerandoPdf()"
+      class="w-full py-3.5 px-4 bg-sky-700 hover:bg-sky-800 active:scale-[0.98] text-white rounded-2xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+    >
+      @if (gerandoPdf()) {
+        <mat-spinner diameter="20" class="!stroke-white"></mat-spinner>
+        <span>Gerando PDF...</span>
+      } @else {
+        <mat-icon class="!w-5 !h-5 !text-[20px]">download</mat-icon>
+        <span>Baixar Credencial em PDF</span>
+      }
+    </button>
   </div>
 </div>
