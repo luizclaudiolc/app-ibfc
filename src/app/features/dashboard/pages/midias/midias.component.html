@@ -1,0 +1,147 @@
+<app-page-layout>
+  <div class="max-w-4xl mx-auto space-y-6 pb-12">
+    <app-page-header
+      titulo="Hub de Mídia"
+      subtitulo="Assista às nossas pregações, louvores e conteúdos em vídeo."
+      icone="smart_display"
+    >
+      <div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+        <div class="relative w-full flex-1">
+          <input
+            type="text"
+            (input)="aoBuscar($any($event.target).value)"
+            placeholder="Pesquisar por título ou assunto..."
+            class="w-full pl-10 pr-4 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm"
+          />
+          <mat-icon
+            class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 !w-5 !h-5 !text-[20px]"
+          >
+            search
+          </mat-icon>
+        </div>
+
+        @if (ehAdminOuLiderMidia()) {
+          <button
+            type="button"
+            (click)="abrirModalNovoVideo()"
+            [disabled]="carregandoSalvar()"
+            class="w-full sm:w-auto px-5 py-3 bg-red-600 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-sm hover:bg-red-700 transition-all active:scale-95 disabled:opacity-60 disabled:bg-slate-300 flex items-center justify-center gap-2 cursor-pointer shrink-0"
+          >
+            @if (carregandoSalvar()) {
+              <mat-spinner diameter="18" class="!stroke-white"></mat-spinner>
+              <span>Salvando...</span>
+            } @else {
+              <mat-icon class="!w-[18px] !h-[18px] !text-[18px] !leading-none overflow-visible"
+                >add</mat-icon
+              >
+              <span>Novo Vídeo</span>
+            }
+          </button>
+        }
+      </div>
+    </app-page-header>
+
+    @if (carregando()) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-pulse">
+        <div class="h-52 bg-white border border-slate-100 rounded-3xl shadow-sm"></div>
+        <div class="h-52 bg-white border border-slate-100 rounded-3xl shadow-sm"></div>
+      </div>
+    } @else {
+      <div class="space-y-6 pb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          @for (midia of midiasExibidas(); track midia.id) {
+            <div
+              class="group bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:border-red-300 transition-all hover:shadow-md flex flex-col justify-between"
+            >
+              <div
+                (click)="abrirPlayer(midia)"
+                class="relative w-full h-48 bg-slate-900 overflow-hidden cursor-pointer"
+              >
+                <img
+                  [src]="midia.thumbnail_url"
+                  [alt]="midia.titulo"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                />
+
+                <div
+                  class="absolute inset-0 bg-slate-900/30 group-hover:bg-slate-900/40 transition-colors flex items-center justify-center"
+                >
+                  <div
+                    class="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md border border-white/50 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform"
+                  >
+                    <mat-icon class="text-white !w-7 !h-7 !text-[28px] ml-0.5">play_arrow</mat-icon>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-4 flex flex-col justify-between flex-1 gap-3">
+                <div (click)="abrirPlayer(midia)" class="cursor-pointer">
+                  <h3
+                    class="text-xs sm:text-sm font-bold text-slate-800 tracking-tight leading-snug line-clamp-2 group-hover:text-red-600 transition-colors"
+                  >
+                    {{ midia.titulo }}
+                  </h3>
+                  @if (midia.descricao) {
+                    <p
+                      class="text-[11px] text-slate-500 font-medium mt-1 line-clamp-2 leading-relaxed"
+                    >
+                      {{ midia.descricao }}
+                    </p>
+                  }
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div
+                    class="flex items-center gap-1.5 text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider"
+                  >
+                    <mat-icon
+                      class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
+                      >calendar_today</mat-icon
+                    >
+                    <span>{{ midia.created_at | date: 'dd/MM/yyyy' : 'UTC' }}</span>
+                  </div>
+
+                  @if (ehAdminOuLiderMidia()) {
+                    <button
+                      type="button"
+                      (click)="excluirVideo($event, midia)"
+                      class="flex items-center gap-1 px-3 py-1.5 bg-white border border-red-100 text-red-500 rounded-xl text-[11px] font-bold hover:bg-red-50 transition-colors shadow-2xs cursor-pointer"
+                    >
+                      <mat-icon
+                        class="!w-[14px] !h-[14px] !text-[14px] !leading-none overflow-visible"
+                        >delete_outline</mat-icon
+                      >
+                      <span>Excluir</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div
+              class="col-span-full text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200 flex flex-col items-center gap-3 p-6"
+            >
+              <div
+                class="w-12 h-12 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-1"
+              >
+                <mat-icon>smart_display</mat-icon>
+              </div>
+              <p class="text-sm font-bold text-slate-700">Nenhum vídeo no hub.</p>
+              <p class="text-xs text-slate-400 max-w-xs">
+                Nossos conteúdos em vídeo e pregações aparecerão aqui.
+              </p>
+            </div>
+          }
+        </div>
+
+        @if (mostrarBotaoCarregarMais()) {
+          <app-botao-carregar-mais
+            texto="Carregar mais vídeos"
+            [restantes]="midiasFiltradas().length - midiasExibidas().length"
+            (carregarMais)="carregarMais()"
+          />
+        }
+      </div>
+    }
+  </div>
+</app-page-layout>

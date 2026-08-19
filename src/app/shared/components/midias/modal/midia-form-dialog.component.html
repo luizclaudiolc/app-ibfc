@@ -1,0 +1,64 @@
+<app-dialog-layout title="Adicionar Vídeo">
+  <div
+    dialog-icon
+    class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center border border-red-100 shadow-sm"
+  >
+    <mat-icon class="!w-[24px] !h-[24px] !text-[24px] !leading-none overflow-visible">
+      smart_display
+    </mat-icon>
+  </div>
+
+  <form [formGroup]="form" class="space-y-4 pt-2">
+    <mat-form-field appearance="outline" class="w-full relative">
+      <mat-label>Link do YouTube</mat-label>
+      <input matInput formControlName="url" placeholder="Cole a URL do vídeo aqui..." />
+
+      @if (buscandoDados) {
+        <div class="absolute right-3 top-3">
+          <mat-spinner diameter="20" class="!stroke-sky-600"></mat-spinner>
+        </div>
+      }
+
+      @if (form.controls.url.hasError('pattern')) {
+        <mat-error>Insira um link válido do YouTube.</mat-error>
+      }
+    </mat-form-field>
+
+    @if (thumbnailPrevia && !buscandoDados) {
+      <div class="rounded-2xl overflow-hidden border border-slate-200 shadow-xs relative h-36 mb-2">
+        <img [src]="thumbnailPrevia" class="w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-slate-900/30 flex items-center justify-center">
+          <mat-icon class="text-white !w-10 !h-10 !text-[40px]">play_circle</mat-icon>
+        </div>
+      </div>
+    }
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Título do Vídeo</mat-label>
+      <input matInput formControlName="titulo" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Descrição (Opcional)</mat-label>
+      <textarea matInput formControlName="descricao" rows="3"></textarea>
+    </mat-form-field>
+  </form>
+
+  <ng-container dialog-actions>
+    <button
+      type="button"
+      mat-dialog-close
+      class="flex-1 py-3 rounded-2xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      (click)="confirmar()"
+      [disabled]="form.invalid || buscandoDados || !thumbnailPrevia"
+      class="flex-[1.5] py-3 rounded-2xl font-bold text-white bg-sky-600 hover:bg-sky-700 transition-colors shadow-sm disabled:opacity-50 disabled:bg-slate-300 cursor-pointer"
+    >
+      Salvar Vídeo
+    </button>
+  </ng-container>
+</app-dialog-layout>

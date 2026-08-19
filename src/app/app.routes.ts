@@ -101,6 +101,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'midias',
+        loadComponent: () =>
+          import('./features/dashboard/pages/midias/midias.component').then(
+            (c) => c.MidiasComponent,
+          ),
+      },
+      {
         path: 'analytics',
         canActivate: [adminGuard],
         loadComponent: () =>

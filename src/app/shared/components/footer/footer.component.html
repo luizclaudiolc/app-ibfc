@@ -1,41 +1,43 @@
 <footer
-  class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50 px-2 py-1.5 flex justify-around items-center max-w-xl mx-auto pb-safe"
+  class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50 px-2 py-1.5 flex justify-between items-center max-w-xl mx-auto pb-safe"
 >
   @for (item of visibleItems(); track item.route) {
     <a
       [routerLink]="item.route"
-      routerLinkActive="text-sky-600 opacity-100"
+      routerLinkActive="text-sky-600 opacity-100 font-extrabold"
       [routerLinkActiveOptions]="{ exact: !!item.exact }"
-      class="flex flex-col items-center gap-1 focus:outline-none text-slate-400 opacity-60 transition-all w-16 hover:opacity-100 py-1"
+      class="flex-1 flex flex-col items-center justify-center gap-0.5 focus:outline-none text-slate-400 opacity-70 transition-all hover:opacity-100 py-1 cursor-pointer"
     >
       <mat-icon class="!w-6 !h-6 text-[24px]">{{ item.icon }}</mat-icon>
-      <span class="text-[10px] font-bold tracking-wide">{{ item.label }}</span>
+      <span class="text-[10px] tracking-wide text-center leading-tight">{{ item.label }}</span>
     </a>
   }
 
-  <button
-    [matMenuTriggerFor]="footerMenu"
-    (menuOpened)="menuAberto.set(true)"
-    (menuClosed)="menuAberto.set(false)"
-    class="flex flex-col items-center gap-1 focus:outline-none text-slate-400 opacity-60 transition-all w-16 hover:opacity-100 py-1"
-  >
-    <mat-icon
-      class="!w-6 !h-6 text-[24px] transition-transform duration-300 transform"
-      [ngClass]="menuAberto() ? 'rotate-90 scale-110 text-sky-600' : 'rotate-0'"
+  @if (overflowItems().length > 0) {
+    <button
+      type="button"
+      [matMenuTriggerFor]="footerMenu"
+      (menuOpened)="menuAberto.set(true)"
+      (menuClosed)="menuAberto.set(false)"
+      class="flex-1 flex flex-col items-center justify-center gap-0.5 focus:outline-none text-slate-400 opacity-70 transition-all hover:opacity-100 py-1 cursor-pointer"
+      [ngClass]="{ 'text-sky-600 !opacity-100 font-bold': menuAberto() }"
     >
-      {{ menuAberto() ? 'close' : 'menu' }}
-    </mat-icon>
-    <span class="text-[10px] font-bold tracking-wide" [ngClass]="menuAberto() ? 'text-sky-600' : ''"
-      >Menu</span
-    >
-  </button>
+      <mat-icon
+        class="!w-6 !h-6 text-[24px] transition-transform duration-300"
+        [ngClass]="menuAberto() ? 'rotate-90 scale-110' : 'rotate-0'"
+      >
+        {{ menuAberto() ? 'close' : 'more_horiz' }}
+      </mat-icon>
+      <span class="text-[10px] tracking-wide text-center leading-tight">Menu</span>
+    </button>
+  }
 </footer>
 
-<mat-menu #footerMenu="matMenu" yPosition="above" class="rounded-2xl mb-2 min-w-[200px]">
+<mat-menu #footerMenu="matMenu" yPosition="above" class="!rounded-2xl !mb-2 !min-w-[200px]">
   @for (overflow of overflowItems(); track overflow.route) {
     <a mat-menu-item [routerLink]="overflow.route" class="flex items-center">
-      <mat-icon class="text-slate-500 mr-2">{{ overflow.icon }}</mat-icon>
-      <span class="font-medium text-slate-700">{{ overflow.label }}</span>
+      <mat-icon class="text-slate-500 !mr-2">{{ overflow.icon }}</mat-icon>
+      <span class="font-medium text-slate-700 text-sm">{{ overflow.label }}</span>
     </a>
   }
 </mat-menu>

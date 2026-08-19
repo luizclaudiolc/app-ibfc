@@ -26,24 +26,24 @@ export class FooterComponent implements OnInit {
 
   visibleItems = signal<FooterItem[]>([]);
   overflowItems = signal<FooterItem[]>([]);
-
   menuAberto = signal<boolean>(false);
 
   ngOnInit(): void {
     const { nivel, setor } = this.authService.obterUsuarioLogado();
 
     const isAdmin = nivel === ENiveisAcesso.Admin || nivel === ENiveisAcesso.SuperAdmin;
-
     const isLider = setor && setor !== 'null' && setor !== 'undefined' && setor !== 'membro';
-    const isLiderMidia = isLider && setor === 'midia';
+    const isLiderMidia = isLider && (setor === 'midia' || setor === 'comunicacao');
 
     const podeAcessarEscalas = isAdmin || !!isLider;
     const podeAcessarAvisos = isAdmin || !!isLiderMidia;
 
     const allItems: FooterItem[] = [
       { label: 'Início', icon: 'home', route: '/dashboard/home', exact: true },
-      { label: 'Estudos', icon: 'menu_book', route: '/dashboard/estudos' },
+      { label: 'Mídias', icon: 'smart_display', route: '/dashboard/midias' },
       { label: 'Orações', icon: 'volunteer_activism', route: '/dashboard/mural-oracoes' },
+      { label: 'Estudos', icon: 'menu_book', route: '/dashboard/estudos' },
+      { label: 'Perfil', icon: 'person', route: '/dashboard/perfil' },
     ];
 
     if (podeAcessarEscalas) {
@@ -54,19 +54,9 @@ export class FooterComponent implements OnInit {
       allItems.push({ label: 'Avisos', icon: 'campaign', route: '/dashboard/avisos' });
     }
 
-    allItems.push({ label: 'Perfil', icon: 'person', route: '/dashboard/perfil' });
-
     if (isAdmin) {
-      allItems.push({
-        label: 'Estatísticas',
-        icon: 'analytics',
-        route: '/dashboard/analytics',
-      });
-      allItems.push({
-        label: 'Membros',
-        icon: 'manage_accounts',
-        route: '/dashboard/admin',
-      });
+      allItems.push({ label: 'Estatísticas', icon: 'analytics', route: '/dashboard/analytics' });
+      allItems.push({ label: 'Membros', icon: 'manage_accounts', route: '/dashboard/admin' });
       allItems.push({
         label: 'Ger. Estudos',
         icon: 'library_books',
@@ -74,8 +64,13 @@ export class FooterComponent implements OnInit {
       });
     }
 
-    this.visibleItems.set(allItems.slice(0, 3));
-    this.overflowItems.set(allItems.slice(3));
+    if (allItems.length <= 5) {
+      this.visibleItems.set(allItems);
+      this.overflowItems.set([]);
+    } else {
+      this.visibleItems.set(allItems.slice(0, 4));
+      this.overflowItems.set(allItems.slice(4));
+    }
   }
 
   efetuarLogout(): void {
