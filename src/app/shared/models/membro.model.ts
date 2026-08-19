@@ -13,6 +13,7 @@ export interface PerfilBase {
   total_oracoes?: number;
   motivo_inativacao?: EMotivoInativacao | null;
   ministerios?: string[];
+  filhos?: FilhoCadastro[];
 }
 
 export interface Membro extends PerfilBase {
@@ -52,4 +53,10 @@ export interface UsuarioLogado {
   status: EStatusMembro;
   genero: EGenero;
   setorResponsavel?: string;
+}
+
+export interface FilhoCadastro {
+  nome: string;
+  data_nascimento: string;
+  informacoes_medicas?: string | null;
 }

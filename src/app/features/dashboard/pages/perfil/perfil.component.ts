@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import imageCompression from 'browser-image-compression';
@@ -18,8 +18,10 @@ import {
   ESCOLARIDADE_MAP,
   MINISTERIOS_DISPONIVEIS,
 } from '../../../../shared/models/consts';
-import { UsuarioAtualizacao } from '../../../../shared/models/membro.model';
+import { Membro, UsuarioAtualizacao } from '../../../../shared/models/membro.model';
 import { CepService } from '../../../../core/services/busca-cep.service';
+import { FilhoService } from '../../../../core/services/filhos.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-perfil',
@@ -35,10 +37,14 @@ export class PerfilComponent implements OnInit {
   private authService = inject(AuthService);
   private notification = inject(NotificationService);
   private cepService = inject(CepService);
+  private filhoService = inject(FilhoService);
 
   carregando = signal<boolean>(false);
   carregandoDados = signal<boolean>(true);
   buscandoCep = signal<boolean>(false);
+  carregandoFilhos = signal<boolean>(false);
+
+  membrosDisponiveis = signal<Membro[]>([]);
 
   previewFoto = signal<string | null>(this.authService.fotoUsuario$());
   cargosDisponiveis = CARGOS_DISPONIVEIS;
@@ -77,10 +83,29 @@ export class PerfilComponent implements OnInit {
     bairro: [''],
     cidade: [''],
     uf: [''],
+
+    filhos: this.fb.array([]),
   });
+
+  get filhosFormArray(): FormArray {
+    return this.perfilForm.get('filhos') as FormArray;
+  }
 
   ngOnInit(): void {
     this.carregarDadosPerfil();
+    this.carregarMembrosParaSelecao();
+  }
+
+  carregarMembrosParaSelecao() {
+    this.membroService.buscarTodos().subscribe({
+      next: (membros) => {
+        const usuarioLogado = this.authService.obterUsuarioLogado();
+
+        const filtrados = membros.filter((m) => m.id !== usuarioLogado.id);
+        this.membrosDisponiveis.set(filtrados);
+      },
+      error: (err) => console.error('Erro ao carregar membros para seleção', err),
+    });
   }
 
   carregarDadosPerfil() {
@@ -106,7 +131,6 @@ export class PerfilComponent implements OnInit {
             cargo: res.cargo || 'membro',
             ministerios: res.ministerios || [],
             data_nascimento: res.data_nascimento || '',
-
             genero: res.genero !== undefined && res.genero !== null ? Number(res.genero) : null,
             estado_civil:
               res.estado_civil !== undefined && res.estado_civil !== null
@@ -116,7 +140,6 @@ export class PerfilComponent implements OnInit {
               res.nivel_escolaridade !== undefined && res.nivel_escolaridade !== null
                 ? Number(res.nivel_escolaridade)
                 : null,
-
             cep: objEndereco.cep || '',
             logradouro: objEndereco.logradouro || '',
             numero: objEndereco.numero || '',
@@ -125,6 +148,10 @@ export class PerfilComponent implements OnInit {
             cidade: objEndereco.cidade || '',
             uf: objEndereco.uf || '',
           });
+
+          if (res.id) {
+            this.carregarFilhosDoMembro(res.id);
+          }
         }
         this.carregandoDados.set(false);
       },
@@ -132,6 +159,86 @@ export class PerfilComponent implements OnInit {
         this.notification.erro('Erro ao carregar dados do perfil.');
         this.carregandoDados.set(false);
       },
+    });
+  }
+
+  carregarFilhosDoMembro(membroId: string) {
+    this.carregandoFilhos.set(true);
+    this.filhoService.buscarPorMembro(membroId).subscribe({
+      next: (filhos) => {
+        this.filhosFormArray.clear();
+        filhos.forEach((filho) => {
+          const ehOutroResponsavel = filho.outro_responsavel_id === membroId;
+          const responsavelParaSelect = ehOutroResponsavel
+            ? filho.membro_id
+            : filho.outro_responsavel_id || null;
+
+          this.filhosFormArray.push(
+            this.fb.group({
+              id: [filho.id],
+              membro_id: [filho.membro_id],
+              outro_responsavel_id: [responsavelParaSelect],
+              nome: [filho.nome, [Validators.required]],
+              data_nascimento: [filho.data_nascimento, [Validators.required]],
+              informacoes_medicas: [filho.informacoes_medicas || ''],
+            }),
+          );
+        });
+        this.carregandoFilhos.set(false);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar filhos', err);
+        this.carregandoFilhos.set(false);
+      },
+    });
+  }
+
+  adicionarFilhoForm(): void {
+    const usuarioLogado = this.authService.obterUsuarioLogado();
+
+    this.filhosFormArray.push(
+      this.fb.group({
+        id: [null],
+        membro_id: [usuarioLogado.id],
+        outro_responsavel_id: [null],
+        nome: ['', [Validators.required]],
+        data_nascimento: ['', [Validators.required]],
+        informacoes_medicas: [''],
+      }),
+    );
+  }
+
+  removerFilhoForm(index: number): void {
+    const controleFilho = this.filhosFormArray.at(index);
+    const filhoId = controleFilho.get('id')?.value;
+
+    const dialogRef = this.dialog.open(GenericDialogComponent, {
+      data: {
+        titulo: 'Remover Dependente',
+        mensagem: 'Tem certeza que deseja excluir os dados deste dependente?',
+        textoConfirmar: 'Sim, remover',
+        textoCancelar: 'Cancelar',
+        tipo: 'perigo',
+      },
+      panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+      width: '90%',
+      maxWidth: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe(async (confirmado) => {
+      if (confirmado) {
+        if (filhoId) {
+          try {
+            await this.filhoService.excluir(filhoId);
+            this.filhosFormArray.removeAt(index);
+            this.notification.sucesso('Dependente removido com sucesso.');
+          } catch (error) {
+            this.notification.erro('Erro ao excluir dependente no servidor.');
+          }
+        } else {
+          this.filhosFormArray.removeAt(index);
+        }
+      }
     });
   }
 
@@ -166,9 +273,10 @@ export class PerfilComponent implements OnInit {
     }
   }
 
-  salvarAlteracoes(): void {
+  async salvarAlteracoes(): Promise<void> {
     if (this.perfilForm.invalid) {
       this.perfilForm.markAllAsTouched();
+      this.notification.aviso('Por favor, revise os campos obrigatórios.');
       return;
     }
 
@@ -176,6 +284,7 @@ export class PerfilComponent implements OnInit {
     this.perfilForm.disable();
 
     const formValues = this.perfilForm.getRawValue();
+    const usuarioLogado = this.authService.obterUsuarioLogado();
 
     const objEndereco = {
       cep: formValues.cep,
@@ -204,36 +313,53 @@ export class PerfilComponent implements OnInit {
       endereco: enderecoString,
     };
 
-    this.membroService.atualizarPerfil(dadosEnvio).subscribe({
-      next: (res) => {
-        this.carregando.set(false);
-        this.perfilForm.enable();
-        this.perfilForm.controls.email.disable();
+    try {
+      const res = await firstValueFrom(this.membroService.atualizarPerfil(dadosEnvio));
 
-        if (res.sucesso) {
-          this.notification.sucesso('Perfil atualizado com sucesso!');
-          if (dadosEnvio.nome && dadosEnvio.sobrenome) {
-            this.authService.atualizarNomeGlobal(`${dadosEnvio.nome} ${dadosEnvio.sobrenome}`);
+      if (usuarioLogado.id) {
+        for (const f of formValues.filhos as any[]) {
+          const membroPrincipalId = f.membro_id || usuarioLogado.id;
+
+          let outroRespId = f.outro_responsavel_id || null;
+          if (f.membro_id && f.membro_id !== usuarioLogado.id) {
+            outroRespId = f.membro_id;
           }
 
-          if (dadosEnvio.genero !== undefined) {
-            this.authService.atualizarGeneroGlobal(dadosEnvio.genero);
-          }
+          const payloadFilho = {
+            membro_id: membroPrincipalId,
+            outro_responsavel_id: outroRespId,
+            nome: f.nome.trim(),
+            data_nascimento: f.data_nascimento,
+            informacoes_medicas: f.informacoes_medicas?.trim() || null,
+          };
 
-          if (dadosEnvio.ministerios !== undefined) {
-            this.authService.atualizarMinisteriosGlobal(dadosEnvio.ministerios);
+          if (f.id) {
+            await this.filhoService.atualizar(f.id, payloadFilho);
+          } else {
+            await this.filhoService.criar(payloadFilho);
           }
-        } else {
-          this.notification.erro(res.mensagem || 'Erro ao salvar.');
         }
-      },
-      error: () => {
-        this.carregando.set(false);
-        this.perfilForm.enable();
-        this.perfilForm.controls.email.disable();
-        this.notification.erro('Erro inesperado ao salvar alterações.');
-      },
-    });
+      }
+
+      this.carregando.set(false);
+      this.perfilForm.enable();
+      this.perfilForm.controls.email.disable();
+
+      if (res && res.sucesso) {
+        this.notification.sucesso('Perfil e dependentes atualizados com sucesso!');
+        if (dadosEnvio.nome && dadosEnvio.sobrenome) {
+          this.authService.atualizarNomeGlobal(`${dadosEnvio.nome} ${dadosEnvio.sobrenome}`);
+        }
+      } else {
+        this.notification.erro(res?.mensagem || 'Erro ao salvar.');
+      }
+    } catch (error) {
+      console.error(error);
+      this.carregando.set(false);
+      this.perfilForm.enable();
+      this.perfilForm.controls.email.disable();
+      this.notification.erro('Erro inesperado ao salvar alterações.');
+    }
   }
 
   async aoSelecionarFoto(event: any): Promise<void> {

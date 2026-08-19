@@ -1,4 +1,5 @@
 export interface SessaoUsuario {
+  id: string;
   email: string;
   nome: string;
   nivel: string;

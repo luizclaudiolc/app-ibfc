@@ -255,6 +255,107 @@
           </div>
         </div>
 
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-50">
+            <div class="flex items-center gap-2">
+              <mat-icon class="text-sky-500 !w-5 !h-5 !text-[20px] flex items-center justify-center"
+                >child_care</mat-icon
+              >
+              <h3 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                Meus Filhos menores
+              </h3>
+            </div>
+            <button
+              type="button"
+              (click)="adicionarFilhoForm()"
+              class="text-sky-600 hover:bg-sky-50 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+            >
+              <mat-icon class="!w-4 !h-4 !text-[16px] flex items-center justify-center"
+                >person_add</mat-icon
+              >
+              <span>Adicionar Dependente</span>
+            </button>
+          </div>
+
+          @if (carregandoFilhos()) {
+            <div class="flex justify-center py-6">
+              <mat-spinner diameter="24"></mat-spinner>
+            </div>
+          } @else {
+            <div formArrayName="filhos" class="space-y-3">
+              @for (filhoForm of filhosFormArray.controls; track $index) {
+                <div
+                  [formGroupName]="$index"
+                  class="p-4 bg-slate-50/60 border border-slate-200/80 rounded-2xl relative animate-fade-in space-y-3"
+                >
+                  <button
+                    type="button"
+                    (click)="removerFilhoForm($index)"
+                    class="absolute top-3 right-3 text-slate-400 hover:text-rose-600 bg-white hover:bg-rose-50 w-8 h-8 rounded-full shadow-sm border border-slate-100 flex items-center justify-center transition-all z-10 cursor-pointer"
+                    title="Remover dependente"
+                  >
+                    <mat-icon class="!w-4 !h-4 !text-[16px] flex items-center justify-center"
+                      >delete_outline</mat-icon
+                    >
+                  </button>
+
+                  <div class="text-xs font-bold text-slate-600 pr-8">
+                    Dependente {{ $index + 1 }}
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-label>Nome Completo</mat-label>
+                      <input matInput formControlName="nome" placeholder="Nome da criança" />
+                      @if (filhoForm.get('nome')?.hasError('required')) {
+                        <mat-error>Obrigatório.</mat-error>
+                      }
+                    </mat-form-field>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-label>Data de Nascimento</mat-label>
+                      <input matInput type="date" formControlName="data_nascimento" />
+                      @if (filhoForm.get('data_nascimento')?.hasError('required')) {
+                        <mat-error>Obrigatório.</mat-error>
+                      }
+                    </mat-form-field>
+                  </div>
+
+                  <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                    <mat-label>Outro Responsável (Opcional)</mat-label>
+                    <mat-select formControlName="outro_responsavel_id">
+                      <mat-option [value]="null">Nenhum / Apenas eu</mat-option>
+                      @for (membro of membrosDisponiveis(); track membro.id) {
+                        <mat-option [value]="membro.id">
+                          {{ membro.nome }} {{ membro.sobrenome }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-hint class="text-[10px]"
+                      >Permite que o cônjuge também visualize esta criança no perfil dele.</mat-hint
+                    >
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                    <mat-label>Informações Médicas (Opcional)</mat-label>
+                    <input
+                      matInput
+                      formControlName="informacoes_medicas"
+                      placeholder="Ex: Alérgico a amendoim, intolerante a lactose..."
+                    />
+                  </mat-form-field>
+                </div>
+              } @empty {
+                <div class="text-center py-6 text-slate-400 text-xs italic">
+                  Nenhum dependente cadastrado. Clique em "Adicionar Dependente" se necessário.
+                </div>
+              }
+            </div>
+          }
+        </div>
+
         <div class="flex gap-3 pt-2">
           <button
             mat-flat-button

@@ -55,6 +55,7 @@ export class AuthService {
     const sessao = this.getSessao();
 
     return {
+      id: sessao?.id || '',
       email: sessao?.email || '',
       nome: sessao?.nome || '',
       nivel: sessao?.nivel || '',
@@ -297,6 +298,7 @@ export class AuthService {
     }
 
     const sessaoData = {
+      id: perfil.id,
       email: perfil.email,
       nome: nomeCompleto,
       nivel: perfil.nivel_acesso || ENiveisAcesso.User,

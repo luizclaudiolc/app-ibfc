@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import {
   AbstractControl,
+  FormArray,
   FormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
@@ -126,6 +127,7 @@ export class CadastroComponent {
       dataNascimento: ['', [Validators.required]],
 
       genero: [null as number | null, [Validators.required]],
+      filhos: this.fb.array([]),
       estadoCivil: [null as number | null, [Validators.required]],
       escolaridade: [null as number | null],
 
@@ -144,7 +146,7 @@ export class CadastroComponent {
   );
 
   private camposPorEtapa: Record<number, string[]> = {
-    1: ['nome', 'sobrenome', 'dataNascimento', 'genero'],
+    1: ['nome', 'sobrenome', 'dataNascimento', 'genero', 'filhos'],
     2: [
       'email',
       'telefone',
@@ -286,6 +288,12 @@ export class CadastroComponent {
       estado_civil: formValues.estadoCivil ? +formValues.estadoCivil : undefined,
       nivel_escolaridade: formValues.escolaridade ? +formValues.escolaridade : undefined,
 
+      filhos: formValues.filhos.map((f: any) => ({
+        nome: f.nome.trim(),
+        data_nascimento: f.dataNascimento,
+        informacoes_medicas: f.informacoesMedicas?.trim() || null,
+      })),
+
       endereco: enderecoString,
     };
 
@@ -309,5 +317,23 @@ export class CadastroComponent {
         this.cadastroForm.enable();
       },
     });
+  }
+
+  get filhosFormArray(): FormArray {
+    return this.cadastroForm.get('filhos') as FormArray;
+  }
+
+  adicionarFilho(): void {
+    const filhoForm = this.fb.group({
+      nome: ['', [Validators.required]],
+      dataNascimento: ['', [Validators.required]],
+      informacoesMedicas: [''],
+    });
+
+    this.filhosFormArray.push(filhoForm);
+  }
+
+  removerFilho(index: number): void {
+    this.filhosFormArray.removeAt(index);
   }
 }
