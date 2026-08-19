@@ -11,6 +11,7 @@ import { NotificationService } from '../../../../../core/services/notifications.
 import { AvisoFormDialogComponent } from './modal/aviso-form-dialog.component';
 import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
 import { BotaoCarregarMaisComponent } from '../../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
+import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../../shared/models/consts';
 
 @Component({
   selector: 'app-avisos-admin',
@@ -29,18 +30,27 @@ export class AvisosAdminComponent implements OnInit {
   carregandoAvisos = signal<boolean>(true);
   carregandoUpload = signal<boolean>(false);
 
-  limiteExibicao = signal<number>(2);
+  limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
 
   private avisoService = inject(AvisoService);
   private dialog = inject(MatDialog);
   private notification = inject(NotificationService);
 
-  avisosExibidos = computed(() => {
-    return this.avisos().slice(0, this.limiteExibicao());
-  });
-
   mostrarBotaoCarregarMais = computed(() => {
     return this.avisos().length > this.limiteExibicao();
+  });
+
+  avisosOrdenados = computed(() => {
+    return [...this.avisos()].sort((a, b) => {
+      const dataA = a.data_evento ? new Date(a.data_evento).getTime() : 0;
+      const dataB = b.data_evento ? new Date(b.data_evento).getTime() : 0;
+
+      return dataB - dataA;
+    });
+  });
+
+  avisosExibidos = computed(() => {
+    return this.avisosOrdenados().slice(0, this.limiteExibicao());
   });
 
   ngOnInit() {
@@ -64,7 +74,7 @@ export class AvisosAdminComponent implements OnInit {
   }
 
   carregarMaisAvisos(): void {
-    this.limiteExibicao.update((valorAtual) => valorAtual + 10);
+    this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
   }
 
   async onFileSelected(event: Event) {
@@ -116,7 +126,7 @@ export class AvisosAdminComponent implements OnInit {
           );
 
           this.avisos.update((atual) => [novoAviso, ...atual]);
-          this.limiteExibicao.set(10);
+          this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
           this.notification.sucesso('Novo banner de aviso publicado!');
         } catch (error) {
           console.error('Erro no upload ou compressão', error);
