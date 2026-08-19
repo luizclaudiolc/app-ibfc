@@ -132,28 +132,6 @@ export class AuthService {
     this.atualizarPropriedadeSessao({ avisosConfirmados: filtrados });
   }
 
-  obterOracoesRealizadas(): string[] {
-    const sessao = this.getSessao();
-    return sessao?.oracoesRealizadas || [];
-  }
-
-  adicionarOracaoRealizada(idMembro: string): void {
-    const atuais = this.obterOracoesRealizadas();
-    if (!atuais.includes(idMembro)) {
-      atuais.push(idMembro);
-      if (atuais.length > 200) {
-        atuais.unshift();
-      }
-      this.atualizarPropriedadeSessao({ oracoesRealizadas: atuais });
-    }
-  }
-
-  removerOracaoRealizada(idMembro: string): void {
-    const atuais = this.obterOracoesRealizadas();
-    const filtrados = atuais.filter((id) => id !== idMembro);
-    this.atualizarPropriedadeSessao({ oracoesRealizadas: filtrados });
-  }
-
   private iniciarObservadorDeSessao() {
     this.supabaseService.supabase.auth.onAuthStateChange((event, session) => {
       this.ngZone.run(() => {
@@ -327,7 +305,6 @@ export class AuthService {
       todosBackups[sessaoAtual.email] = {
         pulsoSemanaVotada: sessaoAtual.pulsoSemanaVotada,
         avisosConfirmados: sessaoAtual.avisosConfirmados,
-        oracoesRealizadas: sessaoAtual.oracoesRealizadas,
         versiculoCache: sessaoAtual.versiculoCache,
       };
 

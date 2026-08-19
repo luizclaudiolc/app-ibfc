@@ -117,15 +117,7 @@ export class MembroService {
       if (dados.nivel_escolaridade !== undefined)
         payloadParaSalvar.nivel_escolaridade = dados.nivel_escolaridade ?? null;
       if (dados.endereco !== undefined) payloadParaSalvar.endereco = dados.endereco || null;
-
       if (dados.ministerios !== undefined) payloadParaSalvar.ministerios = dados.ministerios;
-
-      if (dados.pedido_oracao !== undefined) {
-        payloadParaSalvar.pedido_oracao = dados.pedido_oracao || null;
-        if (!dados.pedido_oracao || dados.pedido_oracao.trim() === '') {
-          payloadParaSalvar.total_oracoes = 0;
-        }
-      }
 
       const { error } = await this.supabaseService.supabase
         .from('membros')
@@ -241,38 +233,5 @@ export class MembroService {
     if (error) throw error;
 
     return data;
-  }
-
-  incrementarOracao(membroId: string): Observable<{ sucesso: boolean; mensagem?: string }> {
-    return from(this.executarIncrementoOracao(membroId));
-  }
-
-  private async executarIncrementoOracao(
-    membroId: string,
-  ): Promise<{ sucesso: boolean; mensagem?: string }> {
-    try {
-      const { error } = await this.supabaseService.supabase.rpc('incrementar_oracao', {
-        membro_id: membroId,
-      });
-
-      if (error) throw error;
-
-      return { sucesso: true };
-    } catch (error: any) {
-      console.error('Erro ao incrementar oração:', error);
-      return { sucesso: false, mensagem: error.message };
-    }
-  }
-
-  buscarPedidosOracao(): Observable<Membro[]> {
-    const promise = this.supabaseService.supabase
-      .from('membros')
-      .select('id, nome, sobrenome, foto_url, pedido_oracao, total_oracoes')
-      .not('pedido_oracao', 'is', null)
-      .neq('pedido_oracao', '')
-      .order('total_oracoes', { ascending: true })
-      .order('id', { ascending: true });
-
-    return from(promise).pipe(map((res) => res.data as Membro[]));
   }
 }

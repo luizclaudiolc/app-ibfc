@@ -2,24 +2,24 @@
   class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-4 transition-all hover:shadow-md"
 >
   <a
-    [routerLink]="['/dashboard/perfil', membroLocal().id]"
+    [routerLink]="['/dashboard/perfil', pedidoLocal().membro_id]"
     class="flex items-center gap-3 mb-3 cursor-pointer group decoration-transparent"
   >
-    @if (membroLocal().foto_url) {
+    @if (pedidoLocal().membro?.foto_url) {
       <img
-        [src]="membroLocal().foto_url"
+        [src]="pedidoLocal().membro?.foto_url"
         class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-50 group-hover:ring-sky-100 transition-all"
       />
     } @else {
       <div
         class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm ring-2 ring-slate-50 group-hover:ring-sky-100 transition-all"
       >
-        {{ membroLocal().nome[0].toUpperCase() }}
+        {{ (pedidoLocal().membro?.nome || 'I')[0].toUpperCase() }}
       </div>
     }
     <div>
       <h3 class="text-sm font-bold text-slate-800 group-hover:text-sky-600 transition-colors">
-        {{ membroLocal().nome }} {{ membroLocal().sobrenome }}
+        {{ pedidoLocal().membro?.nome }} {{ pedidoLocal().membro?.sobrenome }}
       </h3>
       <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
         Precisa de oração
@@ -32,7 +32,7 @@
       >format_quote</mat-icon
     >
     <p class="text-sm font-medium text-slate-600 leading-relaxed italic relative z-10 pl-6">
-      {{ membroLocal().pedido_oracao }}
+      {{ pedidoLocal().descricao }}
     </p>
   </div>
 
@@ -41,17 +41,18 @@
       <mat-icon class="!w-[16px] !h-[16px] !text-[16px] text-amber-500"
         >local_fire_department</mat-icon
       >
-      <strong>{{ membroLocal().total_oracoes || 0 }}</strong> intercessores
+
+      <strong>{{ totalOracoes() }}</strong> intercessores
     </span>
 
     <button
       type="button"
-      (click)="orarPorMembro()"
-      [disabled]="jaOrou() || carregando()"
-      class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+      (click)="alternarOracao()"
+      [disabled]="carregando()"
+      class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
       [ngClass]="
         jaOrou()
-          ? 'bg-emerald-500 text-white cursor-default'
+          ? 'bg-emerald-500 hover:bg-emerald-600 border border-emerald-500 text-white'
           : 'bg-white hover:bg-sky-50 text-sky-600 border border-sky-200'
       "
     >
@@ -61,7 +62,7 @@
         <mat-icon class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible">
           {{ jaOrou() ? 'check' : 'favorite_border' }}
         </mat-icon>
-        <span class="pt-[1px]">{{ jaOrou() ? 'Estou Orando' : 'Orar' }}</span>
+        <span class="pt-[1px]">{{ jaOrou() ? 'Estou Orando' : 'Vou Orar' }}</span>
       }
     </button>
   </div>

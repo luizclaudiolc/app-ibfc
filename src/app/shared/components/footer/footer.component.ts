@@ -29,7 +29,7 @@ export class FooterComponent implements OnInit {
   menuAberto = signal<boolean>(false);
 
   ngOnInit(): void {
-    const { nivel, setor } = this.authService.obterUsuarioLogado();
+    const { nivel, setor, id } = this.authService.obterUsuarioLogado();
 
     const isAdmin = nivel === ENiveisAcesso.Admin || nivel === ENiveisAcesso.SuperAdmin;
     const isLider = setor && setor !== 'null' && setor !== 'undefined' && setor !== 'membro';
@@ -43,8 +43,13 @@ export class FooterComponent implements OnInit {
       { label: 'Mídias', icon: 'smart_display', route: '/dashboard/midias' },
       { label: 'Orações', icon: 'volunteer_activism', route: '/dashboard/mural-oracoes' },
       { label: 'Estudos', icon: 'menu_book', route: '/dashboard/estudos' },
-      { label: 'Perfil', icon: 'person', route: '/dashboard/perfil' },
+
+      { label: 'Ajustes', icon: 'manage_accounts', route: '/dashboard/perfil' },
     ];
+
+    if (id) {
+      allItems.push({ label: 'Meu Perfil', icon: 'person', route: `/dashboard/perfil/${id}` });
+    }
 
     if (podeAcessarEscalas) {
       allItems.push({ label: 'Escalas', icon: 'calendar_month', route: '/dashboard/escala' });
@@ -56,7 +61,7 @@ export class FooterComponent implements OnInit {
 
     if (isAdmin) {
       allItems.push({ label: 'Estatísticas', icon: 'analytics', route: '/dashboard/analytics' });
-      allItems.push({ label: 'Membros', icon: 'manage_accounts', route: '/dashboard/admin' });
+      allItems.push({ label: 'Membros', icon: 'group', route: '/dashboard/admin' });
       allItems.push({
         label: 'Ger. Estudos',
         icon: 'library_books',

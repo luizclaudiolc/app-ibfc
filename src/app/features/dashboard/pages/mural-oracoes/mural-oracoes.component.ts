@@ -1,17 +1,17 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { debounceTime, map } from 'rxjs';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import { OracaoCardComponent } from '../../../../shared/components/oracao-card/oracao-card.component';
-import { MembroService } from '../../../../core/services/membro.service';
-import { Membro } from '../../../../shared/models/membro.model';
+import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/models/consts';
+import { PedidoOracao, PedidoOracaoService } from '../../../../core/services/pedido-oracao.service';
 
 @Component({
   selector: 'app-mural-oracoes',
@@ -28,19 +28,20 @@ import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/models/consts';
   templateUrl: './mural-oracoes.component.html',
 })
 export class MuralOracoesComponent implements OnInit {
-  pedidos = signal<Membro[]>([]);
+  pedidos = signal<PedidoOracao[]>([]);
   carregando = signal<boolean>(true);
   salvando = signal<boolean>(false);
 
   limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
 
-  private membroService = inject(MembroService);
+  private pedidoService = inject(PedidoOracaoService);
+  private authService = inject(AuthService);
   private notification = inject(NotificationService);
   private location = inject(Location);
   private fb = inject(FormBuilder);
 
   oracaoForm = this.fb.nonNullable.group({
-    pedido_oracao: [''],
+    descricao: ['', [Validators.required, Validators.maxLength(160)]],
   });
 
   buscaControl = new FormControl('', { nonNullable: true });
@@ -56,86 +57,96 @@ export class MuralOracoesComponent implements OnInit {
     { initialValue: '' },
   );
 
-  pedidosFiltrados = computed(() => {
+  pedidosAtivosFiltrados = computed(() => {
     const termo = this.termoBusca();
-    const lista = this.pedidos();
+    const lista = this.pedidos().filter((p) => !p.atendido);
 
     if (!termo) return lista;
 
-    return lista.filter((membro) => {
-      const nomeCompleto = `${membro.nome || ''} ${membro.sobrenome || ''}`.toLowerCase();
-      const pedido = (membro.pedido_oracao || '').toLowerCase();
+    return lista.filter((pedido) => {
+      const nomeCompleto =
+        `${pedido.membro?.nome || ''} ${pedido.membro?.sobrenome || ''}`.toLowerCase();
+      const descricao = (pedido.descricao || '').toLowerCase();
 
-      return nomeCompleto.includes(termo) || pedido.includes(termo);
+      return nomeCompleto.includes(termo) || descricao.includes(termo);
     });
   });
 
+  pedidosAtendidosRecentes = computed(() => {
+    return this.pedidos()
+      .filter((p) => p.atendido)
+      .sort(
+        (a, b) =>
+          new Date(b.updated_at || b.created_at).getTime() -
+          new Date(a.updated_at || a.created_at).getTime(),
+      )
+      .slice(0, 3);
+  });
+
+  pedidosAtendidos = computed(() => {
+    return this.pedidos()
+      .filter((p) => p.atendido)
+      .sort(
+        (a, b) =>
+          new Date(b.updated_at || b.created_at).getTime() -
+          new Date(a.updated_at || a.created_at).getTime(),
+      );
+  });
+
   pedidosExibidos = computed(() => {
-    return this.pedidosFiltrados().slice(0, this.limiteExibicao());
+    return this.pedidosAtivosFiltrados().slice(0, this.limiteExibicao());
   });
 
   mostrarBotaoCarregarMais = computed(() => {
-    return this.pedidosFiltrados().length > this.limiteExibicao();
+    return this.pedidosAtivosFiltrados().length > this.limiteExibicao();
   });
 
   ngOnInit() {
-    this.carregarDadosIniciais();
+    this.carregarTodosPedidos();
   }
 
-  carregarDadosIniciais() {
-    this.carregarPedidos();
-    this.carregarMeuPedidoExistente();
-  }
+  carregarTodosPedidos() {
+    this.carregando.set(true);
 
-  carregarPedidos() {
-    this.membroService.buscarPedidosOracao().subscribe({
+    this.pedidoService.buscarTodosComMembro().subscribe({
       next: (dados) => {
         this.pedidos.set(dados);
         this.carregando.set(false);
       },
       error: () => {
-        this.notification.erro('Erro ao carregar o mural.');
+        this.notification.erro('Erro ao carregar o mural de orações.');
         this.carregando.set(false);
       },
     });
   }
 
-  carregarMeuPedidoExistente() {
-    this.membroService.buscarMeuPerfil().subscribe({
-      next: (res) => {
-        if (res && res.pedido_oracao) {
-          this.oracaoForm.patchValue({ pedido_oracao: res.pedido_oracao });
-        }
-      },
-    });
-  }
+  async salvarPedidoOracao() {
+    if (this.oracaoForm.invalid) return;
 
-  salvarPedidoOracao() {
-    const textoPedido = this.oracaoForm.getRawValue().pedido_oracao;
+    const textoPedido = this.oracaoForm.getRawValue().descricao.trim();
+    if (!textoPedido) return;
+
     this.salvando.set(true);
 
-    this.membroService.atualizarPerfil({ pedido_oracao: textoPedido }).subscribe({
-      next: (res) => {
-        this.salvando.set(false);
-        if (res.sucesso) {
-          this.notification.sucesso('Pedido de oração publicado no mural!');
+    try {
+      const usuarioLogado = this.authService.obterUsuarioLogado();
 
-          this.pedidos.set([]);
-          this.carregarPedidos();
-        } else {
-          this.notification.erro(res.mensagem || 'Erro ao publicar pedido.');
-        }
-      },
-      error: () => {
-        this.salvando.set(false);
-        this.notification.erro('Erro inesperado ao salvar pedido.');
-      },
-    });
+      await this.pedidoService.criar(usuarioLogado.id, textoPedido);
+
+      this.notification.sucesso('Seu pedido de oração foi publicado no mural!');
+
+      this.oracaoForm.reset();
+      this.carregarTodosPedidos();
+    } catch (error) {
+      console.error('Erro ao publicar oração', error);
+      this.notification.erro('Erro inesperado ao publicar seu pedido.');
+    } finally {
+      this.salvando.set(false);
+    }
   }
 
-  limparPedido() {
-    this.oracaoForm.controls.pedido_oracao.setValue('');
-    this.salvarPedidoOracao();
+  limparTexto() {
+    this.oracaoForm.reset();
   }
 
   carregarMaisPedidos(): void {

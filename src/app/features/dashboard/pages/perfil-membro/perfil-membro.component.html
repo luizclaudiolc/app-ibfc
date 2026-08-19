@@ -1,9 +1,9 @@
 <app-page-layout>
   <button
     (click)="voltar()"
-    class="flex items-center gap-2 text-slate-500 hover:text-sky-600 transition-colors font-semibold text-sm mb-6 -ml-1 px-2 py-1 rounded-lg"
+    class="flex items-center gap-2 text-slate-500 hover:text-sky-600 transition-colors font-semibold text-sm mb-6 -ml-1 px-2 py-1 rounded-lg cursor-pointer"
   >
-    <mat-icon class="text-[20px] w-5 h-5 flex justify-center items-center"
+    <mat-icon class="!text-[20px] !w-5 !h-5 flex justify-center items-center"
       >arrow_back_ios_new</mat-icon
     >
     Voltar
@@ -61,65 +61,33 @@
               </span>
             }
           </div>
+
+          @if (totalIntercessoesFeitas() >= 20) {
+            <div
+              class="mt-3 flex items-center gap-1.5 bg-gradient-to-r from-amber-50 to-amber-100/60 text-amber-800 px-3.5 py-1 rounded-full border border-amber-200/80 shadow-2xs animate-fade-in"
+            >
+              <mat-icon
+                class="!w-4 !h-4 !text-[16px] text-amber-600 flex items-center justify-center"
+                >workspace_premium</mat-icon
+              >
+              <span class="text-[10px] font-extrabold uppercase tracking-wider"
+                >Intercessor Dedicado ({{ totalIntercessoesFeitas() }})</span
+              >
+            </div>
+          } @else if (totalIntercessoesFeitas() > 0) {
+            <div class="mt-3 text-[11px] font-medium text-slate-400 flex items-center gap-1">
+              <mat-icon
+                class="!w-3.5 !h-3.5 !text-[14px] text-sky-500 flex items-center justify-center"
+                >volunteer_activism</mat-icon
+              >
+              <span
+                >Já intercedeu em <strong>{{ totalIntercessoesFeitas() }}</strong> motivos</span
+              >
+            </div>
+          }
         </div>
 
         <div class="space-y-1 mt-6 border-t border-slate-100 pt-4">
-          @if (membro()!.pedido_oracao) {
-            <div
-              class="mt-6 p-4 bg-sky-50/60 rounded-2xl border border-sky-100 shadow-sm relative overflow-hidden"
-            >
-              <div class="flex items-start gap-3">
-                <div
-                  class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 mt-0.5"
-                >
-                  <mat-icon class="!w-[20px] !h-[20px] !text-[20px] !leading-none overflow-visible"
-                    >volunteer_activism</mat-icon
-                  >
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-[10px] font-bold text-sky-600 uppercase tracking-wider mb-1">
-                    Pedido de Oração
-                  </p>
-                  <p class="text-xs font-medium text-slate-700 leading-relaxed italic">
-                    "{{ membro()!.pedido_oracao }}"
-                  </p>
-
-                  <div
-                    class="mt-3 flex items-center justify-between pt-3 border-t border-sky-100/80"
-                  >
-                    <span class="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-                      <mat-icon class="!w-[14px] !h-[14px] !text-[14px] text-amber-500"
-                        >local_fire_department</mat-icon
-                      >
-                      <strong>{{ membro()!.total_oracoes || 0 }}</strong> pessoas orando
-                    </span>
-
-                    <button
-                      type="button"
-                      (click)="orarPorMembro()"
-                      [disabled]="jaOrou()"
-                      class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
-                      [ngClass]="
-                        jaOrou()
-                          ? 'bg-emerald-500 text-white cursor-default'
-                          : 'bg-white hover:bg-sky-600 hover:text-white text-sky-700 border border-sky-200'
-                      "
-                    >
-                      <mat-icon
-                        class="!w-[16px] !h-[16px] !text-[16px] !leading-none overflow-visible"
-                      >
-                        {{ jaOrou() ? 'check' : 'favorite' }}
-                      </mat-icon>
-                      <span class="pt-[1px]">{{
-                        jaOrou() ? 'Estou Orando 🙏' : 'Orar por isso'
-                      }}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
-
           <a
             [href]="'tel:+55' + membro()!.telefone"
             class="flex items-center gap-4 p-3 -mx-3 rounded-2xl hover:bg-slate-50 transition-colors group cursor-pointer decoration-transparent outline-none"
@@ -127,7 +95,7 @@
             <div
               class="w-11 h-11 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-sky-100 group-hover:text-sky-600 transition-colors shrink-0"
             >
-              <mat-icon class="text-[22px] w-[22px] h-[22px] flex items-center justify-center"
+              <mat-icon class="!text-[22px] !w-[22px] !h-[22px] flex items-center justify-center"
                 >call</mat-icon
               >
             </div>
@@ -139,7 +107,8 @@
                 {{ formatarTelefone(membro()!.telefone || '') }}
               </p>
             </div>
-            <mat-icon class="text-slate-300 group-hover:text-sky-500 transition-colors"
+            <mat-icon
+              class="!text-slate-300 group-hover:!text-sky-500 transition-colors !w-5 !h-5 flex items-center justify-center"
               >chevron_right</mat-icon
             >
           </a>
@@ -151,7 +120,7 @@
             <div
               class="w-11 h-11 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors shrink-0"
             >
-              <mat-icon class="text-[22px] w-[22px] h-[22px] flex items-center justify-center"
+              <mat-icon class="!text-[22px] !w-[22px] !h-[22px] flex items-center justify-center"
                 >mail</mat-icon
               >
             </div>
@@ -161,7 +130,8 @@
               </p>
               <p class="text-sm font-bold text-slate-700 truncate">{{ membro()!.email }}</p>
             </div>
-            <mat-icon class="text-slate-300 group-hover:text-indigo-500 transition-colors"
+            <mat-icon
+              class="!text-slate-300 group-hover:!text-indigo-500 transition-colors !w-5 !h-5 flex items-center justify-center"
               >chevron_right</mat-icon
             >
           </a>
@@ -170,7 +140,7 @@
             <div
               class="w-11 h-11 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 shrink-0"
             >
-              <mat-icon class="text-[22px] w-[22px] h-[22px] flex items-center justify-center"
+              <mat-icon class="!text-[22px] !w-[22px] !h-[22px] flex items-center justify-center"
                 >cake</mat-icon
               >
             </div>
@@ -190,7 +160,7 @@
             <div
               class="w-11 h-11 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 shrink-0"
             >
-              <mat-icon class="text-[22px] w-[22px] h-[22px] flex items-center justify-center"
+              <mat-icon class="!text-[22px] !w-[22px] !h-[22px] flex items-center justify-center"
                 >diversity_3</mat-icon
               >
             </div>
@@ -198,7 +168,6 @@
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
                 Ministérios
               </p>
-
               <p class="text-sm font-bold text-slate-700 leading-snug">
                 {{ obterNomesMinisterios(membro()!.ministerios) }}
               </p>
@@ -228,5 +197,214 @@
         </div>
       </div>
     </div>
+
+    @if (pedidosAtivos().length > 0) {
+      <div class="mt-8 space-y-4">
+        <div class="flex items-center gap-2 px-1">
+          <mat-icon class="!text-sky-500 !w-5 !h-5 !text-[20px] flex items-center justify-center"
+            >volunteer_activism</mat-icon
+          >
+          <h3 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+            Motivos de Intercessão
+          </h3>
+        </div>
+
+        <div class="space-y-4">
+          @for (pedido of pedidosExibidos(); track pedido.id) {
+            <div
+              class="p-5 bg-white rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden transition-all hover:shadow-md"
+            >
+              @if (isMeuPerfil()) {
+                <div class="absolute top-4 right-4 z-20">
+                  <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="menuAcoes"
+                    class="!w-8 !h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
+                  >
+                    <mat-icon
+                      class="!w-[18px] !h-[18px] !text-[18px] flex items-center justify-center"
+                      >more_vert</mat-icon
+                    >
+                  </button>
+
+                  <mat-menu #menuAcoes="matMenu" xPosition="before" class="!rounded-2xl">
+                    <button mat-menu-item (click)="editarPedido(pedido)" class="text-sky-600">
+                      <mat-icon class="!text-[18px]">edit</mat-icon>
+                      <span>Editar</span>
+                    </button>
+                    <button mat-menu-item (click)="excluirPedido(pedido)" class="text-rose-600">
+                      <mat-icon class="!text-[18px]">delete_outline</mat-icon>
+                      <span>Excluir</span>
+                    </button>
+                  </mat-menu>
+                </div>
+              }
+
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center shrink-0"
+                >
+                  <mat-icon
+                    class="!w-[24px] !h-[24px] !text-[24px] flex items-center justify-center"
+                    >volunteer_activism</mat-icon
+                  >
+                </div>
+
+                <div class="flex-1 min-w-0 pt-1 pr-10">
+                  <p class="text-[10px] font-bold text-sky-600 uppercase tracking-wider mb-1">
+                    Pedido Ativo
+                  </p>
+                  <p class="text-sm font-medium text-slate-700 leading-relaxed italic">
+                    "{{ pedido.descricao }}"
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-4 flex items-center justify-between pt-4 border-t border-slate-100">
+                <span class="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
+                  <mat-icon
+                    class="!w-[16px] !h-[16px] !text-[16px] text-amber-500 flex items-center justify-center"
+                    >local_fire_department</mat-icon
+                  >
+                  <strong>{{ pedido.intercessores?.length || 0 }}</strong> pessoas orando
+                </span>
+
+                <div class="flex gap-2">
+                  @if (isMeuPerfil()) {
+                    <button
+                      type="button"
+                      (click)="marcarComoAtendido(pedido)"
+                      [disabled]="processandoOracao()[pedido.id]"
+                      class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 cursor-pointer"
+                    >
+                      @if (processandoOracao()[pedido.id]) {
+                        <mat-spinner diameter="16"></mat-spinner>
+                      } @else {
+                        <mat-icon
+                          class="!w-[16px] !h-[16px] !text-[16px] flex items-center justify-center"
+                          >task_alt</mat-icon
+                        >
+                        <span class="pt-[1px]">Oração Atendida</span>
+                      }
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      (click)="alternarOracao(pedido)"
+                      [disabled]="processandoOracao()[pedido.id]"
+                      class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer"
+                      [ngClass]="
+                        jaOrou(pedido)
+                          ? 'bg-emerald-500 text-white'
+                          : 'bg-white hover:bg-sky-50 border border-sky-200 text-sky-600'
+                      "
+                    >
+                      @if (processandoOracao()[pedido.id]) {
+                        <mat-spinner diameter="16"></mat-spinner>
+                      } @else {
+                        <mat-icon
+                          class="!w-[16px] !h-[16px] !text-[16px] flex items-center justify-center"
+                          >{{ jaOrou(pedido) ? 'check' : 'favorite_border' }}</mat-icon
+                        >
+                        <span class="pt-[1px]">{{
+                          jaOrou(pedido) ? 'Estou Orando' : 'Vou Orar'
+                        }}</span>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+          @if (mostrarBotaoCarregarMais()) {
+            <app-botao-carregar-mais
+              texto="Carregar mais pedidos"
+              [restantes]="pedidosAtivos().length - pedidosExibidos().length"
+              (carregarMais)="carregarMaisPedidos()"
+            />
+          }
+        </div>
+      </div>
+    }
+
+    @if (pedidosAtendidos().length > 0) {
+      <div class="mt-10 space-y-4">
+        <div class="flex items-center gap-2 px-1">
+          <mat-icon
+            class="!text-emerald-500 !w-5 !h-5 !text-[20px] flex items-center justify-center"
+            >celebration</mat-icon
+          >
+          <h3 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+            Testemunhos & Milagres
+          </h3>
+        </div>
+
+        <div class="space-y-4">
+          @for (pedido of pedidosAtendidos(); track pedido.id) {
+            <div
+              class="p-5 bg-gradient-to-br from-emerald-50 to-white rounded-3xl border border-emerald-100 shadow-sm relative overflow-hidden"
+            >
+              @if (isMeuPerfil()) {
+                <div class="absolute top-4 right-4 z-20">
+                  <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="menuAcoesAtendidas"
+                    class="!w-8 !h-8 flex items-center justify-center text-emerald-600 hover:text-emerald-800 bg-emerald-100/50 hover:bg-emerald-100 rounded-full transition-colors cursor-pointer"
+                  >
+                    <mat-icon
+                      class="!w-[18px] !h-[18px] !text-[18px] flex items-center justify-center"
+                      >more_vert</mat-icon
+                    >
+                  </button>
+
+                  <mat-menu #menuAcoesAtendidas="matMenu" xPosition="before" class="!rounded-2xl">
+                    <button mat-menu-item (click)="excluirPedido(pedido)" class="text-rose-600">
+                      <mat-icon class="!text-[18px]">delete_outline</mat-icon>
+                      <span>Excluir Testemunho</span>
+                    </button>
+                  </mat-menu>
+                </div>
+              }
+
+              <div
+                class="absolute -right-8 -top-8 w-32 h-32 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none"
+              ></div>
+              <div class="flex items-start gap-4 relative z-10">
+                <div
+                  class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-inner"
+                >
+                  <mat-icon class="!w-6 !h-6 !text-[24px] flex items-center justify-center"
+                    >workspace_premium</mat-icon
+                  >
+                </div>
+                <div class="flex-1 min-w-0 pt-1 pr-8">
+                  <p
+                    class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 flex items-center gap-1"
+                  >
+                    <mat-icon
+                      class="!w-[14px] !h-[14px] !text-[14px] flex items-center justify-center"
+                      >check_circle</mat-icon
+                    >
+                    Oração Atendida
+                  </p>
+                  <p class="text-sm font-medium text-slate-500 leading-relaxed italic">
+                    "{{ pedido.descricao }}"
+                  </p>
+                  <p
+                    class="mt-3 text-[11px] font-semibold text-emerald-700 flex items-center gap-1.5 bg-emerald-100/50 px-2.5 py-1.5 rounded-lg w-max"
+                  >
+                    <mat-icon
+                      class="!w-[14px] !h-[14px] !text-[14px] text-amber-500 flex items-center justify-center"
+                      >local_fire_department</mat-icon
+                    >
+                    Fruto de <strong>{{ pedido.intercessores?.length || 0 }}</strong> intercessões
+                  </p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
   }
 </app-page-layout>

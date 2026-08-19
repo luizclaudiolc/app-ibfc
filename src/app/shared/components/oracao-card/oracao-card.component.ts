@@ -2,10 +2,9 @@ import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from '../../../core/modules/material.module';
-import { Membro } from '../../models/membro.model';
-import { MembroService } from '../../../core/services/membro.service';
 import { NotificationService } from '../../../core/services/notifications.service';
-import { AuthService } from '../../../core/services/auth.service'; // <-- Importado aqui
+import { AuthService } from '../../../core/services/auth.service';
+import { PedidoOracao, PedidoOracaoService } from '../../../core/services/pedido-oracao.service';
 
 @Component({
   selector: 'app-oracao-card',
@@ -14,74 +13,56 @@ import { AuthService } from '../../../core/services/auth.service'; // <-- Import
   templateUrl: './oracao-card.component.html',
 })
 export class OracaoCardComponent implements OnInit {
-  membroInput = input.required<Membro>();
+  pedido = input.required<PedidoOracao>();
 
-  membroLocal = signal<Membro>({} as Membro);
+  pedidoLocal = signal<PedidoOracao>({} as PedidoOracao);
   jaOrou = signal<boolean>(false);
+  totalOracoes = signal<number>(0);
   carregando = signal<boolean>(false);
 
-  private membroService = inject(MembroService);
+  private pedidoService = inject(PedidoOracaoService);
   private notification = inject(NotificationService);
-  private authService = inject(AuthService); // <-- Injetado aqui
+  private authService = inject(AuthService);
 
   ngOnInit() {
-    this.membroLocal.set(this.membroInput());
-    this.verificarStatusOracaoLocal();
+    this.pedidoLocal.set(this.pedido());
+    this.calcularStatusOracao();
   }
 
-  private verificarStatusOracaoLocal(): void {
-    const oracoesSalvas = this.authService.obterOracoesRealizadas();
-    const id = this.membroLocal().id!;
-    const totalBanco = this.membroLocal().total_oracoes || 0;
+  /**
+   * Verifica dinamicamente usando o Array de intercessores do banco de dados
+   */
+  private calcularStatusOracao(): void {
+    const meuId = this.authService.obterUsuarioLogado().id;
+    const intercessores = this.pedidoLocal().intercessores || [];
 
-    if (totalBanco === 0) {
-      this.authService.removerOracaoRealizada(id);
-      this.jaOrou.set(false);
-      return;
-    }
+    this.jaOrou.set(intercessores.includes(meuId));
 
-    if (oracoesSalvas.includes(id)) {
-      this.jaOrou.set(true);
-    }
+    this.totalOracoes.set(intercessores.length);
   }
 
-  private salvarOracaoLocal(): void {
-    this.authService.adicionarOracaoRealizada(this.membroLocal().id!);
-  }
+  /**
+   * Funciona como um botão de "Like". Adiciona ou remove a pessoa da oração.
+   */
+  async alternarOracao(): Promise<void> {
+    if (this.carregando()) return;
 
-  private removerOracaoLocal(): void {
-    this.authService.removerOracaoRealizada(this.membroLocal().id!);
-  }
-
-  orarPorMembro(): void {
-    if (this.jaOrou() || this.carregando()) return;
-
+    const estavaOrando = this.jaOrou();
     this.carregando.set(true);
-    this.jaOrou.set(true);
-    this.salvarOracaoLocal();
 
-    const totalAtual = this.membroLocal().total_oracoes || 0;
-    this.membroLocal.update((m) => ({ ...m, total_oracoes: totalAtual + 1 }));
+    this.jaOrou.set(!estavaOrando);
+    this.totalOracoes.update((t) => (estavaOrando ? Math.max(0, t - 1) : t + 1));
 
-    this.membroService.incrementarOracao(this.membroLocal().id!).subscribe({
-      next: (res) => {
-        this.carregando.set(false);
-        if (!res.sucesso) {
-          this.reverterOracao(totalAtual);
-          this.notification.erro('Falha ao registrar oração.');
-        }
-      },
-      error: () => {
-        this.carregando.set(false);
-        this.reverterOracao(totalAtual);
-        this.notification.erro('Erro de comunicação.');
-      },
-    });
-  }
+    try {
+      await this.pedidoService.alternarIntercessao(this.pedidoLocal().id);
+    } catch (error) {
+      console.error('Erro ao alternar oração', error);
 
-  private reverterOracao(totalAnterior: number): void {
-    this.jaOrou.set(false);
-    this.removerOracaoLocal();
-    this.membroLocal.update((m) => ({ ...m, total_oracoes: totalAnterior }));
+      this.jaOrou.set(estavaOrando);
+      this.totalOracoes.update((t) => (estavaOrando ? t + 1 : Math.max(0, t - 1)));
+      this.notification.erro('Erro de comunicação ao registrar sua oração.');
+    } finally {
+      this.carregando.set(false);
+    }
   }
 }
