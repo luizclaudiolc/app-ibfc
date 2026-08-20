@@ -22,6 +22,7 @@ import {
 } from '../../../../shared/models/consts';
 import { UsuarioCadastro } from '../../../../shared/models/membro.model';
 import { CepService } from '../../../../core/services/busca-cep.service';
+import { Filho } from '../../../../shared/models/filhos.model';
 
 @Component({
   selector: 'app-cadastro',
@@ -292,7 +293,7 @@ export class CadastroComponent {
         nome: f.nome.trim(),
         data_nascimento: f.dataNascimento,
         informacoes_medicas: f.informacoesMedicas?.trim() || null,
-      })),
+      })) as Partial<Filho>[],
 
       endereco: enderecoString,
     };

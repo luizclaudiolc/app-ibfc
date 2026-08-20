@@ -1,4 +1,5 @@
 import { EGenero, EMotivoInativacao, EStatusMembro, NivelAcesso } from './consts';
+import { Filho } from './filhos.model';
 
 export interface PerfilBase {
   nome: string;
@@ -13,7 +14,7 @@ export interface PerfilBase {
   total_oracoes?: number;
   motivo_inativacao?: EMotivoInativacao | null;
   ministerios?: string[];
-  filhos?: FilhoCadastro[];
+  filhos?: Filho[];
 }
 
 export interface Membro extends PerfilBase {
@@ -26,13 +27,14 @@ export interface Membro extends PerfilBase {
   setor_responsavel?: string;
 }
 
-export interface UsuarioCadastro extends PerfilBase {
+export interface UsuarioCadastro extends Omit<PerfilBase, 'filhos'> {
   email: string;
   senha: string;
   telefone: string;
   cargo: string;
   dataNascimento?: string;
   foto?: File | null;
+  filhos?: Partial<Filho>[];
 }
 
 export interface UsuarioAtualizacao extends PerfilBase {
@@ -53,10 +55,4 @@ export interface UsuarioLogado {
   status: EStatusMembro;
   genero: EGenero;
   setorResponsavel?: string;
-}
-
-export interface FilhoCadastro {
-  nome: string;
-  data_nascimento: string;
-  informacoes_medicas?: string | null;
 }

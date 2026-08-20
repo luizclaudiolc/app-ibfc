@@ -232,6 +232,24 @@ export class AuthService {
 
       if (insertError) throw new Error('Erro ao salvar os dados do perfil.');
 
+      if (membro.filhos && membro.filhos.length > 0) {
+        const filhosParaInserir = membro.filhos.map((filho) => ({
+          membro_id: authData.user!.id,
+          nome: filho.nome,
+          data_nascimento: filho.data_nascimento || null,
+          informacoes_medicas: filho.informacoes_medicas || null,
+        }));
+
+        const { error: insertFilhosError } = await this.supabaseService.supabase
+          .from('filhos')
+          .insert(filhosParaInserir);
+
+        if (insertFilhosError) {
+          console.error('Erro ao salvar filhos no cadastro:', insertFilhosError);
+          throw new Error('Erro ao salvar os dados dos filhos.');
+        }
+      }
+
       await this.supabaseService.supabase.auth.signOut();
       this.limparSessaoLocal();
 

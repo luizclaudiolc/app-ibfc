@@ -22,9 +22,6 @@ export class FilhoService {
     );
   }
 
-  /**
-   * Registra um novo filho para o membro logado.
-   */
   async criar(filho: Omit<Filho, 'id' | 'created_at'>): Promise<Filho> {
     const { data, error } = await this.supabase.supabase
       .from('filhos')
@@ -36,9 +33,6 @@ export class FilhoService {
     return data as Filho;
   }
 
-  /**
-   * Atualiza as informações de uma criança existente (ex: adicionou uma alergia).
-   */
   async atualizar(id: string, dados: Partial<Filho>): Promise<Filho> {
     const { data, error } = await this.supabase.supabase
       .from('filhos')
@@ -51,9 +45,20 @@ export class FilhoService {
     return data as Filho;
   }
 
-  /**
-   * Remove o cadastro da criança.
-   */
+  buscarTodosAdmin(): Observable<Filho[]> {
+    const promise = this.supabase.supabase
+      .from('filhos')
+      .select('*')
+      .order('nome', { ascending: true });
+
+    return from(promise).pipe(
+      map((res) => {
+        if (res.error) throw res.error;
+        return res.data as Filho[];
+      }),
+    );
+  }
+
   async excluir(id: string): Promise<void> {
     const { error } = await this.supabase.supabase.from('filhos').delete().eq('id', id);
 

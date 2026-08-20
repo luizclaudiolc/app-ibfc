@@ -13,6 +13,8 @@ import {
   StatusMembro,
 } from '../../../../shared/models/consts';
 import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
+import { FilhoService } from '../../../../core/services/filhos.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
@@ -37,6 +39,7 @@ export class AdminComponent implements OnInit {
 
   private dialog = inject(MatDialog);
   private membroService = inject(MembroService);
+  private filhoService = inject(FilhoService);
 
   qtdPendentes = computed(() => this.membrosRaw().filter((m) => m.status === 'PENDENTE').length);
   qtdAtivos = computed(() => this.membrosRaw().filter((m) => m.status === 'ATIVO').length);
@@ -105,13 +108,23 @@ export class AdminComponent implements OnInit {
     this.carregando.set(true);
     this.erroMembros.set('');
 
-    this.membroService.buscarTodos(true).subscribe({
-      next: (dados) => {
-        this.membrosRaw.set(dados);
+    forkJoin({
+      membros: this.membroService.buscarTodos(true),
+      filhos: this.filhoService.buscarTodosAdmin(),
+    }).subscribe({
+      next: ({ membros, filhos }) => {
+        const membrosComFilhos = membros.map((membro) => {
+          const filhosDesteMembro = filhos.filter(
+            (f) => f.membro_id === membro.id || f.outro_responsavel_id === membro.id,
+          );
+          return { ...membro, filhos: filhosDesteMembro };
+        });
+
+        this.membrosRaw.set(membrosComFilhos);
         this.carregando.set(false);
       },
       error: (err) => {
-        console.error('Erro ao buscar membros no Admin:', err);
+        console.error('Erro ao buscar membros e filhos no Admin:', err);
         this.erroMembros.set('Não foi possível carregar a lista de membros no momento.');
         this.carregando.set(false);
       },
@@ -158,5 +171,21 @@ export class AdminComponent implements OnInit {
         }
       }
     });
+  }
+
+  calcularIdade(dataNascimento: string | undefined): string {
+    if (!dataNascimento) return '';
+
+    const hoje = new Date();
+    const nascimento = new Date(dataNascimento);
+
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const m = hoje.getMonth() - nascimento.getMonth();
+
+    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+      idade--;
+    }
+
+    return `${idade} ano${idade !== 1 ? 's' : ''}`;
   }
 }
