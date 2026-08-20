@@ -1,0 +1,1 @@
+import{e as o,eb as a,w as n,z as i}from"./chunk-63CVK75D.js";var c=class r{http=i(a);buscarCep(t){let e=t.replace(/\D/g,"");return e.length!==8?o(null):this.http.get(`https://viacep.com.br/ws/${e}/json/`)}static \u0275fac=function(e){return new(e||r)};static \u0275prov=n({token:r,factory:r.\u0275fac,providedIn:"root"})};export{c as a};
