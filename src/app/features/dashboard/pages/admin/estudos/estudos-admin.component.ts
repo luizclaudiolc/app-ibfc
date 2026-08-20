@@ -60,7 +60,6 @@ export class EstudosAdminComponent implements OnInit {
 
   ngOnInit() {
     this.carregarEstudos();
-    console.log(this.ehAdminOuLider());
   }
 
   carregarEstudos() {
@@ -242,6 +241,46 @@ export class EstudosAdminComponent implements OnInit {
   abrirEstudo(url: string) {
     const urlVisualizacao = this.estudoService.obterUrlVisualizacao(url);
     window.open(urlVisualizacao, '_blank', 'noopener,noreferrer');
+  }
+
+  editarEstudo(estudo: Estudo) {
+    const dialogRef = this.dialog.open(EstudoFormDialogComponent, {
+      data: {
+        modo: 'EDITAR',
+        tituloAtual: estudo.titulo,
+        descricaoAtual: estudo.descricao,
+      },
+      panelClass: ['!p-0', '!rounded-3xl', '!overflow-hidden'],
+      width: '90%',
+      maxWidth: '450px',
+    });
+
+    dialogRef.afterClosed().subscribe(async (dadosEditados) => {
+      if (dadosEditados) {
+        try {
+          this.notification.aviso('Salvando alterações...', 1500);
+
+          const estudoAtualizado = await this.estudoService.atualizar(
+            estudo.id!,
+            dadosEditados.titulo,
+            dadosEditados.descricao,
+          );
+
+          this.estudos.update((lista) =>
+            lista.map((e) =>
+              e.id === estudo.id
+                ? { ...e, titulo: estudoAtualizado.titulo, descricao: estudoAtualizado.descricao }
+                : e,
+            ),
+          );
+
+          this.notification.sucesso('Estudo atualizado com sucesso!');
+        } catch (error) {
+          console.error('Erro ao editar estudo', error);
+          this.notification.erro('Falha ao atualizar o estudo. Tente novamente.');
+        }
+      }
+    });
   }
 
   async baixarPdf(url: string, titulo: string): Promise<void> {

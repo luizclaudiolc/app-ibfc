@@ -72,6 +72,22 @@
             <div
               class="group bg-slate-50/50 border border-slate-200/80 rounded-3xl p-4 sm:p-5 flex flex-col justify-between hover:border-sky-300 transition-all hover:shadow-sm relative"
             >
+              @if (ehAdminOuLider()) {
+                <div class="absolute top-4 right-4 z-20">
+                  <button
+                    type="button"
+                    (click)="editarEstudo(estudo)"
+                    class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-sky-600 bg-white hover:bg-sky-50 rounded-full transition-all cursor-pointer shadow-sm border border-slate-100 hover:border-sky-200 active:scale-95"
+                    title="Editar Título e Descrição"
+                  >
+                    <mat-icon
+                      class="!w-[16px] !h-[16px] !text-[16px] flex items-center justify-center"
+                      >edit</mat-icon
+                    >
+                  </button>
+                </div>
+              }
+
               <div class="flex items-start gap-3.5">
                 @if (estudoService.isLinkExterno(estudo.arquivo_url)) {
                   <div
@@ -91,7 +107,7 @@
                   </div>
                 }
 
-                <div class="flex-1 min-w-0 pt-0.5">
+                <div class="flex-1 min-w-0 pt-0.5 pr-10">
                   <h3
                     class="text-xs sm:text-sm font-bold text-slate-800 tracking-tight leading-snug line-clamp-2"
                   >

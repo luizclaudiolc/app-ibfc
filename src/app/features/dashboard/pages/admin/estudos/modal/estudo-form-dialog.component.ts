@@ -6,9 +6,11 @@ import { DialogLayoutComponent } from '../../../../../../shared/components/layou
 import { Component, inject, OnInit } from '@angular/core';
 
 export interface EstudoFormDialogData {
-  modo: 'PDF' | 'LINK';
+  modo: 'PDF' | 'LINK' | 'EDITAR';
   fileName?: string;
   fileSize?: string;
+  tituloAtual?: string;
+  descricaoAtual?: string;
 }
 
 @Component({
@@ -35,6 +37,13 @@ export class EstudoFormDialogComponent implements OnInit {
         Validators.pattern(/^https?:\/\/.+/),
       ]);
       this.form.controls.url.updateValueAndValidity();
+    }
+
+    if (this.data.modo === 'EDITAR') {
+      this.form.patchValue({
+        titulo: this.data.tituloAtual || '',
+        descricao: this.data.descricaoAtual || '',
+      });
     }
   }
 

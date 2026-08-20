@@ -1,19 +1,36 @@
-<app-dialog-layout [title]="data.modo === 'LINK' ? 'Novo Estudo (Link)' : 'Novo Estudo (PDF)'">
+<app-dialog-layout
+  [title]="
+    data.modo === 'EDITAR'
+      ? 'Editar Estudo'
+      : data.modo === 'LINK'
+        ? 'Novo Estudo (Link)'
+        : 'Novo Estudo (PDF)'
+  "
+>
   <div
     dialog-icon
     class="w-12 h-12 rounded-full flex items-center justify-center border shadow-sm"
     [ngClass]="
-      data.modo === 'LINK'
-        ? 'bg-sky-50 text-sky-600 border-sky-100'
-        : 'bg-red-50 text-red-600 border-red-100'
+      data.modo === 'EDITAR'
+        ? 'bg-amber-50 text-amber-600 border-amber-100'
+        : data.modo === 'LINK'
+          ? 'bg-sky-50 text-sky-600 border-sky-100'
+          : 'bg-red-50 text-red-600 border-red-100'
     "
   >
     <mat-icon class="!w-[24px] !h-[24px] !text-[24px] !leading-none overflow-visible">
-      {{ data.modo === 'LINK' ? 'add_to_drive' : 'picture_as_pdf' }}
+      {{
+        data.modo === 'EDITAR'
+          ? 'edit_note'
+          : data.modo === 'LINK'
+            ? 'add_to_drive'
+            : 'picture_as_pdf'
+      }}
     </mat-icon>
   </div>
 
   <form [formGroup]="form" class="space-y-4 pt-2">
+    <!-- Bloco exibido apenas para upload de PDF novo -->
     @if (data.modo === 'PDF') {
       <div class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-4">
         <div
@@ -31,7 +48,9 @@
         </div>
         <mat-icon class="text-emerald-500 !w-[20px] !h-[20px] !text-[20px]">check_circle</mat-icon>
       </div>
-    } @else {
+    }
+    <!-- Bloco exibido apenas para Link novo -->
+    @else if (data.modo === 'LINK') {
       <mat-form-field appearance="outline" class="w-full">
         <mat-label>Link do Estudo (Google Drive, etc.)</mat-label>
         <input matInput formControlName="url" placeholder="https://drive.google.com/..." />
@@ -43,6 +62,7 @@
       </mat-form-field>
     }
 
+    <!-- Os campos de Título e Descrição aparecem em TODOS os modos -->
     <mat-form-field appearance="outline" class="w-full">
       <mat-label>Título do Estudo</mat-label>
       <input
@@ -74,16 +94,16 @@
   <ng-container dialog-actions>
     <button
       mat-dialog-close
-      class="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+      class="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
     >
       Cancelar
     </button>
     <button
       (click)="confirmar()"
       [disabled]="form.invalid"
-      class="flex-[1.5] py-3 rounded-xl font-bold text-white bg-sky-600 hover:bg-sky-700 transition-colors shadow-sm disabled:opacity-50 disabled:bg-slate-300"
+      class="flex-[1.5] py-3 rounded-xl font-bold text-white bg-sky-600 hover:bg-sky-700 transition-colors shadow-sm disabled:opacity-50 disabled:bg-slate-300 cursor-pointer"
     >
-      Confirmar e Enviar
+      {{ data.modo === 'EDITAR' ? 'Salvar Alterações' : 'Confirmar e Enviar' }}
     </button>
   </ng-container>
 </app-dialog-layout>

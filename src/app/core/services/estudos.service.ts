@@ -48,7 +48,7 @@ export class EstudoService {
     descricao?: string | null,
   ): Promise<Estudo> {
     const payloadParaSalvar: any = {
-      titulo: titulo.trim(),
+      titulo: titulo.trim().toLowerCase(),
       arquivo_url: url.trim(),
     };
 
@@ -83,6 +83,24 @@ export class EstudoService {
         await this.supabaseService.supabase.storage.from(this.bucketName).remove([filePath]);
       }
     }
+  }
+
+  async atualizar(id: string, titulo: string, descricao?: string | null): Promise<Estudo> {
+    const payload: any = {
+      titulo: titulo.trim().toUpperCase(),
+    };
+
+    payload.descricao = descricao && descricao.trim() !== '' ? descricao.trim() : null;
+
+    const { data, error } = await this.supabaseService.supabase
+      .from('estudos')
+      .update(payload)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as Estudo;
   }
 
   public isLinkExterno(url: string): boolean {
