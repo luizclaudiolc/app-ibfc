@@ -31,6 +31,7 @@ export const authGuard: CanActivateFn = async (route, state) => {
     }
   } catch (err) {
     console.error('Erro na validação do AuthGuard', err);
+    localStorage.removeItem('app_user_session');
     router.navigate(['/login']);
     return false;
   }

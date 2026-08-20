@@ -138,11 +138,6 @@ export class AuthService {
         if (event === 'SIGNED_OUT') {
           this.limparSessaoLocal();
           this.router.navigate(['/login']);
-        } else if (event === 'TOKEN_REFRESHED') {
-          const currentUrl = this.router.url;
-          this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-            this.router.navigate([currentUrl]);
-          });
         }
       });
     });
