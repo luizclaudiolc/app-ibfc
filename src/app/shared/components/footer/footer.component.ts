@@ -40,10 +40,10 @@ export class FooterComponent implements OnInit {
 
     const allItems: FooterItem[] = [
       { label: 'Início', icon: 'home', route: '/dashboard/home', exact: true },
+      { label: 'Bíblia', icon: 'auto_stories', route: '/dashboard/plano-leitura' },
       { label: 'Mídias', icon: 'smart_display', route: '/dashboard/midias' },
       { label: 'Orações', icon: 'volunteer_activism', route: '/dashboard/mural-oracoes' },
       { label: 'Estudos', icon: 'menu_book', route: '/dashboard/estudos' },
-
       { label: 'Ajustes', icon: 'manage_accounts', route: '/dashboard/perfil' },
     ];
 

@@ -85,6 +85,58 @@
               >
             </div>
           }
+
+          @if (
+            planosAgrupados().emAndamento.length > 0 || planosAgrupados().concluidos.length > 0
+          ) {
+            <div class="w-full mt-5 pt-5 border-t border-slate-100 space-y-5">
+              <span
+                class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 px-1"
+              >
+                <mat-icon class="!w-3.5 !h-3.5 !text-[14px] text-indigo-500">auto_stories</mat-icon>
+                Jornada nas Escrituras
+              </span>
+
+              @for (plano of planosAgrupados().emAndamento; track plano.id) {
+                <div class="bg-white border border-slate-100 rounded-2xl p-3 shadow-sm">
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-slate-700">{{ plano.titulo }}</span>
+                    <span class="text-[10px] font-bold text-indigo-600"
+                      >{{ plano.porcentagem }}%</span
+                    >
+                  </div>
+                  <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      class="h-full bg-indigo-500 rounded-full"
+                      [style.width]="plano.porcentagem + '%'"
+                    ></div>
+                  </div>
+                </div>
+              }
+
+              @if (planosAgrupados().concluidos.length > 0) {
+                <div>
+                  <p
+                    class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1"
+                  >
+                    Conquistas
+                  </p>
+                  <div class="flex flex-wrap gap-2">
+                    @for (plano of planosAgrupados().concluidos; track plano.id) {
+                      <div
+                        class="group relative flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full"
+                      >
+                        <mat-icon class="!w-4 !h-4 !text-[16px] text-amber-500"
+                          >workspace_premium</mat-icon
+                        >
+                        <span class="text-[11px] font-bold text-amber-800">{{ plano.titulo }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
         </div>
 
         <div class="space-y-1 mt-6 border-t border-slate-100 pt-4">

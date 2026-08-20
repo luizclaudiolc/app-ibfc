@@ -80,6 +80,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'plano-leitura',
+        loadComponent: () =>
+          import('./features/dashboard/pages/plano-leitura/plano-leitura.component').then(
+            (c) => c.PlanoLeituraComponent,
+          ),
+      },
+      {
         path: 'escala',
         loadComponent: () =>
           import('./features/dashboard/pages/admin/escalas/escalas.component').then(

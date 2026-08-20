@@ -19,6 +19,8 @@ import { PedidoOracao, PedidoOracaoService } from '../../../../core/services/ped
 import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
 import { EditarPedidoDialogComponent } from '../../../../shared/components/editar-oracao/editar-pedido-dialog.component';
+import { PlanoLeituraService } from '../../../../core/services/plano-leitura.service';
+import { PLANOS_LEITURA } from '../../../../shared/models/plano-leitura.const';
 
 @Component({
   selector: 'app-membro-perfil',
@@ -74,9 +76,29 @@ export class PerfilMembroComponent implements OnInit {
   private dialog = inject(MatDialog);
   private notification = inject(NotificationService);
   private authService = inject(AuthService);
+  planoLeitura = inject(PlanoLeituraService);
 
   departamentos = DEPARTAMENTOS_DISPONIVEIS_MAP;
   gradientesPasteis = GRADIENTES_PASTEIS;
+  planosDisponiveis = PLANOS_LEITURA;
+
+  planosAgrupados = computed(() => {
+    const progressoGeral = this.membro()?.progresso_leitura || {};
+
+    const todos = this.planosDisponiveis.map((plano) => {
+      const diasLidos = progressoGeral[plano.id] || [];
+      return {
+        ...plano,
+        porcentagem: Math.round((diasLidos.length / plano.dias.length) * 100),
+        concluido: diasLidos.length >= plano.dias.length,
+      };
+    });
+
+    return {
+      emAndamento: todos.filter((p) => !p.concluido && p.porcentagem > 0),
+      concluidos: todos.filter((p) => p.concluido),
+    };
+  });
 
   constructor() {
     this.meuId = this.authService.obterUsuarioLogado().id;

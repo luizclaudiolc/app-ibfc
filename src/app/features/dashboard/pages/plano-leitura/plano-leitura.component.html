@@ -1,0 +1,141 @@
+<app-page-layout>
+  <div class="max-w-3xl mx-auto space-y-6 pb-12">
+    <app-page-header
+      titulo="Jornada de Leitura"
+      subtitulo="Acompanhe seu crescimento diário nas escrituras."
+      icone="auto_stories"
+    ></app-page-header>
+
+    @if (carregando()) {
+      <div class="flex justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
+        <mat-spinner diameter="40" class="!stroke-indigo-500"></mat-spinner>
+      </div>
+    } @else if (planoSelecionado()) {
+      <div class="flex gap-2 overflow-x-auto no-scrollbar items-center pb-2 px-1">
+        @for (p of planos(); track p.id) {
+          <button
+            (click)="selecionarPlano(p)"
+            class="whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition-all border shadow-sm cursor-pointer"
+            [ngClass]="
+              planoSelecionado()?.id === p.id
+                ? 'bg-indigo-900 text-white border-indigo-900 shadow-indigo-900/30'
+                : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+            "
+          >
+            {{ p.titulo }}
+          </button>
+        }
+      </div>
+
+      <div
+        class="bg-indigo-900 rounded-3xl p-6 shadow-lg shadow-indigo-900/20 relative overflow-hidden mt-2"
+      >
+        <div
+          class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl"
+        ></div>
+        <div
+          class="absolute -left-10 -bottom-10 w-32 h-32 bg-sky-500/20 rounded-full blur-2xl"
+        ></div>
+
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <p class="text-indigo-200 text-xs font-bold mb-1 leading-relaxed">
+              {{ planoSelecionado()?.subtitulo }}
+            </p>
+            <h2 class="text-white text-3xl font-extrabold tracking-tight mt-2">
+              {{ porcentagemConclusao() }}%
+              <span class="text-indigo-300 text-base font-medium">Concluído</span>
+            </h2>
+            <p class="text-indigo-200 text-sm mt-1">
+              {{ progressoDoPlanoAtual().length }} de {{ planoSelecionado()?.dias?.length }} dias
+              finalizados.
+            </p>
+          </div>
+
+          @if (porcentagemConclusao() === 100) {
+            <div
+              class="bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 w-max"
+            >
+              <mat-icon class="!w-[18px] !h-[18px] !text-[18px]">emoji_events</mat-icon> Plano
+              Finalizado!
+            </div>
+          }
+        </div>
+
+        <div class="relative z-10 w-full h-3 bg-indigo-950/50 rounded-full mt-5 overflow-hidden">
+          <div
+            class="h-full bg-gradient-to-r from-indigo-500 to-sky-400 rounded-full transition-all duration-1000 ease-out"
+            [style.width]="porcentagemConclusao() + '%'"
+          ></div>
+        </div>
+      </div>
+
+      <div class="space-y-3 pt-2">
+        @for (item of planoSelecionado()?.dias; track item.dia) {
+          <div
+            (click)="abrirLeitura(item)"
+            class="p-4 rounded-2xl border flex items-center justify-between gap-4 cursor-pointer transition-all active:scale-[0.98] relative"
+            [ngClass]="{
+              'bg-emerald-50/60 border-emerald-100 opacity-70': diaJaLido(item.dia),
+              'bg-white border-indigo-300 shadow-md shadow-indigo-100 ring-2 ring-indigo-50':
+                proximoDiaPendente() === item.dia,
+              'bg-white border-slate-100 hover:border-indigo-200 shadow-sm':
+                !diaJaLido(item.dia) && proximoDiaPendente() !== item.dia,
+            }"
+          >
+            @if (proximoDiaPendente() === item.dia) {
+              <span
+                class="absolute -top-2.5 left-4 bg-indigo-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm"
+              >
+                Próxima Leitura
+              </span>
+            }
+
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-inner"
+                [ngClass]="{
+                  'bg-emerald-100 text-emerald-600': diaJaLido(item.dia),
+                  'bg-indigo-100 text-indigo-600': !diaJaLido(item.dia),
+                }"
+              >
+                @if (diaJaLido(item.dia)) {
+                  <mat-icon class="!w-[22px] !h-[22px] !text-[22px]">check</mat-icon>
+                } @else {
+                  <span class="font-extrabold text-sm">{{ item.dia }}</span>
+                }
+              </div>
+
+              <div class="truncate">
+                <p
+                  class="text-xs font-bold uppercase tracking-wider mb-0.5"
+                  [ngClass]="diaJaLido(item.dia) ? 'text-emerald-600' : 'text-indigo-600'"
+                >
+                  {{ item.referencia }}
+                </p>
+                <h4 class="text-sm font-semibold text-slate-800 truncate">
+                  {{ item.titulo }}
+                </h4>
+              </div>
+            </div>
+
+            <div class="shrink-0">
+              <button
+                class="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                [ngClass]="
+                  diaJaLido(item.dia)
+                    ? 'text-emerald-500 bg-emerald-50'
+                    : 'text-slate-400 bg-slate-50 group-hover:bg-indigo-50 group-hover:text-indigo-600'
+                "
+              >
+                <mat-icon class="!w-5 !h-5 !text-[20px]">{{
+                  diaJaLido(item.dia) ? 'task_alt' : 'chevron_right'
+                }}</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</app-page-layout>

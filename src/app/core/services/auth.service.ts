@@ -10,6 +10,7 @@ import {
   EStatusMembro,
 } from '../../shared/models/consts';
 import { SessaoUsuario } from '../../shared/models/sessaoUsuario';
+import { CapituloBiblia } from './plano-leitura.service';
 
 export interface RespostaLogin {
   sucesso: boolean;
@@ -319,6 +320,7 @@ export class AuthService {
         pulsoSemanaVotada: sessaoAtual.pulsoSemanaVotada,
         avisosConfirmados: sessaoAtual.avisosConfirmados,
         versiculoCache: sessaoAtual.versiculoCache,
+        bibliaCache: sessaoAtual.bibliaCache,
       };
 
       localStorage.setItem('app_cache_backup', JSON.stringify(todosBackups));
@@ -399,5 +401,25 @@ export class AuthService {
         mensagem: error.message || 'Erro ao processar sua solicitação de exclusão.',
       };
     }
+  }
+
+  obterCapituloEmCache(referencia: string): CapituloBiblia | null {
+    const sessao = this.getSessao();
+    const cacheMap = sessao?.bibliaCache || {};
+    return cacheMap[referencia] || null;
+  }
+
+  salvarCapituloEmCache(referencia: string, capitulo: CapituloBiblia): void {
+    const sessao = this.getSessao();
+    const cacheMap = sessao?.bibliaCache || {};
+
+    cacheMap[referencia] = capitulo;
+
+    const chaves = Object.keys(cacheMap);
+    if (chaves.length > 30) {
+      delete cacheMap[chaves[0]];
+    }
+
+    this.atualizarPropriedadeSessao({ bibliaCache: cacheMap });
   }
 }

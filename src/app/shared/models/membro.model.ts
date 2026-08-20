@@ -15,6 +15,7 @@ export interface PerfilBase {
   motivo_inativacao?: EMotivoInativacao | null;
   ministerios?: string[];
   filhos?: Filho[];
+  progresso_leitura?: Record<string, number[]>;
 }
 
 export interface Membro extends PerfilBase {
