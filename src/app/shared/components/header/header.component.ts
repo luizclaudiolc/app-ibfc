@@ -18,6 +18,7 @@ export class HeaderComponent {
   nomeUsuario = this.authService.nomeUsuario$;
   fotoUsuario = this.authService.fotoUsuario$;
   userGenero = this.authService.userGenero$;
+  user = this.authService.obterUsuarioLogado();
 
   nomeExibicao = computed(() => {
     const nomeCompleto = this.nomeUsuario()?.trim() || '';
@@ -45,6 +46,10 @@ export class HeaderComponent {
   });
 
   irParaperfil(): void {
-    this.router.navigate(['dashboard/perfil']);
+    this.router.navigate([`dashboard/perfil/${this.user.id}`]);
+  }
+
+  irParaHome(): void {
+    this.router.navigate(['dashboad/home']);
   }
 }
