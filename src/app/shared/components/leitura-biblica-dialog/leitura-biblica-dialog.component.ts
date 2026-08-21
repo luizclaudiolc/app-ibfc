@@ -49,13 +49,23 @@ export interface LeituraDialogData {
               {{ capitulo()!.referencia }}
             </h2>
 
-            @for (v of capitulo()!.versiculos; track v.verse) {
-              <p class="mb-4">
-                <sup class="text-[10px] font-sans font-bold text-indigo-400 mr-1.5">{{
-                  v.verse
-                }}</sup>
-                <span>{{ v.text }}</span>
-              </p>
+            @for (v of capitulo()!.versiculos; track $index) {
+              @if (v.verse === 0) {
+                <div class="my-8 text-center">
+                  <span
+                    class="text-xs font-sans font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full border border-indigo-100 shadow-2xs"
+                  >
+                    {{ v.text }}
+                  </span>
+                </div>
+              } @else {
+                <p class="mb-4">
+                  <sup class="text-[10px] font-sans font-bold text-indigo-400 mr-1.5">{{
+                    v.verse
+                  }}</sup>
+                  <span>{{ v.text }}</span>
+                </p>
+              }
             }
           </div>
         }

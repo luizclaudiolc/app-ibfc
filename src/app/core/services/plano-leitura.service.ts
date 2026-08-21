@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, tap, map, from } from 'rxjs';
+import { Observable, of, tap, map, from, forkJoin } from 'rxjs';
 import { SupabaseService } from './supabase';
 import { AuthService } from './auth.service';
 import { PlanoLeitura, PLANOS_LEITURA } from '../../shared/models/plano-leitura.const';
@@ -12,13 +12,11 @@ export interface CapituloBiblia {
 
 @Injectable({ providedIn: 'root' })
 export class PlanoLeituraService {
-  constructor() {
-    this.validarIntegridadePlanos();
-  }
-
   private http = inject(HttpClient);
   private supabase = inject(SupabaseService);
   private authService = inject(AuthService);
+
+  private readonly CACHE_PREFIX = 'biblia_cache_v2_';
 
   obterPlanos(): PlanoLeitura[] {
     return PLANOS_LEITURA;
@@ -67,9 +65,57 @@ export class PlanoLeituraService {
   }
 
   obterCapitulo(referencia: string): Observable<CapituloBiblia> {
-    const cacheLocal = this.authService.obterCapituloEmCache(referencia);
+    const cacheKey = `${this.CACHE_PREFIX}${referencia.replace(/\s/g, '_')}`;
+    const cacheLocal = this.authService.obterCapituloEmCache(cacheKey);
+
     if (cacheLocal) {
       return of(cacheLocal);
+    }
+
+    const matchIntervalo = referencia.match(/^(.+?)\s+(\d+)-(\d+)$/);
+
+    if (matchIntervalo) {
+      const livro = matchIntervalo[1];
+      const capInicial = parseInt(matchIntervalo[2], 10);
+      const capFinal = parseInt(matchIntervalo[3], 10);
+
+      const chamadas: Observable<any>[] = [];
+      for (let c = capInicial; c <= capFinal; c++) {
+        const url = `https://bible-api.com/${livro} ${c}?translation=almeida`;
+        chamadas.push(this.http.get<any>(url));
+      }
+
+      return forkJoin(chamadas).pipe(
+        map((respostas: any[]) => {
+          let todosVersiculos: { verse: number; text: string }[] = [];
+
+          respostas.forEach((res, index) => {
+            const numeroCapitulo = capInicial + index;
+
+            todosVersiculos.push({
+              verse: 0,
+              text: `Capítulo ${numeroCapitulo}`,
+            });
+
+            res.verses.forEach((v: any) => {
+              todosVersiculos.push({
+                verse: v.verse,
+                text: v.text.trim(),
+              });
+            });
+          });
+
+          const capituloConsolidado: CapituloBiblia = {
+            referencia: referencia,
+            versiculos: todosVersiculos,
+          };
+
+          return capituloConsolidado;
+        }),
+        tap((capitulo) => {
+          this.authService.salvarCapituloEmCache(cacheKey, capitulo);
+        }),
+      );
     }
 
     const url = `https://bible-api.com/${referencia}?translation=almeida`;
@@ -83,29 +129,8 @@ export class PlanoLeituraService {
         })),
       })),
       tap((capitulo) => {
-        this.authService.salvarCapituloEmCache(referencia, capitulo);
+        this.authService.salvarCapituloEmCache(cacheKey, capitulo);
       }),
     );
-  }
-
-  verificarSePlanoEstaConcluido(
-    planoId: string,
-    progressoGeral: Record<string, number[]>,
-  ): boolean {
-    const plano = this.obterPlanos().find((p) => p.id === planoId);
-    if (!plano) return false;
-
-    const diasLidosDoPlano = progressoGeral[planoId] || [];
-
-    return diasLidosDoPlano.length >= plano.dias.length;
-  }
-
-  private validarIntegridadePlanos() {
-    const ids = PLANOS_LEITURA.map((p) => p.id);
-    const duplicados = ids.filter((id, index) => ids.indexOf(id) !== index);
-
-    if (duplicados.length > 0) {
-      console.error('⚠️ ERRO CRÍTICO: IDs de planos duplicados detectados:', duplicados);
-    }
   }
 }
