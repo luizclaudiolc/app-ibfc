@@ -128,6 +128,7 @@ export class CadastroComponent {
       dataNascimento: ['', [Validators.required]],
 
       genero: [null as number | null, [Validators.required]],
+      possuiFilhos: [false],
       filhos: this.fb.array([]),
       estadoCivil: [null as number | null, [Validators.required]],
       escolaridade: [null as number | null],
@@ -147,7 +148,7 @@ export class CadastroComponent {
   );
 
   private camposPorEtapa: Record<number, string[]> = {
-    1: ['nome', 'sobrenome', 'dataNascimento', 'genero', 'filhos'],
+    1: ['nome', 'sobrenome', 'dataNascimento', 'genero', 'possuiFilhos', 'filhos'],
     2: [
       'email',
       'telefone',
@@ -336,5 +337,18 @@ export class CadastroComponent {
 
   removerFilho(index: number): void {
     this.filhosFormArray.removeAt(index);
+  }
+
+  setPossuiFilhos(valor: boolean): void {
+    this.cadastroForm.get('possuiFilhos')?.setValue(valor);
+
+    if (valor && this.filhosFormArray.length === 0) {
+      // UX Boost: Se marcou "Sim", já adiciona 1 form vazio para poupar clique.
+      this.adicionarFilho();
+    } else if (!valor && this.filhosFormArray.length > 0) {
+      // Segurança: Se marcou "Não", esvazia o array para limpar dados residuais
+      // e impedir que campos invisíveis invalidem o formulário.
+      this.filhosFormArray.clear();
+    }
   }
 }

@@ -179,6 +179,7 @@ export class AuthService {
     membro: UsuarioCadastro,
   ): Promise<{ sucesso: boolean; mensagem: string }> {
     try {
+      // 1. Cria a conta de Autenticação (Login)
       const { data: authData, error: authError } = await this.supabaseService.supabase.auth.signUp({
         email: membro.email,
         password: membro.senha,
@@ -187,11 +188,13 @@ export class AuthService {
       if (authError) throw new Error(authError.message);
       if (!authData.user) throw new Error('Erro ao gerar identificação do usuário.');
 
+      const userId = authData.user.id;
       let urlDaFoto = null;
 
+      // 2. Faz o upload da foto (se houver)
       if (membro.foto) {
         const extensao = membro.foto.name.split('.').pop();
-        const nomeArquivo = `${authData.user.id}-perfil.${extensao}`;
+        const nomeArquivo = `${userId}-perfil.${extensao}`;
 
         const { error: uploadError } = await this.supabaseService.supabase.storage
           .from('fotos_membros')
@@ -206,14 +209,14 @@ export class AuthService {
           const { data: urlData } = this.supabaseService.supabase.storage
             .from('fotos_membros')
             .getPublicUrl(nomeArquivo);
-
           urlDaFoto = urlData.publicUrl;
         }
       }
 
+      // 3. Salva os dados na tabela 'membros'
       const { error: insertError } = await this.supabaseService.supabase.from('membros').insert([
         {
-          id: authData.user.id,
+          id: userId,
           nome: membro.nome,
           sobrenome: membro.sobrenome,
           email: membro.email,
@@ -231,11 +234,16 @@ export class AuthService {
         },
       ]);
 
-      if (insertError) throw new Error('Erro ao salvar os dados do perfil.');
+      if (insertError) {
+        // Fallback de segurança: Se falhar ao criar o perfil, idealmente exclui o auth gerado para não deixar conta "fantasma"
+        console.error('Erro ao salvar membro:', insertError);
+        throw new Error('Erro ao salvar os dados do perfil.');
+      }
 
+      // 4. Salva os Filhos (Se o array tiver dados!)
       if (membro.filhos && membro.filhos.length > 0) {
         const filhosParaInserir = membro.filhos.map((filho) => ({
-          membro_id: authData.user!.id,
+          membro_id: userId, // Vincula a criança ao pai/mãe que acabou de ser criado
           nome: filho.nome,
           data_nascimento: filho.data_nascimento || null,
           informacoes_medicas: filho.informacoes_medicas || null,
@@ -247,10 +255,13 @@ export class AuthService {
 
         if (insertFilhosError) {
           console.error('Erro ao salvar filhos no cadastro:', insertFilhosError);
-          throw new Error('Erro ao salvar os dados dos filhos.');
+          // Nota: Não quebramos o cadastro principal se o filho falhar, mas logamos o erro.
+          // Em um sistema real robusto, você poderia decidir se lança o erro ou apenas avisa.
+          throw new Error('Membro salvo, mas houve um erro ao registrar os dados dos filhos.');
         }
       }
 
+      // 5. Finaliza o processo limpando a sessão residual do signUp automático do Supabase
       await this.supabaseService.supabase.auth.signOut();
       this.limparSessaoLocal();
 
@@ -258,8 +269,9 @@ export class AuthService {
     } catch (error: any) {
       let msg = error.message;
       if (msg.includes('already registered')) msg = 'Este e-mail já está cadastrado.';
-      if (msg.includes('Password should be at least'))
+      if (msg.includes('Password should be at least')) {
         msg = 'A senha deve ter pelo menos 6 caracteres.';
+      }
 
       return { sucesso: false, mensagem: msg };
     }

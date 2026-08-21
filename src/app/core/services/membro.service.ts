@@ -204,7 +204,7 @@ export class MembroService {
   private async executarAtualizacaoMembroAdmin(
     membro: MembroAtualizacaoAdmin & { id: string; foto_url?: string },
   ) {
-    const { id, remover_foto, foto_url, ...dadosSalvar } = membro;
+    const { id, remover_foto, foto_url, filhos, ...dadosSalvar } = membro;
 
     if (remover_foto && foto_url) {
       try {

@@ -206,8 +206,10 @@ export class EditarMembroDialogComponent {
     const enderecoString =
       formValues.logradouro || formValues.cep ? JSON.stringify(objEndereco) : null;
 
+    const { filhos, ...dadosOriginais } = this.data;
+
     const dadosAtualizados = {
-      ...this.data,
+      ...dadosOriginais,
       nome: formValues.nome.trim(),
       sobrenome: formValues.sobrenome.trim(),
       telefone: formValues.telefone.replace(/\D/g, ''),

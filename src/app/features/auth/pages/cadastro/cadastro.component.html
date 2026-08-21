@@ -124,69 +124,109 @@
           </mat-form-field>
         </div>
 
-        <div class="mt-2 pt-4 border-t border-slate-100 animate-fade-in w-full">
-          <div class="flex items-center justify-between mb-3">
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              Filhos menores (Opcional)
-            </div>
-            <button
-              type="button"
-              (click)="adicionarFilho()"
-              class="text-sky-600 hover:bg-sky-50 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 text-[11px] font-bold"
-            >
-              <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">person_add</mat-icon>
-              <span>Adicionar</span>
-            </button>
-          </div>
-
-          <div formArrayName="filhos" class="space-y-3">
-            @for (filhoForm of filhosFormArray.controls; track $index) {
-              <div
-                [formGroupName]="$index"
-                class="p-3.5 bg-slate-50/50 border border-slate-200 rounded-2xl relative animate-fade-in"
+        <!-- ================= BLOCO DE FILHOS REFATORADO ================= -->
+        <div class="mt-4 pt-4 border-t border-slate-100 animate-fade-in w-full">
+          <div class="mb-4">
+            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+              Possui filhos menores?
+            </label>
+            <div class="flex bg-slate-100 p-1 rounded-xl">
+              <button
+                type="button"
+                (click)="setPossuiFilhos(false)"
+                [ngClass]="
+                  !cadastroForm.get('possuiFilhos')?.value
+                    ? 'bg-white shadow-sm text-slate-800'
+                    : 'text-slate-500 hover:text-slate-700'
+                "
+                class="flex-1 py-2 text-sm font-bold rounded-lg transition-all duration-200"
               >
-                <button
-                  type="button"
-                  (click)="removerFilho($index)"
-                  class="absolute top-2 right-2 text-slate-300 hover:text-red-500 bg-white hover:bg-red-50 w-7 h-7 rounded-full shadow-sm border border-slate-100 flex items-center justify-center transition-all z-10"
-                  title="Remover filho"
-                >
-                  <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">close</mat-icon>
-                </button>
-
-                <div class="text-xs font-bold text-slate-600 mb-3 pr-8">
-                  Criança {{ $index + 1 }}
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Nome da Criança</mat-label>
-                    <input matInput formControlName="nome" />
-                    @if (filhoForm.get('nome')?.hasError('required')) {
-                      <mat-error>Obrigatório.</mat-error>
-                    }
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Data de Nascimento</mat-label>
-                    <input matInput type="date" formControlName="dataNascimento" />
-                    @if (filhoForm.get('dataNascimento')?.hasError('required')) {
-                      <mat-error>Obrigatório.</mat-error>
-                    }
-                  </mat-form-field>
-                </div>
-
-                <mat-form-field appearance="outline" class="w-full mt-1" subscriptSizing="dynamic">
-                  <mat-label>Informações Médicas (Alergias, etc.)</mat-label>
-                  <input
-                    matInput
-                    formControlName="informacoesMedicas"
-                    placeholder="Ex: Alérgico a amendoim, intolerante a lactose..."
-                  />
-                </mat-form-field>
-              </div>
-            }
+                Não
+              </button>
+              <button
+                type="button"
+                (click)="setPossuiFilhos(true)"
+                [ngClass]="
+                  cadastroForm.get('possuiFilhos')?.value
+                    ? 'bg-white shadow-sm text-sky-600'
+                    : 'text-slate-500 hover:text-slate-700'
+                "
+                class="flex-1 py-2 text-sm font-bold rounded-lg transition-all duration-200"
+              >
+                Sim
+              </button>
+            </div>
           </div>
+
+          <!-- Só exibe os inputs se ele marcou SIM -->
+          @if (cadastroForm.get('possuiFilhos')?.value) {
+            <div class="flex items-center justify-between mb-3 animate-fade-in">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Dados das Crianças
+              </div>
+              <button
+                type="button"
+                (click)="adicionarFilho()"
+                class="text-sky-600 hover:bg-sky-50 px-2 py-1 rounded-lg transition-colors flex items-center gap-1 text-[11px] font-bold"
+              >
+                <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">person_add</mat-icon>
+                <span>Adicionar Mais</span>
+              </button>
+            </div>
+
+            <div formArrayName="filhos" class="space-y-3">
+              @for (filhoForm of filhosFormArray.controls; track $index) {
+                <div
+                  [formGroupName]="$index"
+                  class="p-3.5 bg-slate-50/50 border border-slate-200 rounded-2xl relative animate-fade-in"
+                >
+                  <button
+                    type="button"
+                    (click)="removerFilho($index)"
+                    class="absolute top-2 right-2 text-slate-300 hover:text-red-500 bg-white hover:bg-red-50 w-7 h-7 rounded-full shadow-sm border border-slate-100 flex items-center justify-center transition-all z-10"
+                    title="Remover filho"
+                  >
+                    <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">close</mat-icon>
+                  </button>
+
+                  <div class="text-xs font-bold text-slate-600 mb-3 pr-8">
+                    Criança {{ $index + 1 }}
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-label>Nome da Criança</mat-label>
+                      <input matInput formControlName="nome" />
+                      @if (filhoForm.get('nome')?.hasError('required')) {
+                        <mat-error>Obrigatório.</mat-error>
+                      }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-label>Nascimento</mat-label>
+                      <input matInput type="date" formControlName="dataNascimento" />
+                      @if (filhoForm.get('dataNascimento')?.hasError('required')) {
+                        <mat-error>Obrigatório.</mat-error>
+                      }
+                    </mat-form-field>
+                  </div>
+
+                  <mat-form-field
+                    appearance="outline"
+                    class="w-full mt-1"
+                    subscriptSizing="dynamic"
+                  >
+                    <mat-label>Informações Médicas (Alergias, etc.)</mat-label>
+                    <input
+                      matInput
+                      formControlName="informacoesMedicas"
+                      placeholder="Ex: Alérgico a amendoim, intolerante a lactose..."
+                    />
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+          }
         </div>
       }
 
