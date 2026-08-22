@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, from, map, firstValueFrom } from 'rxjs';
 import { SupabaseService } from './supabase';
 import { Midia } from '../../shared/models/midia.model';
-import { environment } from '../../../environments/environments.prod';
+import { environment } from '../../../environments/environments';
 
 export interface DetalhesYoutube {
   titulo: string;
