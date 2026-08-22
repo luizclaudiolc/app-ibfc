@@ -14,7 +14,8 @@ export class SupabaseService {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        storage: window.localStorage,
+        storage: localStorage,
+        storageKey: 'sb-ibfc-auth',
       },
     });
   }

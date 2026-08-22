@@ -4,39 +4,6 @@ import { ENiveisAcesso } from '../../../shared/models/consts';
 import { SupabaseService } from '../supabase';
 import { AuthService } from '../auth.service';
 
-export const authGuard: CanActivateFn = async (route, state) => {
-  const router = inject(Router);
-  const supabaseService = inject(SupabaseService);
-  const authService = inject(AuthService);
-
-  try {
-    const {
-      data: { session },
-      error,
-    } = await supabaseService.supabase.auth.getSession();
-
-    if (session && !error) {
-      const usuario = authService.obterUsuarioLogado();
-
-      if (usuario.status === 'PENDENTE') {
-        router.navigate(['/aguardando-aprovacao']);
-        return false;
-      }
-
-      return true;
-    } else {
-      localStorage.removeItem('app_user_session');
-      router.navigate(['/login']);
-      return false;
-    }
-  } catch (err) {
-    console.error('Erro na validação do AuthGuard', err);
-    localStorage.removeItem('app_user_session');
-    router.navigate(['/login']);
-    return false;
-  }
-};
-
 export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const authService = inject(AuthService);
@@ -51,16 +18,42 @@ export const adminGuard: CanActivateFn = (route, state) => {
   return false;
 };
 
-export const loginGuard: CanActivateFn = async (route, state) => {
+export const authGuard: CanActivateFn = async () => {
   const router = inject(Router);
-  const supabaseService = inject(SupabaseService);
   const authService = inject(AuthService);
 
-  const {
-    data: { session },
-  } = await supabaseService.supabase.auth.getSession();
+  try {
+    const sessaoValida = await authService.garantirSessaoValida();
 
-  if (session) {
+    if (!sessaoValida) {
+      localStorage.removeItem('app_user_session');
+      router.navigate(['/login']);
+      return false;
+    }
+
+    const usuario = authService.obterUsuarioLogado();
+
+    if (usuario.status === 'PENDENTE') {
+      router.navigate(['/aguardando-aprovacao']);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Erro na validação do AuthGuard', err);
+    localStorage.removeItem('app_user_session');
+    router.navigate(['/login']);
+    return false;
+  }
+};
+
+export const loginGuard: CanActivateFn = async () => {
+  const router = inject(Router);
+  const authService = inject(AuthService);
+
+  const sessaoValida = await authService.garantirSessaoValida();
+
+  if (sessaoValida) {
     const usuario = authService.obterUsuarioLogado();
 
     if (usuario.status === 'PENDENTE') {
@@ -74,24 +67,21 @@ export const loginGuard: CanActivateFn = async (route, state) => {
   return true;
 };
 
-export const aguardandoGuard: CanActivateFn = async (route, state) => {
+export const aguardandoGuard: CanActivateFn = async () => {
   const router = inject(Router);
-  const supabaseService = inject(SupabaseService);
   const authService = inject(AuthService);
 
-  const {
-    data: { session },
-  } = await supabaseService.supabase.auth.getSession();
+  const sessaoValida = await authService.garantirSessaoValida();
 
-  if (session) {
+  if (sessaoValida) {
     const usuario = authService.obterUsuarioLogado();
 
     if (usuario.status === 'PENDENTE') {
       return true;
-    } else {
-      router.navigate(['/dashboard/home']);
-      return false;
     }
+
+    router.navigate(['/dashboard/home']);
+    return false;
   }
 
   router.navigate(['/login']);

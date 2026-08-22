@@ -136,12 +136,51 @@ export class AuthService {
   private iniciarObservadorDeSessao() {
     this.supabaseService.supabase.auth.onAuthStateChange((event, session) => {
       this.ngZone.run(() => {
-        if (event === 'SIGNED_OUT') {
+        if (event === 'SIGNED_OUT' && !session) {
           this.limparSessaoLocal();
           this.router.navigate(['/login']);
         }
       });
     });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        void this.renovarSessaoSeNecessario();
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      void this.renovarSessaoSeNecessario();
+    });
+
+    window.addEventListener('online', () => {
+      void this.renovarSessaoSeNecessario();
+    });
+  }
+
+  async garantirSessaoValida(): Promise<boolean> {
+    const { data, error } = await this.supabaseService.supabase.auth.getSession();
+    if (error || !data.session) {
+      return this.tentarRefresh();
+    }
+
+    const expiresAt = data.session.expires_at ?? 0;
+    const agora = Math.floor(Date.now() / 1000);
+
+    if (expiresAt - agora < 600) {
+      return this.tentarRefresh();
+    }
+
+    return true;
+  }
+
+  private async renovarSessaoSeNecessario(): Promise<void> {
+    await this.garantirSessaoValida();
+  }
+
+  private async tentarRefresh(): Promise<boolean> {
+    const { data, error } = await this.supabaseService.supabase.auth.refreshSession();
+    return !error && !!data.session;
   }
 
   private async executarLoginSupabase(email: string, senha: string): Promise<RespostaLogin> {
@@ -179,7 +218,6 @@ export class AuthService {
     membro: UsuarioCadastro,
   ): Promise<{ sucesso: boolean; mensagem: string }> {
     try {
-      // 1. Cria a conta de Autenticação (Login)
       const { data: authData, error: authError } = await this.supabaseService.supabase.auth.signUp({
         email: membro.email,
         password: membro.senha,
@@ -191,7 +229,6 @@ export class AuthService {
       const userId = authData.user.id;
       let urlDaFoto = null;
 
-      // 2. Faz o upload da foto (se houver)
       if (membro.foto) {
         const extensao = membro.foto.name.split('.').pop();
         const nomeArquivo = `${userId}-perfil.${extensao}`;
@@ -213,7 +250,6 @@ export class AuthService {
         }
       }
 
-      // 3. Salva os dados na tabela 'membros'
       const { error: insertError } = await this.supabaseService.supabase.from('membros').insert([
         {
           id: userId,
@@ -235,15 +271,13 @@ export class AuthService {
       ]);
 
       if (insertError) {
-        // Fallback de segurança: Se falhar ao criar o perfil, idealmente exclui o auth gerado para não deixar conta "fantasma"
         console.error('Erro ao salvar membro:', insertError);
         throw new Error('Erro ao salvar os dados do perfil.');
       }
 
-      // 4. Salva os Filhos (Se o array tiver dados!)
       if (membro.filhos && membro.filhos.length > 0) {
         const filhosParaInserir = membro.filhos.map((filho) => ({
-          membro_id: userId, // Vincula a criança ao pai/mãe que acabou de ser criado
+          membro_id: userId,
           nome: filho.nome,
           data_nascimento: filho.data_nascimento || null,
           informacoes_medicas: filho.informacoes_medicas || null,
@@ -255,13 +289,11 @@ export class AuthService {
 
         if (insertFilhosError) {
           console.error('Erro ao salvar filhos no cadastro:', insertFilhosError);
-          // Nota: Não quebramos o cadastro principal se o filho falhar, mas logamos o erro.
-          // Em um sistema real robusto, você poderia decidir se lança o erro ou apenas avisa.
+
           throw new Error('Membro salvo, mas houve um erro ao registrar os dados dos filhos.');
         }
       }
 
-      // 5. Finaliza o processo limpando a sessão residual do signUp automático do Supabase
       await this.supabaseService.supabase.auth.signOut();
       this.limparSessaoLocal();
 

@@ -120,25 +120,18 @@
             >
           </mat-form-field>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>WhatsApp</mat-label>
-              <input matInput type="tel" formControlName="telefone" placeholder="24 999999999" />
-              @if (perfilForm.controls.telefone.hasError('required')) {
-                <mat-error>Obrigatório.</mat-error>
-              } @else if (perfilForm.controls.telefone.hasError('pattern')) {
-                <mat-error>Digite 10 ou 11 números.</mat-error>
-              }
-            </mat-form-field>
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>WhatsApp</mat-label>
 
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Data de Nascimento</mat-label>
-              <input matInput type="date" formControlName="data_nascimento" />
-              @if (perfilForm.controls.data_nascimento.hasError('required')) {
-                <mat-error>Obrigatório.</mat-error>
-              }
-            </mat-form-field>
-          </div>
+            <input matInput type="tel" formControlName="telefone" placeholder="24999999999" />
+            <mat-hint class="text-[10px]">Apenas números, com DDD</mat-hint>
+
+            @if (perfilForm.controls.telefone.hasError('required')) {
+              <mat-error>Obrigatório.</mat-error>
+            } @else if (perfilForm.controls.telefone.hasError('pattern')) {
+              <mat-error>Digite 10 ou 11 números.</mat-error>
+            }
+          </mat-form-field>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <mat-form-field appearance="outline" class="w-full">
@@ -371,7 +364,7 @@
             mat-flat-button
             type="submit"
             class="w-full !rounded-2xl !h-13 !bg-sky-600 hover:!bg-sky-700 !text-white !font-bold shadow-lg shadow-sky-600/20 transition-all"
-            [disabled]="carregando() || perfilForm.invalid"
+            [disabled]="carregando()"
           >
             @if (carregando()) {
               <mat-spinner diameter="18" class="!inline-block !mr-2"></mat-spinner>
