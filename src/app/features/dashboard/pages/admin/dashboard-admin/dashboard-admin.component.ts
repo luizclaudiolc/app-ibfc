@@ -107,6 +107,6 @@ export class DashboardAdminComponent implements OnInit {
   }
 
   irParaAdminMembros() {
-    this.router.navigate(['/admin']);
+    this.router.navigate(['/dashboard/admin']);
   }
 }

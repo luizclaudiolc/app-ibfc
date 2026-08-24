@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, from, map, Observable } from 'rxjs';
+import { forkJoin, from, map, Observable, shareReplay } from 'rxjs';
 import { SupabaseService } from './supabase';
 
 export interface PedidoOracao {
@@ -21,6 +21,15 @@ export interface PedidoOracao {
 export class PedidoOracaoService {
   private supabase = inject(SupabaseService);
   private readonly selectComMembro = '*, membro:membros(nome, sobrenome, foto_url)';
+
+  private cacheMural$: Observable<{ ativos: PedidoOracao[]; atendidos: PedidoOracao[] }> | null =
+    null;
+  private cacheMeusPedidos = new Map<string, Observable<PedidoOracao[]>>();
+
+  limparCache(): void {
+    this.cacheMural$ = null;
+    this.cacheMeusPedidos.clear();
+  }
 
   buscarAtivos(): Observable<PedidoOracao[]> {
     const promise = this.supabase.supabase
@@ -54,25 +63,39 @@ export class PedidoOracaoService {
   }
 
   buscarParaMural(): Observable<{ ativos: PedidoOracao[]; atendidos: PedidoOracao[] }> {
-    return forkJoin({
+    if (this.cacheMural$) {
+      return this.cacheMural$;
+    }
+
+    this.cacheMural$ = forkJoin({
       ativos: this.buscarAtivos(),
       atendidos: this.buscarAtendidosRecentes(3),
-    });
+    }).pipe(shareReplay(1));
+
+    return this.cacheMural$;
   }
 
   buscarMeusPedidos(membroId: string): Observable<PedidoOracao[]> {
+    if (this.cacheMeusPedidos.has(membroId)) {
+      return this.cacheMeusPedidos.get(membroId)!;
+    }
+
     const promise = this.supabase.supabase
       .from('pedidos_oracao')
       .select('*')
       .eq('membro_id', membroId)
       .order('created_at', { ascending: false });
 
-    return from(promise).pipe(
+    const request$ = from(promise).pipe(
       map((res) => {
         if (res.error) throw res.error;
         return res.data as PedidoOracao[];
       }),
+      shareReplay(1),
     );
+
+    this.cacheMeusPedidos.set(membroId, request$);
+    return request$;
   }
 
   async criar(membroId: string, descricao: string): Promise<PedidoOracao> {
@@ -83,6 +106,7 @@ export class PedidoOracaoService {
       .single();
 
     if (error) throw error;
+    this.limparCache();
     return data as PedidoOracao;
   }
 
@@ -93,6 +117,7 @@ export class PedidoOracaoService {
       .eq('id', id);
 
     if (error) throw error;
+    this.limparCache();
   }
 
   async alternarIntercessao(pedidoId: string): Promise<void> {
@@ -101,12 +126,14 @@ export class PedidoOracaoService {
     });
 
     if (error) throw error;
+    this.limparCache();
   }
 
   async excluir(id: string): Promise<void> {
     const { error } = await this.supabase.supabase.from('pedidos_oracao').delete().eq('id', id);
 
     if (error) throw error;
+    this.limparCache();
   }
 
   async atualizar(id: string, novaDescricao: string): Promise<PedidoOracao> {
@@ -121,6 +148,7 @@ export class PedidoOracaoService {
       .single();
 
     if (error) throw error;
+    this.limparCache();
     return data as PedidoOracao;
   }
 

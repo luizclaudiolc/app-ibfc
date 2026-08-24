@@ -2,10 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, forkJoin, from, map } from 'rxjs';
 import { SupabaseService } from './supabase';
 import { PulsoService } from './pulso.service';
-import { ESCOLARIDADE_MAP, MINISTERIOS_DISPONIVEIS } from '../../shared/models/consts';
+import { MINISTERIOS_DISPONIVEIS } from '../../shared/models/consts';
 
 export interface DashboardData {
   totalMembros: number;
+  totalCriancas: number;
   membrosPendentes: number;
   oracoesAtivas: number;
   mediaIdade: number;
@@ -26,7 +27,7 @@ export class EstatisticasService {
     const membros$ = from(
       this.supabase.supabase
         .from('membros')
-        .select('genero, estado_civil, pedido_oracao, status, data_nascimento, ministerios'),
+        .select('genero, estado_civil, status, data_nascimento, ministerios'),
     );
 
     const pulso$ = from(
@@ -36,10 +37,28 @@ export class EstatisticasService {
         .eq('semana_ano', semanaAtual),
     );
 
-    return forkJoin({ membros: membros$, pulso: pulso$ }).pipe(
-      map(({ membros, pulso }) => {
+    const oracoes$ = from(
+      this.supabase.supabase
+        .from('pedidos_oracao')
+        .select('id', { count: 'exact', head: true })
+        .eq('atendido', false),
+    );
+
+    const criancas$ = from(
+      this.supabase.supabase.from('filhos').select('id', { count: 'exact', head: true }),
+    );
+
+    return forkJoin({
+      membros: membros$,
+      pulso: pulso$,
+      oracoes: oracoes$,
+      criancas: criancas$,
+    }).pipe(
+      map(({ membros, pulso, oracoes, criancas }) => {
         const todosMembros = membros.data || [];
         const listaPulso = pulso.data || [];
+        const oracoesAtivasCount = oracoes.count || 0;
+        const totalCriancasCount = criancas.count || 0;
 
         const ativos = todosMembros.filter((m) => m.status === 'ATIVO');
         const pendentes = todosMembros.filter((m) => m.status === 'PENDENTE');
@@ -50,8 +69,6 @@ export class EstatisticasService {
           solteiros = 0,
           div = 0,
           viuvos = 0;
-
-        let qtdOracoesAtivas = 0;
         let somaIdades = 0;
         let qtdMembrosComIdade = 0;
         const hoje = new Date();
@@ -59,10 +76,6 @@ export class EstatisticasService {
         const ministerioContagem: { [key: string]: number } = {};
 
         ativos.forEach((m) => {
-          if (m.pedido_oracao && m.pedido_oracao.trim() !== '') {
-            qtdOracoesAtivas++;
-          }
-
           if (m.genero === 1) masc++;
           if (m.genero === 2) fem++;
 
@@ -121,27 +134,17 @@ export class EstatisticasService {
 
         return {
           totalMembros: ativos.length,
+          totalCriancas: totalCriancasCount,
           membrosPendentes: pendentes.length,
-          oracoesAtivas: qtdOracoesAtivas,
+          oracoesAtivas: oracoesAtivasCount,
           mediaIdade,
-          genero: {
-            labels: ['Masculino', 'Feminino'],
-            data: [masc, fem],
-          },
+          genero: { labels: ['Masculino', 'Feminino'], data: [masc, fem] },
           estadoCivil: {
             labels: ['Solteiros', 'Casados', 'Divorciados', 'Viúvos'],
             data: [solteiros, casados, div, viuvos],
           },
-          ministeriosCount: {
-            labels: minLabels,
-            data: minData,
-          },
-          pulsoSemana: {
-            paz,
-            correria,
-            oracao,
-            total: listaPulso.length,
-          },
+          ministeriosCount: { labels: minLabels, data: minData },
+          pulsoSemana: { paz, correria, oracao, total: listaPulso.length },
         };
       }),
     );

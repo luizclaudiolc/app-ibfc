@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, catchError, from, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, from, map, of, switchMap, shareReplay, tap } from 'rxjs';
 import {
   Membro,
   MembroAtualizacaoAdmin,
@@ -25,7 +25,23 @@ export class MembroService {
   private supabaseService = inject(SupabaseService);
   private readonly authService = inject(AuthService);
 
+  private cacheMeuPerfil$: Observable<Membro> | null = null;
+  private cacheTodosMembros = new Map<string, Observable<Membro[]>>();
+
+  limparCache(): void {
+    this.cacheMeuPerfil$ = null;
+    this.cacheTodosMembros.clear();
+  }
+
   buscarTodos(todosStatus = false, colunas = colunasHome): Observable<Membro[]> {
+    const cacheKey = `${todosStatus}-${colunas}`;
+
+    if (this.cacheTodosMembros.has(cacheKey)) {
+      console.log('TEM CACHE');
+
+      return this.cacheTodosMembros.get(cacheKey)!;
+    }
+
     const promise = this.supabaseService.supabase
       .from('membros')
       .select(colunas)
@@ -35,7 +51,13 @@ export class MembroService {
       promise.eq('status', EStatusMembro.ATIVO);
     }
 
-    return from(promise).pipe(map((res) => (res.data ?? []) as unknown as Membro[]));
+    const request$ = from(promise).pipe(
+      map((res) => (res.data ?? []) as unknown as Membro[]),
+      shareReplay(1),
+    );
+
+    this.cacheTodosMembros.set(cacheKey, request$);
+    return request$;
   }
 
   buscarPorId(id: string): Observable<Membro | null> {
@@ -50,10 +72,34 @@ export class MembroService {
     );
   }
 
+  buscarMeuPerfil(): Observable<Membro> {
+    if (this.cacheMeuPerfil$) {
+      return this.cacheMeuPerfil$;
+    }
+
+    this.cacheMeuPerfil$ = from(this.supabaseService.supabase.auth.getUser()).pipe(
+      switchMap(({ data }) =>
+        this.supabaseService.supabase
+          .from('membros')
+          .select(colunasMeuPerfil)
+          .eq('id', data.user?.id)
+          .single(),
+      ),
+      map((res) => res.data as Membro),
+      shareReplay(1),
+    );
+
+    return this.cacheMeuPerfil$;
+  }
+
   atualizarFotoPerfil(
     arquivo: File,
   ): Observable<{ sucesso: boolean; fotoUrl?: string; mensagem?: string }> {
-    return from(this.executarAtualizacaoFoto(arquivo));
+    return from(this.executarAtualizacaoFoto(arquivo)).pipe(
+      tap((res) => {
+        if (res.sucesso) this.limparCache();
+      }),
+    );
   }
 
   private async executarAtualizacaoFoto(
@@ -65,7 +111,6 @@ export class MembroService {
       if (authError || !authData.user) throw new Error('Usuário não autenticado.');
 
       const userId = authData.user.id;
-
       const nomeArquivo = `${userId}-perfil`;
 
       const { error: uploadError } = await this.supabaseService.supabase.storage
@@ -102,7 +147,11 @@ export class MembroService {
   atualizarPerfil(
     dados: Partial<UsuarioAtualizacao>,
   ): Observable<{ sucesso: boolean; mensagem?: string }> {
-    return from(this.executarAtualizacaoPerfil(dados));
+    return from(this.executarAtualizacaoPerfil(dados)).pipe(
+      tap((res) => {
+        if (res.sucesso) this.limparCache();
+      }),
+    );
   }
 
   private async executarAtualizacaoPerfil(
@@ -147,19 +196,6 @@ export class MembroService {
     }
   }
 
-  buscarMeuPerfil(): Observable<Membro> {
-    return from(this.supabaseService.supabase.auth.getUser()).pipe(
-      switchMap(({ data }) =>
-        this.supabaseService.supabase
-          .from('membros')
-          .select(colunasMeuPerfil)
-          .eq('id', data.user?.id)
-          .single(),
-      ),
-      map((res) => res.data as Membro),
-    );
-  }
-
   atualizarSetor(id: string, novoSetor: string): Observable<any> {
     return from(
       this.supabaseService.supabase
@@ -167,6 +203,7 @@ export class MembroService {
         .update({ setor_responsavel: novoSetor })
         .eq('id', id),
     ).pipe(
+      tap(() => this.limparCache()),
       map((res) => {
         if (res.error) throw res.error;
         return res;
@@ -207,13 +244,14 @@ export class MembroService {
         if (updateError) throw updateError;
         return { sucesso: true };
       }),
+      tap(() => this.limparCache()),
     );
   }
 
   atualizarMembroAdmin(
     membro: MembroAtualizacaoAdmin & { id: string; foto_url?: string },
   ): Observable<any> {
-    return from(this.executarAtualizacaoMembroAdmin(membro));
+    return from(this.executarAtualizacaoMembroAdmin(membro)).pipe(tap(() => this.limparCache()));
   }
 
   private async executarAtualizacaoMembroAdmin(

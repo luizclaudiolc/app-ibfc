@@ -1,11 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, from, map } from 'rxjs';
+import { Observable, from, map, shareReplay, tap } from 'rxjs';
 import { Escala } from '../../shared/models/escala.model';
 import { SupabaseService } from './supabase';
 
 @Injectable({ providedIn: 'root' })
 export class EscalaService {
   private supabaseService = inject(SupabaseService);
+
+  private cacheEscalas = new Map<string, Observable<Escala[]>>();
+
+  limparCache(): void {
+    this.cacheEscalas.clear();
+  }
 
   buscarProximosDias(dias = 30): Observable<Escala[]> {
     const hoje = this.toISODate(new Date());
@@ -32,6 +38,12 @@ export class EscalaService {
     dataFim: string,
     departamento?: string | null,
   ): Observable<Escala[]> {
+    const cacheKey = `intervalo_${dataInicio}_${dataFim}_${departamento || 'todos'}`;
+
+    if (this.cacheEscalas.has(cacheKey)) {
+      return this.cacheEscalas.get(cacheKey)!;
+    }
+
     let query = this.supabaseService.supabase
       .from('escalas')
       .select('id, data_escala, evento, departamento, voluntarios, pedidos_substituicao')
@@ -43,7 +55,13 @@ export class EscalaService {
       query = query.eq('departamento', departamento);
     }
 
-    return from(query).pipe(map((res) => (res.data ?? []) as Escala[]));
+    const request$ = from(query).pipe(
+      map((res) => (res.data ?? []) as Escala[]),
+      shareReplay(1),
+    );
+
+    this.cacheEscalas.set(cacheKey, request$);
+    return request$;
   }
 
   salvar(escala: Partial<Escala>): Observable<Escala> {
@@ -54,15 +72,24 @@ export class EscalaService {
         .eq('id', escala.id)
         .select()
         .single();
-      return from(promise).pipe(map((res) => res.data as Escala));
+
+      return from(promise).pipe(
+        map((res) => res.data as Escala),
+        tap(() => this.limparCache()),
+      );
     }
 
     const promise = this.supabaseService.supabase.from('escalas').insert(escala).select().single();
-    return from(promise).pipe(map((res) => res.data as Escala));
+    return from(promise).pipe(
+      map((res) => res.data as Escala),
+      tap(() => this.limparCache()),
+    );
   }
 
   excluir(id: string): Observable<unknown> {
-    return from(this.supabaseService.supabase.from('escalas').delete().eq('id', id));
+    return from(this.supabaseService.supabase.from('escalas').delete().eq('id', id)).pipe(
+      tap(() => this.limparCache()),
+    );
   }
 
   private toISODate(data: Date): string {

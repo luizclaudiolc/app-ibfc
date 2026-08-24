@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, from, map } from 'rxjs';
+import { Observable, from, map, shareReplay, tap } from 'rxjs';
 import { Aviso } from '../../shared/models/aviso.model';
 import { SupabaseService } from './supabase';
 
@@ -8,11 +8,19 @@ export class AvisoService {
   private supabaseService = inject(SupabaseService);
   private bucketName = 'avisos';
 
-  /**
-   * Busca os avisos cadastrados.
-   * @param somenteFuturos Se `true` (padrão), traz apenas eventos de hoje em diante. Se `false`, traz todos.
-   */
+  private cacheAvisos = new Map<string, Observable<Aviso[]>>();
+
+  limparCache(): void {
+    this.cacheAvisos.clear();
+  }
+
   buscarTodos(somenteFuturos: boolean = true): Observable<Aviso[]> {
+    const cacheKey = `avisos_${somenteFuturos}`;
+
+    if (this.cacheAvisos.has(cacheKey)) {
+      return this.cacheAvisos.get(cacheKey)!;
+    }
+
     let query = this.supabaseService.supabase
       .from('avisos')
       .select('*')
@@ -28,7 +36,13 @@ export class AvisoService {
       query = query.gte('data_evento', dataAtual);
     }
 
-    return from(query).pipe(map((res) => res.data as Aviso[]));
+    const request$ = from(query).pipe(
+      map((res) => res.data as Aviso[]),
+      shareReplay(1),
+    );
+
+    this.cacheAvisos.set(cacheKey, request$);
+    return request$;
   }
 
   async criar(file: File, dataEvento: string, descricao?: string | null): Promise<Aviso> {
@@ -64,6 +78,8 @@ export class AvisoService {
       .single();
 
     if (dbError) throw dbError;
+
+    this.limparCache();
     return data as Aviso;
   }
 
@@ -80,6 +96,8 @@ export class AvisoService {
     if (dbError) throw dbError;
 
     await this.supabaseService.supabase.storage.from(this.bucketName).remove([filePath]);
+
+    this.limparCache();
   }
 
   async limparAvisosPassados(): Promise<{ sucesso: boolean; mensagem?: string }> {
@@ -135,6 +153,7 @@ export class AvisoService {
         }
       }
 
+      this.limparCache();
       return { sucesso: true, mensagem: 'Avisos passados e arquivos limpos com sucesso!' };
     } catch (error: any) {
       console.error('Erro ao limpar avisos antigos:', error);
@@ -156,6 +175,7 @@ export class AvisoService {
 
       if (error) throw error;
 
+      this.limparCache();
       return { sucesso: true };
     } catch (error: any) {
       console.error('Erro ao confirmar leitura do aviso:', error);
