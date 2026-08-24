@@ -184,4 +184,9 @@ export class EscalasComponent implements OnInit {
       }
     });
   }
+
+  isDiaDeCulto(data: Date): boolean {
+    const diaSemana = data.getDay();
+    return diaSemana === 0 || diaSemana === 2 || diaSemana === 4;
+  }
 }
