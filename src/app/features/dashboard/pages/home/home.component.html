@@ -120,6 +120,7 @@
                 <app-escala-card
                   [escala]="escala"
                   [nomeEvento]="eventosMap[escala.evento] || escala.evento"
+                  [nomeDepartamento]="obterNomeDepartamento(escala.departamento)"
                   [nomeUsuario]="nomeUsuario() || ''"
                   (solicitarSubstituicao)="solicitarTrocaEscala($event)"
                 ></app-escala-card>

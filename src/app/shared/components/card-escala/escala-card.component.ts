@@ -13,6 +13,7 @@ export class EscalaCardComponent {
   escala = input.required<Escala>();
   nomeEvento = input.required<string>();
   nomeUsuario = input.required<string>();
+  nomeDepartamento = input.required<string>();
 
   solicitarSubstituicao = output<Escala>();
 
@@ -36,7 +37,6 @@ export class EscalaCardComponent {
     const agora = new Date();
 
     const diferencaMs = dataEvento.getTime() - agora.getTime();
-
     const limite24h = 24 * 60 * 60 * 1000;
 
     return diferencaMs >= limite24h;

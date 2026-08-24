@@ -7,11 +7,18 @@
     ⛪
   </div>
 
-  <div class="flex items-center gap-2 mb-4 relative z-10">
+  <div class="flex items-center justify-between gap-2 mb-4 relative z-10 flex-wrap">
     <span
       class="text-[10px] bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full font-bold uppercase tracking-wider"
     >
       Você está escalado(a)
+    </span>
+
+    <span
+      class="text-[10px] bg-black/20 backdrop-blur-md text-sky-100 border border-white/10 px-2.5 py-1 rounded-full font-extrabold uppercase tracking-wider flex items-center gap-1"
+    >
+      <mat-icon class="!w-3 !h-3 !text-[12px]">diversity_3</mat-icon>
+      {{ nomeDepartamento() }}
     </span>
   </div>
 
@@ -44,6 +51,7 @@
       </div>
     } @else if (permiteSubstituicao()) {
       <button
+        type="button"
         (click)="solicitarSubstituicao.emit(escala())"
         class="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95"
       >

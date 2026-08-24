@@ -389,4 +389,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.filtroMinisterio.set(ministerio);
     this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
   }
+
+  obterNomeDepartamento(valor: string): string {
+    return this.departamentos[valor] || valor;
+  }
 }

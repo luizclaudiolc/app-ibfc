@@ -47,45 +47,31 @@ export const CARGOS_DISPONIVEIS = [
   { label: 'Missionária', value: 'missionaria' },
 ];
 
-export const CARGOS_DISPONIVEIS_MAP: Record<string, string> = {
-  membro: 'Membro',
-  pastor: 'Pastor',
-  pastora: 'Pastora',
-  presbitero: 'Presbítero',
-  diacono: 'Diácono',
-  diaconisa: 'Diaconisa',
-  evangelista: 'Evangelista',
-  missionario: 'Missionário',
-  missionaria: 'Missionária',
-};
+export const CARGOS_DISPONIVEIS_MAP: Record<string, string> = Object.fromEntries(
+  CARGOS_DISPONIVEIS.map((c) => [c.value, c.label]),
+);
 
-export const DEPARTAMENTOS_DISPONIVEIS = [
-  { label: 'Ministério de Louvor', value: 'ministerio_louvor' },
-  { label: 'Recepção', value: 'recepcao' },
+const LISTA_BASE_MINISTERIOS_DEPARTAMENTOS = [
+  { label: 'Louvor', value: 'louvor' },
   { label: 'Mídia', value: 'midia' },
-  { label: 'Infantil', value: 'infantil' },
-  { label: 'Jovens', value: 'jovens' },
-  { label: 'Adultos', value: 'adultos' },
   { label: 'Casais', value: 'casais' },
-  { label: 'Mulheres', value: 'mulheres' },
   { label: 'Homens', value: 'homens' },
-  { label: 'Missões', value: 'missoes' },
-  { label: 'Membro', value: 'membro' },
+  { label: 'Mulheres', value: 'mulheres' },
+  { label: 'Diaconato', value: 'diaconato' },
+  { label: 'Infantil/Kids', value: 'infantil_kids' },
+  { label: 'Jovens', value: 'jovens' },
 ];
 
-export const DEPARTAMENTOS_DISPONIVEIS_MAP: Record<string, string> = {
-  ministerio_louvor: 'Líder Ministério de Louvor',
-  recepcao: 'Líder Recepção',
-  midia: 'Líder Mídia',
-  infantil: 'Líder Infantil',
-  jovens: 'Líder Jovens',
-  adultos: 'Líder Adultos',
-  casais: 'Líder Casais',
-  mulheres: 'Líder Mulheres',
-  homens: 'Líder Homens',
-  missoes: 'Líder Missões',
-  membro: 'membro',
-};
+export const MINISTERIOS_DISPONIVEIS = LISTA_BASE_MINISTERIOS_DEPARTAMENTOS;
+
+export const DEPARTAMENTOS_DISPONIVEIS = [
+  ...LISTA_BASE_MINISTERIOS_DEPARTAMENTOS,
+  { label: 'Palavra', value: 'palavra' },
+];
+
+export const DEPARTAMENTOS_DISPONIVEIS_MAP: Record<string, string> = Object.fromEntries(
+  DEPARTAMENTOS_DISPONIVEIS.map((d) => [d.value, d.label]),
+);
 
 export const EVENTOS_OPCOES = [
   { value: 'QUINTA_PROFETICA', label: 'Quinta Profetica do Clamor' },
@@ -99,27 +85,9 @@ export const EVENTOS_OPCOES = [
   { value: 'OUTRO', label: 'Outro' },
 ];
 
-export const EVENTOS_MAP: Record<string, string> = {
-  QUINTA_PROFETICA: 'Quinta Profetica do Clamor',
-  CULTO_DOMINGO_MANHA: 'Culto de Celebração Domingo Manhã',
-  CULTO_DOMINGO_NOITE: 'Culto de Celebração Domingo Noite',
-  ESCOLA_BIBLICA: 'Escola Bíblica - Terça-feira',
-  CULTO_JOVENS: 'Culto de Jovens',
-  CULTO_MULHERES: 'Culto de Mulheres',
-  CULTO_HOMENS: 'Culto de Homens',
-  REUNIAO_LIDERANCA: 'Reunião de Liderança',
-  OUTRO: 'Outro',
-};
-
-export const MINISTERIOS_DISPONIVEIS = [
-  { label: 'Louvor e Adoração', value: 'LOUVOR' },
-  { label: 'Mídia e Comunicação', value: 'MIDIA' },
-  { label: 'Infantil (Kids)', value: 'INFANTIL' },
-  { label: 'Recepção e Diaconia', value: 'RECEPCAO' },
-  { label: 'Intercessão', value: 'INTERCESSAO' },
-  { label: 'Jovens', value: 'JOVENS' },
-  { label: 'Casais e Família', value: 'CASAIS_FAMILIA' },
-];
+export const EVENTOS_MAP: Record<string, string> = Object.fromEntries(
+  EVENTOS_OPCOES.map((e) => [e.value, e.label]),
+);
 
 export enum EGenero {
   MASCULINO = 1,
