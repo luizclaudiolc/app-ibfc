@@ -129,7 +129,7 @@ export class CadastroComponent {
       dataNascimento: ['', [Validators.required]],
 
       genero: [null as number | null, [Validators.required]],
-      possuiFilhos: [false],
+      possuiFilhos: [null as boolean | null, [Validators.required]],
       filhos: this.fb.array([]),
       estadoCivil: [null as number | null, [Validators.required]],
       escolaridade: [null as number | null],
@@ -149,7 +149,7 @@ export class CadastroComponent {
   );
 
   private camposPorEtapa: Record<number, string[]> = {
-    1: ['nome', 'sobrenome', 'dataNascimento', 'genero', 'possuiFilhos', 'filhos'],
+    1: ['nome', 'sobrenome', 'dataNascimento', 'genero', 'possuiFilhos'],
     2: [
       'email',
       'telefone',
@@ -206,6 +206,20 @@ export class CadastroComponent {
         etapaValida = false;
       }
     });
+
+    if (this.etapaAtual() === 1 && this.cadastroForm.get('possuiFilhos')?.value === true) {
+      if (this.filhosFormArray.length === 0) {
+        this.notification.aviso('Adicione ao menos os dados da criança.');
+        etapaValida = false;
+      } else {
+        this.filhosFormArray.controls.forEach((filhoCtrl) => {
+          if (filhoCtrl.invalid) {
+            filhoCtrl.markAllAsTouched();
+            etapaValida = false;
+          }
+        });
+      }
+    }
 
     if (etapaValida && this.etapaAtual() < this.totalEtapas) {
       this.etapaAtual.update((e) => e + 1);
@@ -312,11 +326,13 @@ export class CadastroComponent {
       estado_civil: formValues.estadoCivil ? +formValues.estadoCivil : undefined,
       nivel_escolaridade: formValues.escolaridade ? +formValues.escolaridade : undefined,
 
-      filhos: formValues.filhos.map((f: any) => ({
-        nome: f.nome.trim(),
-        data_nascimento: f.dataNascimento,
-        informacoes_medicas: f.informacoesMedicas?.trim() || null,
-      })) as Partial<Filho>[],
+      filhos: formValues.possuiFilhos
+        ? (formValues.filhos.map((f: any) => ({
+            nome: f.nome.trim(),
+            data_nascimento: f.dataNascimento,
+            informacoes_medicas: f.informacoesMedicas?.trim() || null,
+          })) as Partial<Filho>[])
+        : [],
 
       endereco: enderecoString,
     };
@@ -361,12 +377,10 @@ export class CadastroComponent {
     this.filhosFormArray.removeAt(index);
   }
 
-  setPossuiFilhos(valor: boolean): void {
-    this.cadastroForm.get('possuiFilhos')?.setValue(valor);
-
+  onPossuiFilhosChange(valor: boolean): void {
     if (valor && this.filhosFormArray.length === 0) {
       this.adicionarFilho();
-    } else if (!valor && this.filhosFormArray.length > 0) {
+    } else if (!valor) {
       this.filhosFormArray.clear();
     }
   }
