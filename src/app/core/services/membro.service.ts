@@ -28,6 +28,14 @@ export class MembroService {
   private cacheMeuPerfil$: Observable<Membro> | null = null;
   private cacheTodosMembros = new Map<string, Observable<Membro[]>>();
 
+  constructor() {
+    this.supabaseService.supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        this.limparCache();
+      }
+    });
+  }
+
   limparCache(): void {
     this.cacheMeuPerfil$ = null;
     this.cacheTodosMembros.clear();

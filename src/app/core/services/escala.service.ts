@@ -9,6 +9,14 @@ export class EscalaService {
 
   private cacheEscalas = new Map<string, Observable<Escala[]>>();
 
+  constructor() {
+    this.supabaseService.supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        this.limparCache();
+      }
+    });
+  }
+
   limparCache(): void {
     this.cacheEscalas.clear();
   }

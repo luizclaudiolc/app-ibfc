@@ -10,6 +10,14 @@ export class AvisoService {
 
   private cacheAvisos = new Map<string, Observable<Aviso[]>>();
 
+  constructor() {
+    this.supabaseService.supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        this.limparCache();
+      }
+    });
+  }
+
   limparCache(): void {
     this.cacheAvisos.clear();
   }

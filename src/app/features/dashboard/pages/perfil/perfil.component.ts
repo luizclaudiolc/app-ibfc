@@ -121,6 +121,8 @@ export class PerfilComponent implements OnInit {
             }
           }
 
+          this.previewFoto.set(res.foto_url || null);
+
           this.perfilForm.patchValue({
             nome: res.nome || '',
             sobrenome: res.sobrenome || '',

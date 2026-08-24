@@ -26,6 +26,14 @@ export class PedidoOracaoService {
     null;
   private cacheMeusPedidos = new Map<string, Observable<PedidoOracao[]>>();
 
+  constructor() {
+    this.supabase.supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        this.limparCache();
+      }
+    });
+  }
+
   limparCache(): void {
     this.cacheMural$ = null;
     this.cacheMeusPedidos.clear();
