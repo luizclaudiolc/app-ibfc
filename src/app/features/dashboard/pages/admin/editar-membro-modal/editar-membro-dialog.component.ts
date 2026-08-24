@@ -235,20 +235,6 @@ export class EditarMembroDialogComponent {
           dadosAtualizados.foto_url = null;
         }
 
-        if (dadosAtualizados.nome && dadosAtualizados.sobrenome) {
-          this.authService.atualizarNomeGlobal(
-            `${dadosAtualizados.nome} ${dadosAtualizados.sobrenome}`,
-          );
-        }
-
-        if (dadosAtualizados.genero !== undefined) {
-          this.authService.atualizarGeneroGlobal(dadosAtualizados.genero);
-        }
-
-        if (dadosAtualizados.ministerios !== undefined) {
-          this.authService.atualizarMinisteriosGlobal(dadosAtualizados.ministerios);
-        }
-
         this.dialogRef.close({ sucesso: true, dadosAtualizados });
         this.notification.sucesso('Membro atualizado com sucesso!');
       },
