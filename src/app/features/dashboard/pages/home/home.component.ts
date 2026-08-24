@@ -10,13 +10,13 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { filter, finalize, forkJoin, fromEvent, Subscription } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
+import { finalize, forkJoin, fromEvent, Subscription } from 'rxjs';
 
+import { AuthService } from '../../../../core/services/auth.service';
 import { AvisoService } from '../../../../core/services/aviso.service';
 import { EscalaService } from '../../../../core/services/escala.service';
-import { MembroService } from '../../../../core/services/membro.service';
-import { AuthService } from '../../../../core/services/auth.service';
+import { colunasHome, MembroService } from '../../../../core/services/membro.service';
 import { Aviso } from '../../../../shared/models/aviso.model';
 import { Escala } from '../../../../shared/models/escala.model';
 import { Membro } from '../../../../shared/models/membro.model';
@@ -35,19 +35,19 @@ import {
   MINISTERIOS_DISPONIVEIS,
 } from '../../../../shared/models/consts';
 
-import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
-import { ScrollableCarouselComponent } from '../../../../shared/components/carrossel/scrollable-carousel.component';
-import { EscalaCardComponent } from '../../../../shared/components/card-escala/escala-card.component';
-import { MembroListItemComponent } from '../../../../shared/components/lista-membros/membro-list-item.component';
-import { CardAvisoComponent } from '../../../../shared/components/card-aviso/card-aviso.component';
-import { CardAniversarianteComponent } from '../../../../shared/components/card-aniversariante/card-aniversariante.component';
 import { DevocionalService, VersiculoDia } from '../../../../core/services/devocional.service';
-import { VersiculoCardComponent } from '../../../../shared/components/card-versiculo/card-versiculo.component';
-import { PulsoCardComponent } from '../../../../shared/components/pulso-card/pulso-card.component';
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { PwaService } from '../../../../core/services/pwa.service';
 import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
+import { CardAniversarianteComponent } from '../../../../shared/components/card-aniversariante/card-aniversariante.component';
+import { CardAvisoComponent } from '../../../../shared/components/card-aviso/card-aviso.component';
+import { EscalaCardComponent } from '../../../../shared/components/card-escala/escala-card.component';
+import { VersiculoCardComponent } from '../../../../shared/components/card-versiculo/card-versiculo.component';
+import { ScrollableCarouselComponent } from '../../../../shared/components/carrossel/scrollable-carousel.component';
+import { MembroListItemComponent } from '../../../../shared/components/lista-membros/membro-list-item.component';
 import { PixCardComponent } from '../../../../shared/components/pix/pix-card.component';
+import { PulsoCardComponent } from '../../../../shared/components/pulso-card/pulso-card.component';
+import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
 
 @Component({
   selector: 'app-home',
@@ -113,10 +113,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.carregarTodosOsDados();
     this.setupScrollSync();
     this.startAutoScroll();
-
-    this.router.events
-      .pipe(filter((e) => e instanceof NavigationEnd))
-      .subscribe(() => this.carregarTodosOsDados());
   }
 
   ngOnDestroy(): void {
@@ -141,7 +137,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     forkJoin({
       avisos: this.avisoService.buscarTodos(),
       escalas: this.escalaService.buscarTodas(),
-      membros: this.membroService.buscarTodos(),
+      membros: this.membroService.buscarTodos(false, colunasHome),
       versiculo: this.devocionalService.obterVersiculoDoDia(),
     })
       .pipe(finalize(() => this.carregando.set(false)))

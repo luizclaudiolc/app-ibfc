@@ -9,6 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import imageCompression from 'browser-image-compression';
 import { timer } from 'rxjs';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -235,19 +236,40 @@ export class CadastroComponent {
     return null;
   }
 
-  aoSelecionarFoto(event: any): void {
-    const arquivo = event.target.files[0];
-    if (!arquivo) return;
-    if (arquivo.size > 2 * 1024 * 1024) {
-      this.notification.aviso('A imagem selecionada deve ter no máximo 2MB.');
+  async aoSelecionarFoto(event: any): Promise<void> {
+    const arquivoOriginal = event.target.files[0];
+    if (!arquivoOriginal) return;
+
+    if (arquivoOriginal.size > 10 * 1024 * 1024) {
+      this.notification.aviso('A imagem é muito grande (máximo 10MB). Escolha outra menor.');
       return;
     }
-    this.arquivoFotoSelecionado = arquivo;
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.previewFoto.set(reader.result as string);
-    };
-    reader.readAsDataURL(arquivo);
+
+    this.carregando.set(true);
+
+    try {
+      const opcoes = {
+        maxSizeMB: 0.15,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+        initialQuality: 0.8,
+      };
+
+      const arquivoComprimido = await imageCompression(arquivoOriginal, opcoes);
+
+      this.arquivoFotoSelecionado = arquivoComprimido as File;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.previewFoto.set(reader.result as string);
+        this.carregando.set(false);
+      };
+      reader.readAsDataURL(arquivoComprimido);
+    } catch (error) {
+      console.error('Erro na compressão:', error);
+      this.carregando.set(false);
+      this.notification.erro('Não foi possível processar a imagem. Tente outra.');
+    }
   }
 
   submeterCadastro(): void {
@@ -343,11 +365,8 @@ export class CadastroComponent {
     this.cadastroForm.get('possuiFilhos')?.setValue(valor);
 
     if (valor && this.filhosFormArray.length === 0) {
-      // UX Boost: Se marcou "Sim", já adiciona 1 form vazio para poupar clique.
       this.adicionarFilho();
     } else if (!valor && this.filhosFormArray.length > 0) {
-      // Segurança: Se marcou "Não", esvazia o array para limpar dados residuais
-      // e impedir que campos invisíveis invalidem o formulário.
       this.filhosFormArray.clear();
     }
   }

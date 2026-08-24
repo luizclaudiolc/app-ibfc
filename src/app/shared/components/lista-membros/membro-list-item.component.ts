@@ -17,8 +17,9 @@ import { MaterialModule } from '../../../core/modules/material.module';
         @if (membro().foto_url) {
           <img
             [src]="membro().foto_url"
-            class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100 shadow-inner shrink-0"
-            alt="Perfil"
+            loading="lazy"
+            alt="Foto de {{ membro().nome }}"
+            class="w-12 h-12 rounded-full object-cover bg-slate-100 ring-2 ring-slate-100 shadow-inner shrink-0"
           />
         } @else {
           <div

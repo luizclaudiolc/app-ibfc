@@ -9,22 +9,25 @@ import { SupabaseService } from './supabase';
 import { EStatusMembro } from '../../shared/models/consts';
 import { AuthService } from './auth.service';
 
+export const colunasHome =
+  'id, nome, sobrenome, email, foto_url, data_nascimento, status, telefone, cargo, setor_responsavel, ministerios, genero';
+
 @Injectable({ providedIn: 'root' })
 export class MembroService {
   private supabaseService = inject(SupabaseService);
   private readonly authService = inject(AuthService);
 
-  buscarTodos(todosStatus = false): Observable<Membro[]> {
+  buscarTodos(todosStatus = false, colunas = '*'): Observable<Membro[]> {
     const promise = this.supabaseService.supabase
       .from('membros')
-      .select('*')
+      .select(colunas)
       .order('nome', { ascending: true });
 
     if (!todosStatus) {
       promise.eq('status', EStatusMembro.ATIVO);
     }
 
-    return from(promise).pipe(map((res) => res.data as Membro[]));
+    return from(promise).pipe(map((res) => (res.data ?? []) as unknown as Membro[]));
   }
 
   buscarPorId(id: string): Observable<Membro | null> {

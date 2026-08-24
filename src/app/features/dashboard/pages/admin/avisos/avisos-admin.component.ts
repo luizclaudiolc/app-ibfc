@@ -111,7 +111,7 @@ export class AvisosAdminComponent implements OnInit {
           this.notification.aviso('Comprimindo e enviando imagem...', 2000);
 
           const opcoes = {
-            maxSizeMB: 0.6,
+            maxSizeMB: 0.2,
             maxWidthOrHeight: 1920,
             useWebWorker: true,
             initialQuality: 0.85,
