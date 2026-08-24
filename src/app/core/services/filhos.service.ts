@@ -48,7 +48,7 @@ export class FilhoService {
   buscarTodosAdmin(): Observable<Filho[]> {
     const promise = this.supabase.supabase
       .from('filhos')
-      .select('*')
+      .select('id, nome, data_nascimento, membro_id, outro_responsavel_id')
       .order('nome', { ascending: true });
 
     return from(promise).pipe(

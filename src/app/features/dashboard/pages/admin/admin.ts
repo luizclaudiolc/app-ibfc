@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule } from '../../../../core/modules/material.module';
-import { MembroService } from '../../../../core/services/membro.service';
+import { colunasAdminLista, MembroService } from '../../../../core/services/membro.service';
 import { EditarMembroDialogComponent } from './editar-membro-modal/editar-membro-dialog.component';
 import { Membro } from '../../../../shared/models/membro.model';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
@@ -109,7 +109,7 @@ export class AdminComponent implements OnInit {
     this.erroMembros.set('');
 
     forkJoin({
-      membros: this.membroService.buscarTodos(true),
+      membros: this.membroService.buscarTodos(true, colunasAdminLista),
       filhos: this.filhoService.buscarTodosAdmin(),
     }).subscribe({
       next: ({ membros, filhos }) => {
@@ -150,26 +150,34 @@ export class AdminComponent implements OnInit {
     this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
   }
 
-  abrirEdicaoMembro(membro: any) {
-    const dialogRef = this.dialog.open(EditarMembroDialogComponent, {
-      width: '90%',
-      maxWidth: '500px',
-      data: membro,
-      panelClass: ['!p-0', '!rounded-3xl', '!overflow-hidden'],
-      disableClose: true,
-    });
+  abrirEdicaoMembro(membro: Membro) {
+    if (!membro.id) return;
 
-    dialogRef.afterClosed().subscribe((resultado) => {
-      if (resultado && resultado.sucesso) {
-        const dadosAtualizados = resultado.dadosAtualizados;
-        const listaAtual = this.membrosRaw();
-        const index = listaAtual.findIndex((m) => m.id === dadosAtualizados.id);
+    this.membroService.buscarPorId(membro.id).subscribe({
+      next: (completo) => {
+        if (!completo) return;
 
-        if (index !== -1) {
-          listaAtual[index] = dadosAtualizados;
-          this.membrosRaw.set([...listaAtual]);
-        }
-      }
+        const dialogRef = this.dialog.open(EditarMembroDialogComponent, {
+          width: '90%',
+          maxWidth: '500px',
+          data: { ...completo, filhos: membro.filhos },
+          panelClass: ['!p-0', '!rounded-3xl', '!overflow-hidden'],
+          disableClose: true,
+        });
+
+        dialogRef.afterClosed().subscribe((resultado) => {
+          if (resultado?.sucesso) {
+            const dadosAtualizados = resultado.dadosAtualizados;
+            const listaAtual = this.membrosRaw();
+            const index = listaAtual.findIndex((m) => m.id === dadosAtualizados.id);
+            if (index !== -1) {
+              listaAtual[index] = { ...listaAtual[index], ...dadosAtualizados };
+              this.membrosRaw.set([...listaAtual]);
+            }
+          }
+        });
+      },
+      error: () => this.erroMembros.set('Não foi possível abrir o cadastro deste membro.'),
     });
   }
 

@@ -50,6 +50,18 @@
         "maxAge": "365d",
         "strategy": "performance"
       }
+    },
+    {
+      "name": "supabase-storage",
+      "urls": [
+        "https://*.supabase.co/storage/v1/object/**",
+        "https://*.supabase.co/storage/v1/render/**"
+      ],
+      "cacheConfig": {
+        "maxSize": 120,
+        "maxAge": "14d",
+        "strategy": "performance"
+      }
     }
   ]
 }

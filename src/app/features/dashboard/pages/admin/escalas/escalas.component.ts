@@ -121,16 +121,19 @@ export class EscalasComponent implements OnInit {
   }
 
   carregarEscalasMes() {
-    this.escalaService.buscarTodas(false).subscribe({
-      next: (escalasDoBanco) => {
-        const escalasVisiveis = this.isAdmin()
-          ? escalasDoBanco
-          : this.setorUsuario
-            ? escalasDoBanco.filter(({ departamento }) => departamento === this.setorUsuario)
-            : [];
+    if (!this.isAdmin() && !this.setorUsuario) {
+      this.escalasRaw.set([]);
+      this.distribuirEscalasNosDias([]);
+      return;
+    }
 
-        this.escalasRaw.set(escalasVisiveis);
-        this.distribuirEscalasNosDias(escalasVisiveis);
+    const data = this.dataAtual();
+    const departamento = this.isAdmin() ? null : this.setorUsuario;
+
+    this.escalaService.buscarPorMes(data.getFullYear(), data.getMonth(), departamento).subscribe({
+      next: (escalasDoBanco) => {
+        this.escalasRaw.set(escalasDoBanco);
+        this.distribuirEscalasNosDias(escalasDoBanco);
       },
       error: (err) => {
         this.notificationService.erro('Erro ao carregar escalas. Por favor, tente novamente.');

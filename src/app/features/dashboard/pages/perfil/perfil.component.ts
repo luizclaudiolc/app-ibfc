@@ -7,7 +7,7 @@ import imageCompression from 'browser-image-compression';
 
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { AuthService } from '../../../../core/services/auth.service';
-import { MembroService } from '../../../../core/services/membro.service';
+import { colunasSeletor, MembroService } from '../../../../core/services/membro.service';
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
@@ -97,12 +97,10 @@ export class PerfilComponent implements OnInit {
   }
 
   carregarMembrosParaSelecao() {
-    this.membroService.buscarTodos().subscribe({
+    this.membroService.buscarTodos(false, colunasSeletor).subscribe({
       next: (membros) => {
         const usuarioLogado = this.authService.obterUsuarioLogado();
-
-        const filtrados = membros.filter((m) => m.id !== usuarioLogado.id);
-        this.membrosDisponiveis.set(filtrados);
+        this.membrosDisponiveis.set(membros.filter((m) => m.id !== usuarioLogado.id));
       },
       error: (err) => console.error('Erro ao carregar membros para seleção', err),
     });

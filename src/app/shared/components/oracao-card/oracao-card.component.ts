@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, inject, input, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from '../../../core/modules/material.module';
@@ -12,7 +12,7 @@ import { PedidoOracao, PedidoOracaoService } from '../../../core/services/pedido
   imports: [CommonModule, MaterialModule, RouterModule],
   templateUrl: './oracao-card.component.html',
 })
-export class OracaoCardComponent implements OnInit {
+export class OracaoCardComponent {
   pedido = input.required<PedidoOracao>();
 
   pedidoLocal = signal<PedidoOracao>({} as PedidoOracao);
@@ -24,26 +24,24 @@ export class OracaoCardComponent implements OnInit {
   private notification = inject(NotificationService);
   private authService = inject(AuthService);
 
-  ngOnInit() {
-    this.pedidoLocal.set(this.pedido());
-    this.calcularStatusOracao();
+  constructor() {
+    effect(() => {
+      const atual = this.pedido();
+      if (atual) {
+        this.pedidoLocal.set(atual);
+        this.calcularStatusOracao(atual);
+      }
+    });
   }
 
-  /**
-   * Verifica dinamicamente usando o Array de intercessores do banco de dados
-   */
-  private calcularStatusOracao(): void {
+  private calcularStatusOracao(pedidoAtual: PedidoOracao): void {
     const meuId = this.authService.obterUsuarioLogado().id;
-    const intercessores = this.pedidoLocal().intercessores || [];
+    const intercessores = pedidoAtual.intercessores || [];
 
     this.jaOrou.set(intercessores.includes(meuId));
-
     this.totalOracoes.set(intercessores.length);
   }
 
-  /**
-   * Funciona como um botão de "Like". Adiciona ou remove a pessoa da oração.
-   */
   async alternarOracao(): Promise<void> {
     if (this.carregando()) return;
 

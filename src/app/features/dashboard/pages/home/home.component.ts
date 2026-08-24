@@ -136,7 +136,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.carregando.set(true);
     forkJoin({
       avisos: this.avisoService.buscarTodos(),
-      escalas: this.escalaService.buscarTodas(),
+      escalas: this.escalaService.buscarProximosDias(30),
       membros: this.membroService.buscarTodos(false, colunasHome),
       versiculo: this.devocionalService.obterVersiculoDoDia(),
     })
@@ -211,23 +211,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   escalasPessoais = computed(() => {
     const volTarget = [this.nomeUsuario(), this.emailUsuario()].map((s) => s.toLowerCase());
 
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    const limite = new Date(hoje);
-    limite.setDate(hoje.getDate() + 30);
-
     return this.escalas()
-      .filter((e) => {
-        const partes = e.data_escala.split('-');
-        const dataEscala = new Date(
-          parseInt(partes[0], 10),
-          parseInt(partes[1], 10) - 1,
-          parseInt(partes[2], 10),
-        );
-        dataEscala.setHours(0, 0, 0, 0);
-
-        return dataEscala >= hoje && dataEscala <= limite;
-      })
       .filter(({ voluntarios }) => volTarget.some((v) => voluntarios.toLowerCase().includes(v)))
       .sort((a, b) => a.data_escala.localeCompare(b.data_escala));
   });

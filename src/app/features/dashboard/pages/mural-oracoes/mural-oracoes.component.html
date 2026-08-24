@@ -75,16 +75,47 @@
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" class="mt-6">
       <mat-tab label="Para Interceder">
         @if (pedidos().length > 0) {
-          <div class="relative mt-4 mb-4">
-            <input
-              type="text"
-              [formControl]="buscaControl"
-              placeholder="Pesquisar pedidos..."
-              class="w-full pl-5 pr-12 py-3 text-sm bg-white border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm"
-            />
-            <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
-              >search</mat-icon
-            >
+          <div class="space-y-2.5 mt-4 mb-4">
+            <div class="relative">
+              <input
+                type="text"
+                [formControl]="buscaControl"
+                placeholder="Pesquisar pedidos..."
+                class="w-full pl-5 pr-12 py-3 text-sm bg-white border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm"
+              />
+              <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                >search</mat-icon
+              >
+            </div>
+
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 pb-1">
+              <button
+                type="button"
+                (click)="setFiltroTipo('TODOS')"
+                class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer"
+                [ngClass]="
+                  filtroTipo() === 'TODOS'
+                    ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                "
+              >
+                Todos
+              </button>
+
+              <button
+                type="button"
+                (click)="setFiltroTipo('MEUS')"
+                class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer flex items-center gap-1"
+                [ngClass]="
+                  filtroTipo() === 'MEUS'
+                    ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-200'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-sky-600'
+                "
+              >
+                <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">person</mat-icon>
+                Meus Pedidos
+              </button>
+            </div>
           </div>
         }
 
@@ -97,7 +128,35 @@
         } @else {
           <div class="space-y-4 pt-4 pb-4">
             @for (pedido of pedidosExibidos(); track pedido.id) {
-              <app-oracao-card [pedido]="pedido" />
+              <div class="relative">
+                @if (pedido.membro_id === usuarioLogadoId) {
+                  <div class="absolute top-4 right-4 z-20">
+                    <button
+                      mat-icon-button
+                      [matMenuTriggerFor]="menuAcoes"
+                      class="!w-8 !h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors cursor-pointer shadow-xs"
+                    >
+                      <mat-icon
+                        class="!w-[18px] !h-[18px] !text-[18px] flex items-center justify-center"
+                        >more_vert</mat-icon
+                      >
+                    </button>
+
+                    <mat-menu #menuAcoes="matMenu" xPosition="before" class="!rounded-2xl">
+                      <button mat-menu-item (click)="editarPedido(pedido)" class="text-sky-600">
+                        <mat-icon class="!text-[18px]">edit</mat-icon>
+                        <span>Editar</span>
+                      </button>
+                      <button mat-menu-item (click)="excluirPedido(pedido)" class="text-rose-600">
+                        <mat-icon class="!text-[18px]">delete_outline</mat-icon>
+                        <span>Excluir</span>
+                      </button>
+                    </mat-menu>
+                  </div>
+                }
+
+                <app-oracao-card [pedido]="pedido" />
+              </div>
             } @empty {
               <div class="text-center py-10 text-slate-400 text-xs italic">
                 Nenhum pedido ativo no momento.

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, from, map } from 'rxjs';
+import { forkJoin, from, map, Observable } from 'rxjs';
 import { SupabaseService } from './supabase';
 
 export interface PedidoOracao {
@@ -20,11 +20,12 @@ export interface PedidoOracao {
 @Injectable({ providedIn: 'root' })
 export class PedidoOracaoService {
   private supabase = inject(SupabaseService);
+  private readonly selectComMembro = '*, membro:membros(nome, sobrenome, foto_url)';
 
   buscarAtivos(): Observable<PedidoOracao[]> {
     const promise = this.supabase.supabase
       .from('pedidos_oracao')
-      .select('*, membro:membros(nome, sobrenome, foto_url)')
+      .select(this.selectComMembro)
       .eq('atendido', false)
       .order('created_at', { ascending: false });
 
@@ -36,11 +37,13 @@ export class PedidoOracaoService {
     );
   }
 
-  buscarTodosComMembro(): Observable<PedidoOracao[]> {
+  buscarAtendidosRecentes(limite = 3): Observable<PedidoOracao[]> {
     const promise = this.supabase.supabase
       .from('pedidos_oracao')
-      .select('*, membro:membros(nome, sobrenome, foto_url)')
-      .order('created_at', { ascending: false });
+      .select(this.selectComMembro)
+      .eq('atendido', true)
+      .order('updated_at', { ascending: false })
+      .limit(limite);
 
     return from(promise).pipe(
       map((res) => {
@@ -48,6 +51,13 @@ export class PedidoOracaoService {
         return res.data as PedidoOracao[];
       }),
     );
+  }
+
+  buscarParaMural(): Observable<{ ativos: PedidoOracao[]; atendidos: PedidoOracao[] }> {
+    return forkJoin({
+      ativos: this.buscarAtivos(),
+      atendidos: this.buscarAtendidosRecentes(3),
+    });
   }
 
   buscarMeusPedidos(membroId: string): Observable<PedidoOracao[]> {
@@ -65,9 +75,6 @@ export class PedidoOracaoService {
     );
   }
 
-  /**
-   * Cria um novo pedido de oração.
-   */
   async criar(membroId: string, descricao: string): Promise<PedidoOracao> {
     const { data, error } = await this.supabase.supabase
       .from('pedidos_oracao')

@@ -12,12 +12,20 @@ import { AuthService } from './auth.service';
 export const colunasHome =
   'id, nome, sobrenome, email, foto_url, data_nascimento, status, telefone, cargo, setor_responsavel, ministerios, genero';
 
+export const colunasSeletor = 'id, nome, sobrenome';
+
+export const colunasAdminLista =
+  'id, nome, sobrenome, email, foto_url, status, cargo, setor_responsavel, ministerios, nivel_acesso';
+
+export const colunasMeuPerfil =
+  'id, nome, sobrenome, email, telefone, cargo, ministerios, data_nascimento, genero, estado_civil, nivel_escolaridade, endereco, foto_url, status';
+
 @Injectable({ providedIn: 'root' })
 export class MembroService {
   private supabaseService = inject(SupabaseService);
   private readonly authService = inject(AuthService);
 
-  buscarTodos(todosStatus = false, colunas = '*'): Observable<Membro[]> {
+  buscarTodos(todosStatus = false, colunas = colunasHome): Observable<Membro[]> {
     const promise = this.supabaseService.supabase
       .from('membros')
       .select(colunas)
@@ -63,7 +71,7 @@ export class MembroService {
       const { error: uploadError } = await this.supabaseService.supabase.storage
         .from('fotos_membros')
         .upload(nomeArquivo, arquivo, {
-          cacheControl: '3600',
+          cacheControl: '31536000',
           upsert: true,
         });
 
@@ -139,12 +147,16 @@ export class MembroService {
     }
   }
 
-  buscarMeuPerfil(): Observable<any> {
+  buscarMeuPerfil(): Observable<Membro> {
     return from(this.supabaseService.supabase.auth.getUser()).pipe(
       switchMap(({ data }) =>
-        this.supabaseService.supabase.from('membros').select('*').eq('id', data.user?.id).single(),
+        this.supabaseService.supabase
+          .from('membros')
+          .select(colunasMeuPerfil)
+          .eq('id', data.user?.id)
+          .single(),
       ),
-      map((res) => res.data),
+      map((res) => res.data as Membro),
     );
   }
 

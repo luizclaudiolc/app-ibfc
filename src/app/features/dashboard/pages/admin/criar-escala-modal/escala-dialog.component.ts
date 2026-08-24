@@ -8,7 +8,7 @@ import {
   EVENTOS_MAP,
 } from '../../../../../shared/models/consts';
 import { CommonModule, DatePipe } from '@angular/common';
-import { MembroService } from '../../../../../core/services/membro.service';
+import { colunasSeletor, MembroService } from '../../../../../core/services/membro.service';
 import { Membro } from '../../../../../shared/models/membro.model';
 import { EscalaService } from '../../../../../core/services/escala.service';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -59,10 +59,9 @@ export class EscalaDialogComponent implements OnInit {
         this.data.escala.voluntarios.split(',').map((n: string) => n.trim()),
       );
     }
-    this.membroService.buscarTodos(true).subscribe((membros) => {
-      const ativos = membros.filter((m) => m.status === 'ATIVO');
-      this.membrosAtivos.set(ativos);
-      this.membrosFiltrados.set(ativos);
+    this.membroService.buscarTodos(false, colunasSeletor).subscribe((membros) => {
+      this.membrosAtivos.set(membros);
+      this.membrosFiltrados.set(membros);
     });
   }
 
