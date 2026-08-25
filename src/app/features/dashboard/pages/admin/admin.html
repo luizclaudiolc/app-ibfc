@@ -90,7 +90,7 @@
                 : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
             "
           >
-            Todos ({{ membrosRaw().length }})
+            Todos ({{ qtdTotal() }})
           </button>
 
           <button
@@ -301,7 +301,7 @@
       @if (mostrarBotaoCarregarMais()) {
         <app-botao-carregar-mais
           texto="Carregar mais membros"
-          [restantes]="membrosFiltrados().length - membrosExibidos().length"
+          [restantes]="totalLista() - membrosLista().length"
           (carregarMais)="carregarMaisMembros()"
         />
       }

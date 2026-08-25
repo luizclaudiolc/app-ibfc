@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, from, map } from 'rxjs';
+import { Observable, from, map, of } from 'rxjs';
 import { SupabaseService } from './supabase';
 import { Filho } from '../../shared/models/filhos.model';
 
@@ -45,13 +45,17 @@ export class FilhoService {
     return data as Filho;
   }
 
-  buscarTodosAdmin(): Observable<Filho[]> {
-    const promise = this.supabase.supabase
-      .from('filhos')
-      .select('id, nome, data_nascimento, membro_id, outro_responsavel_id')
-      .order('nome', { ascending: true });
+  buscarPorMembros(ids: string[]): Observable<Filho[]> {
+    if (!ids.length) return of([]);
 
-    return from(promise).pipe(
+    const lista = ids.join(',');
+
+    return from(
+      this.supabase.supabase
+        .from('filhos')
+        .select('id, nome, data_nascimento, membro_id, outro_responsavel_id')
+        .or(`membro_id.in.(${lista}),outro_responsavel_id.in.(${lista})`),
+    ).pipe(
       map((res) => {
         if (res.error) throw res.error;
         return res.data as Filho[];

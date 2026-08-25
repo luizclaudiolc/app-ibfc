@@ -1,13 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, catchError, from, map, of, shareReplay, switchMap, tap } from 'rxjs';
+import { catchError, forkJoin, from, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
+import { EStatusMembro, StatusMembro } from '../../shared/models/consts';
 import {
   Membro,
   MembroAtualizacaoAdmin,
   UsuarioAtualizacao,
 } from '../../shared/models/membro.model';
-import { SupabaseService } from './supabase';
-import { EStatusMembro, LIMITE_CARREGAMENTO_INICIAL } from '../../shared/models/consts';
 import { AuthService } from './auth.service';
+import { SupabaseService } from './supabase';
 
 export const colunasHome =
   'id, nome, sobrenome, email, foto_url, data_nascimento, status, telefone, cargo, setor_responsavel, ministerios, genero';
@@ -93,41 +93,61 @@ export class MembroService {
     limite?: number;
     busca?: string;
     ministerio?: string;
+    status?: StatusMembro | 'TODOS';
+    colunas?: string;
   }): Observable<{ data: Membro[]; total: number }> {
-    const limite = opts.limite ?? LIMITE_CARREGAMENTO_INICIAL;
+    const limite = opts.limite ?? 10;
     const busca = (opts.busca ?? '').trim().replace(/[,()]/g, '');
-
-    const cacheKey = `${opts.offset}-${limite}-${busca}-${opts.ministerio || 'TODOS'}`;
-
-    if (this.cachePaginado.has(cacheKey)) {
-      return this.cachePaginado.get(cacheKey)!;
-    }
+    const colunas = opts.colunas ?? colunasHome;
 
     let query = this.supabaseService.supabase
       .from('membros')
-      .select(colunasHome, { count: 'exact' })
-      .eq('status', EStatusMembro.ATIVO)
+      .select(colunas, { count: 'exact' })
       .order('nome', { ascending: true })
       .range(opts.offset, opts.offset + limite - 1);
+
+    if (opts.status && opts.status !== 'TODOS') {
+      query = query.eq('status', opts.status);
+    } else if (opts.status !== 'TODOS') {
+      query = query.eq('status', EStatusMembro.ATIVO);
+    }
 
     if (opts.ministerio && opts.ministerio !== 'TODOS') {
       query = query.contains('ministerios', [opts.ministerio]);
     }
 
     if (busca) {
-      query = query.or(`nome.ilike.%${busca}%,sobrenome.ilike.%${busca}%,cargo.ilike.%${busca}%`);
+      query = query.or(
+        `nome.ilike.%${busca}%,sobrenome.ilike.%${busca}%,email.ilike.%${busca}%,cargo.ilike.%${busca}%,setor_responsavel.ilike.%${busca}%`,
+      );
     }
 
-    const request$ = from(query).pipe(
+    return from(query).pipe(
       map((res) => ({
         data: (res.data ?? []) as unknown as Membro[],
         total: res.count ?? 0,
       })),
-      shareReplay(1),
     );
+  }
 
-    this.cachePaginado.set(cacheKey, request$);
-    return request$;
+  contarPorStatus(): Observable<{
+    pendentes: number;
+    ativos: number;
+    inativos: number;
+  }> {
+    const count = (status: EStatusMembro) =>
+      from(
+        this.supabaseService.supabase
+          .from('membros')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', status),
+      ).pipe(map((r) => r.count ?? 0));
+
+    return forkJoin({
+      pendentes: count(EStatusMembro.PENDENTE),
+      ativos: count(EStatusMembro.ATIVO),
+      inativos: count(EStatusMembro.INATIVO),
+    });
   }
 
   buscarPorId(id: string): Observable<Membro | null> {
@@ -136,7 +156,13 @@ export class MembroService {
     }
 
     const request$ = from(
-      this.supabaseService.supabase.from('membros').select('*').eq('id', id).single(),
+      this.supabaseService.supabase
+        .from('membros')
+        .select(
+          'id, nome, sobrenome, email, telefone, cargo, ministerios, data_nascimento, genero, estado_civil, nivel_escolaridade, endereco, foto_url, status, nivel_acesso, setor_responsavel, motivo_inativacao',
+        )
+        .eq('id', id)
+        .single(),
     ).pipe(
       map((res) => res.data as Membro),
       catchError((erro) => {

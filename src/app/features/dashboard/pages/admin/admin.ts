@@ -14,7 +14,16 @@ import {
 } from '../../../../shared/models/consts';
 import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 import { FilhoService } from '../../../../core/services/filhos.service';
-import { forkJoin } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  forkJoin,
+  of,
+  Subject,
+  switchMap,
+} from 'rxjs';
+import { Filho } from '../../../../shared/models/filhos.model';
 
 @Component({
   selector: 'app-admin',
@@ -30,10 +39,24 @@ import { forkJoin } from 'rxjs';
   styleUrl: './admin.css',
 })
 export class AdminComponent implements OnInit {
-  membrosRaw = signal<Membro[]>([]);
+  membrosLista = signal<Membro[]>([]);
+  totalLista = signal(0);
+  qtdPendentes = signal(0);
+  qtdAtivos = signal(0);
+  qtdInativos = signal(0);
+  carregandoMais = signal(false);
+
+  private busca$ = new Subject<string>();
+
+  qtdTotal = computed(() => this.qtdPendentes() + this.qtdAtivos() + this.qtdInativos());
+
+  membrosExibidos = computed(() => this.membrosLista());
+  membrosFiltrados = computed(() => ({ length: this.totalLista() }));
+
+  mostrarBotaoCarregarMais = computed(() => this.membrosLista().length < this.totalLista());
+
   termoBusca = signal<string>('');
   filtroStatus = signal<StatusMembro | 'TODOS'>('TODOS');
-  limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
   carregando = signal<boolean>(true);
   erroMembros = signal<string>('');
 
@@ -41,140 +64,150 @@ export class AdminComponent implements OnInit {
   private membroService = inject(MembroService);
   private filhoService = inject(FilhoService);
 
-  qtdPendentes = computed(() => this.membrosRaw().filter((m) => m.status === 'PENDENTE').length);
-  qtdAtivos = computed(() => this.membrosRaw().filter((m) => m.status === 'ATIVO').length);
-  qtdInativos = computed(() => this.membrosRaw().filter((m) => m.status === 'INATIVO').length);
-
   mostrarFiltrosAvancados = signal<boolean>(false);
   filtroMinisterio = signal<string | 'TODOS'>('TODOS');
   ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
 
-  membrosFiltrados = computed(() => {
-    const busca = this.termoBusca()
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-    const statusAtual = this.filtroStatus();
-    const ministerioAtual = this.filtroMinisterio();
-
-    let lista = this.membrosRaw();
-
-    if (statusAtual !== 'TODOS') {
-      lista = lista.filter((m) => m.status === statusAtual);
-    }
-
-    if (ministerioAtual !== 'TODOS') {
-      lista = lista.filter((m) => m.ministerios?.includes(ministerioAtual));
-    }
-
-    let resultadoBusca = lista;
-    if (busca) {
-      resultadoBusca = lista.filter((membro) => {
-        const nomeCompleto = `${membro.nome} ${membro.sobrenome}`
-          .toLowerCase()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '');
-        return (
-          nomeCompleto.includes(busca) ||
-          membro.email.toLowerCase().includes(busca) ||
-          membro.setor_responsavel?.toLowerCase().includes(busca) ||
-          membro.cargo?.toLowerCase().includes(busca)
-        );
-      });
-    }
-
-    return [...resultadoBusca].sort((a, b) => {
-      const prioridade = { PENDENTE: 1, ATIVO: 2, INATIVO: 3 };
-      const pA = prioridade[a.status as keyof typeof prioridade] || 99;
-      const pB = prioridade[b.status as keyof typeof prioridade] || 99;
-      if (pA !== pB) return pA - pB;
-      return a.nome.localeCompare(b.nome);
-    });
-  });
-
-  membrosExibidos = computed(() => {
-    return this.membrosFiltrados().slice(0, this.limiteExibicao());
-  });
-
-  mostrarBotaoCarregarMais = computed(() => {
-    return this.membrosFiltrados().length > this.limiteExibicao();
-  });
-
   ngOnInit() {
+    this.carregarContadores();
     this.carregarMembros();
+
+    this.busca$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((termo) => {
+      this.termoBusca.set(termo);
+      this.carregarMembros();
+    });
   }
 
-  carregarMembros() {
+  ngOnDestroy() {
+    this.busca$.complete();
+  }
+
+  carregarMembros(): void {
     this.carregando.set(true);
     this.erroMembros.set('');
 
-    forkJoin({
-      membros: this.membroService.buscarTodos(true, colunasAdminLista),
-      filhos: this.filhoService.buscarTodosAdmin(),
-    }).subscribe({
-      next: ({ membros, filhos }) => {
-        const membrosComFilhos = membros.map((membro) => {
-          const filhosDesteMembro = filhos.filter(
-            (f) => f.membro_id === membro.id || f.outro_responsavel_id === membro.id,
-          );
-          return { ...membro, filhos: filhosDesteMembro };
-        });
+    this.membroService
+      .buscarPaginado({
+        offset: 0,
+        limite: LIMITE_CARREGAMENTO_INICIAL,
+        busca: this.termoBusca(),
+        ministerio: this.filtroMinisterio(),
+        status: this.filtroStatus(),
+        colunas: colunasAdminLista,
+      })
+      .pipe(
+        switchMap((res) => {
+          const ids = res.data.map((m) => m.id!).filter(Boolean);
+          return forkJoin({
+            pagina: of(res),
+            filhos: this.filhoService.buscarPorMembros(ids),
+          });
+        }),
+        finalize(() => this.carregando.set(false)),
+      )
+      .subscribe({
+        next: ({ pagina, filhos }) => {
+          this.membrosLista.set(this.anexarFilhos(pagina.data, filhos));
+          this.totalLista.set(pagina.total);
+        },
+        error: (err) => {
+          console.error('Erro ao buscar membros no Admin:', err);
+          this.erroMembros.set('Não foi possível carregar a lista de membros no momento.');
+        },
+      });
+  }
 
-        this.membrosRaw.set(membrosComFilhos);
-        this.carregando.set(false);
-      },
-      error: (err) => {
-        console.error('Erro ao buscar membros e filhos no Admin:', err);
-        this.erroMembros.set('Não foi possível carregar a lista de membros no momento.');
-        this.carregando.set(false);
+  private carregarContadores(): void {
+    this.membroService.contarPorStatus().subscribe({
+      next: ({ pendentes, ativos, inativos }) => {
+        this.qtdPendentes.set(pendentes);
+        this.qtdAtivos.set(ativos);
+        this.qtdInativos.set(inativos);
       },
     });
   }
 
+  private anexarFilhos(membros: Membro[], filhos: Filho[]): Membro[] {
+    return membros.map((membro) => ({
+      ...membro,
+      filhos: filhos.filter(
+        (f) => f.membro_id === membro.id || f.outro_responsavel_id === membro.id,
+      ),
+    }));
+  }
+
   aoBuscarMembro(termo: string): void {
-    this.termoBusca.set(termo);
-    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
+    this.busca$.next(termo);
   }
 
   definirFiltroStatus(status: StatusMembro | 'TODOS') {
     this.filtroStatus.set(status);
-    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
+    this.carregarMembros();
   }
 
   carregarMaisMembros(): void {
-    this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
+    if (this.carregandoMais()) return;
+
+    this.carregandoMais.set(true);
+    this.membroService
+      .buscarPaginado({
+        offset: this.membrosLista().length,
+        limite: LIMITE_CARREGAMENTO_INICIAL,
+        busca: this.termoBusca(),
+        ministerio: this.filtroMinisterio(),
+        status: this.filtroStatus(),
+        colunas: colunasAdminLista,
+      })
+      .pipe(
+        switchMap((res) => {
+          const ids = res.data.map((m) => m.id!).filter(Boolean);
+          return forkJoin({
+            pagina: of(res),
+            filhos: this.filhoService.buscarPorMembros(ids),
+          });
+        }),
+        finalize(() => this.carregandoMais.set(false)),
+      )
+      .subscribe({
+        next: ({ pagina, filhos }) => {
+          const novos = this.anexarFilhos(pagina.data, filhos);
+          this.membrosLista.update((atual) => [...atual, ...novos]);
+          this.totalLista.set(pagina.total);
+        },
+      });
   }
 
   definirFiltroMinisterio(ministerio: string | 'TODOS') {
     this.filtroMinisterio.set(ministerio);
-    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
+    this.carregarMembros();
   }
 
   abrirEdicaoMembro(membro: Membro) {
     if (!membro.id) return;
 
-    this.membroService.buscarPorId(membro.id).subscribe({
-      next: (completo) => {
+    forkJoin({
+      completo: this.membroService.buscarPorId(membro.id),
+      filhos: this.filhoService.buscarPorMembro(membro.id),
+    }).subscribe({
+      next: ({ completo, filhos }) => {
         if (!completo) return;
 
         const dialogRef = this.dialog.open(EditarMembroDialogComponent, {
           width: '90%',
           maxWidth: '500px',
-          data: { ...completo, filhos: membro.filhos },
+          data: { ...completo, filhos },
           panelClass: ['!p-0', '!rounded-3xl', '!overflow-hidden'],
           disableClose: true,
         });
 
         dialogRef.afterClosed().subscribe((resultado) => {
-          if (resultado?.sucesso) {
-            const dadosAtualizados = resultado.dadosAtualizados;
-            const listaAtual = this.membrosRaw();
-            const index = listaAtual.findIndex((m) => m.id === dadosAtualizados.id);
-            if (index !== -1) {
-              listaAtual[index] = { ...listaAtual[index], ...dadosAtualizados };
-              this.membrosRaw.set([...listaAtual]);
-            }
-          }
+          if (!resultado?.sucesso) return;
+
+          const dados = resultado.dadosAtualizados;
+          this.membrosLista.update((lista) =>
+            lista.map((m) => (m.id === dados.id ? { ...m, ...dados } : m)),
+          );
+          this.carregarContadores();
         });
       },
       error: () => this.erroMembros.set('Não foi possível abrir o cadastro deste membro.'),
