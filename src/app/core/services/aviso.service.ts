@@ -60,7 +60,10 @@ export class AvisoService {
 
     const { error: uploadError } = await this.supabaseService.supabase.storage
       .from(this.bucketName)
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '31536000',
+        upsert: false,
+      });
 
     if (uploadError) throw uploadError;
 

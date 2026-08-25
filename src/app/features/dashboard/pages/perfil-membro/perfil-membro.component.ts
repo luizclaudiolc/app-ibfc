@@ -1,25 +1,25 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { MembroService } from '../../../../core/services/membro.service';
-import { Membro } from '../../../../shared/models/membro.model';
 import { MaterialModule } from '../../../../core/modules/material.module';
+import { AuthService } from '../../../../core/services/auth.service';
+import { MembroService } from '../../../../core/services/membro.service';
+import { NotificationService } from '../../../../core/services/notifications.service';
+import { PedidoOracao, PedidoOracaoService } from '../../../../core/services/pedido-oracao.service';
+import { PlanoLeituraService } from '../../../../core/services/plano-leitura.service';
+import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
+import { EditarPedidoDialogComponent } from '../../../../shared/components/editar-oracao/editar-pedido-dialog.component';
+import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
+import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
+import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import {
   DEPARTAMENTOS_DISPONIVEIS_MAP,
   GRADIENTES_PASTEIS,
-  MINISTERIOS_DISPONIVEIS,
   LIMITE_CARREGAMENTO_INICIAL,
+  MINISTERIOS_DISPONIVEIS_MAP,
 } from '../../../../shared/models/consts';
-import { MatDialog } from '@angular/material/dialog';
-import { ImagePreviewDialogComponent } from '../../../../shared/components/img-preview/image-preview-dialog.component';
-import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
-import { NotificationService } from '../../../../core/services/notifications.service';
-import { AuthService } from '../../../../core/services/auth.service';
-import { PedidoOracao, PedidoOracaoService } from '../../../../core/services/pedido-oracao.service';
-import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
-import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
-import { EditarPedidoDialogComponent } from '../../../../shared/components/editar-oracao/editar-pedido-dialog.component';
-import { PlanoLeituraService } from '../../../../core/services/plano-leitura.service';
+import { Membro } from '../../../../shared/models/membro.model';
 import { PLANOS_LEITURA } from '../../../../shared/models/plano-leitura.const';
 
 @Component({
@@ -67,7 +67,7 @@ export class PerfilMembroComponent implements OnInit {
   });
 
   corFundoCard = signal<string>('');
-  ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
+  ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS_MAP;
 
   private route = inject(ActivatedRoute);
   private membroService = inject(MembroService);
@@ -329,7 +329,15 @@ export class PerfilMembroComponent implements OnInit {
   obterNomesMinisterios(valores: string[] | undefined): string {
     if (!valores || valores.length === 0) return '';
     return valores
-      .map((val) => this.ministeriosDisponiveis.find((m) => m.value === val)?.label || val)
+      .map((val) => {
+        if (!val) return '';
+        const chaveNormalizada = String(val).toLowerCase().trim();
+
+        return (
+          this.ministeriosDisponiveis[val] || this.ministeriosDisponiveis[chaveNormalizada] || val
+        );
+      })
+      .filter(Boolean)
       .join(', ');
   }
 }

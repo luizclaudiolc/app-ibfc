@@ -11,7 +11,15 @@ import {
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router, RouterModule } from '@angular/router';
-import { finalize, forkJoin, fromEvent, Subscription } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  forkJoin,
+  fromEvent,
+  Subject,
+  Subscription,
+} from 'rxjs';
 
 import { AuthService } from '../../../../core/services/auth.service';
 import { AvisoService } from '../../../../core/services/aviso.service';
@@ -88,15 +96,20 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   avisos = signal<Aviso[]>([]);
   escalas = signal<Escala[]>([]);
-  membrosRaw = signal<Membro[]>([]);
   versiculoDiario = signal<VersiculoDia | null>(null);
+
+  aniversariantes = signal<Membro[]>([]);
+  membrosLista = signal<Membro[]>([]);
+  totalMembros = signal(0);
+  carregandoMais = signal(false);
+
+  private busca$ = new Subject<string>();
 
   mostrarFiltrosAvancados = signal<boolean>(false);
   filtroMinisterio = signal<string | 'TODOS'>('TODOS');
   ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
 
   termoBusca = signal('');
-  limiteExibicao = signal(LIMITE_CARREGAMENTO_INICIAL);
 
   currentIndex = signal(0);
 
@@ -113,11 +126,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.carregarTodosOsDados();
     this.setupScrollSync();
     this.startAutoScroll();
+
+    this.busca$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((termo) => {
+      this.termoBusca.set(termo);
+      this.recarregarListaMembros();
+    });
   }
 
   ngOnDestroy(): void {
     this.stopAutoScroll();
     this.scrollSubscription?.unsubscribe();
+    this.busca$.complete();
   }
 
   private setupScrollSync(): void {
@@ -137,7 +156,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     forkJoin({
       avisos: this.avisoService.buscarTodos(),
       escalas: this.escalaService.buscarProximosDias(30),
-      membros: this.membroService.buscarTodos(false, colunasHome),
+      aniversariantes: this.membroService.buscarAniversariantes(7),
+      membros: this.membroService.buscarPaginado({
+        offset: 0,
+        limite: LIMITE_CARREGAMENTO_INICIAL,
+        busca: this.termoBusca(),
+        ministerio: this.filtroMinisterio(),
+      }),
       versiculo: this.devocionalService.obterVersiculoDoDia(),
     })
       .pipe(finalize(() => this.carregando.set(false)))
@@ -145,7 +170,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         next: (res) => {
           this.avisos.set(res.avisos);
           this.escalas.set(res.escalas);
-          this.membrosRaw.set(res.membros);
+          this.aniversariantes.set(res.aniversariantes);
+          this.membrosLista.set(res.membros.data);
+          this.totalMembros.set(res.membros.total);
           this.versiculoDiario.set(res.versiculo);
         },
         error: (err) => console.error('Erro ao carregar dados', err),
@@ -199,15 +226,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.autoScrollTimeout = setTimeout(() => this.startAutoScroll(), 10000);
   }
 
-  aoBuscarMembro(termo: string): void {
-    this.termoBusca.set(termo);
-    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
-  }
-
-  carregarMaisMembros(): void {
-    this.limiteExibicao.update((valorAtual) => valorAtual + LIMITE_CARREGAMENTO_INICIAL);
-  }
-
   escalasPessoais = computed(() => {
     const volTarget = [this.nomeUsuario(), this.emailUsuario()].map((s) => s.toLowerCase());
 
@@ -216,80 +234,58 @@ export class HomeComponent implements OnInit, OnDestroy {
       .sort((a, b) => a.data_escala.localeCompare(b.data_escala));
   });
 
-  membrosFiltrados = computed(() => {
-    const busca = this.termoBusca()
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-    const ministerioAtual = this.filtroMinisterio();
-    let lista = this.membrosRaw();
+  aoBuscarMembro(termo: string): void {
+    this.busca$.next(termo);
+  }
 
-    if (ministerioAtual !== 'TODOS') {
-      lista = lista.filter((m) => m.ministerios && m.ministerios.includes(ministerioAtual));
-    }
+  definirFiltroMinisterio(ministerio: string | 'TODOS') {
+    this.filtroMinisterio.set(ministerio);
+    this.recarregarListaMembros();
+  }
 
-    if (!busca) return lista;
-
-    return lista.filter((m) =>
-      `${m.nome} ${m.sobrenome} ${m.cargo} ${m.setor_responsavel}`
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .includes(busca),
-    );
-  });
-
-  membrosExibidos = computed(() => {
-    return this.membrosFiltrados().slice(0, this.limiteExibicao());
-  });
-
-  mostrarBotaoCarregarMais = computed(() => {
-    return this.membrosFiltrados().length > this.limiteExibicao();
-  });
-
-  aniversariantesDaSemana = computed(() => {
-    const membros = this.membrosRaw();
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-
-    const daquiAte = new Date(hoje);
-    daquiAte.setDate(hoje.getDate() + 7);
-    daquiAte.setHours(23, 59, 59, 999);
-
-    const anoAtual = hoje.getFullYear();
-
-    return membros
-      .filter((m) => {
-        if (!m.data_nascimento || m.status === 'INATIVO') return false;
-
-        const partes = m.data_nascimento.split('-');
-        if (partes.length !== 3) return false;
-
-        const mes = parseInt(partes[1], 10) - 1;
-        const dia = parseInt(partes[2], 10);
-
-        let dataAniversario = new Date(anoAtual, mes, dia);
-        dataAniversario.setHours(0, 0, 0, 0);
-
-        if (dataAniversario < hoje) {
-          dataAniversario.setFullYear(anoAtual + 1);
-        }
-
-        return dataAniversario >= hoje && dataAniversario <= daquiAte;
+  private recarregarListaMembros(): void {
+    this.membroService
+      .buscarPaginado({
+        offset: 0,
+        limite: LIMITE_CARREGAMENTO_INICIAL,
+        busca: this.termoBusca(),
+        ministerio: this.filtroMinisterio(),
       })
-      .sort((a, b) => {
-        const getProxNiver = (dataNasc: string) => {
-          const partes = dataNasc.split('-');
-          const mes = parseInt(partes[1], 10) - 1;
-          const dia = parseInt(partes[2], 10);
-          let d = new Date(anoAtual, mes, dia);
-          d.setHours(0, 0, 0, 0);
-          if (d < hoje) d.setFullYear(anoAtual + 1);
-          return d.getTime();
-        };
-        return getProxNiver(a.data_nascimento!) - getProxNiver(b.data_nascimento!);
+      .subscribe({
+        next: (res) => {
+          this.membrosLista.set(res.data);
+          this.totalMembros.set(res.total);
+        },
       });
-  });
+  }
+
+  carregarMaisMembros(): void {
+    if (this.carregandoMais()) return;
+
+    this.carregandoMais.set(true);
+    this.membroService
+      .buscarPaginado({
+        offset: this.membrosLista().length,
+        limite: LIMITE_CARREGAMENTO_INICIAL,
+        busca: this.termoBusca(),
+        ministerio: this.filtroMinisterio(),
+      })
+      .pipe(finalize(() => this.carregandoMais.set(false)))
+      .subscribe({
+        next: (res) => {
+          this.membrosLista.update((atual) => [...atual, ...res.data]);
+          this.totalMembros.set(res.total);
+        },
+      });
+  }
+
+  membrosExibidos = computed(() => this.membrosLista());
+
+  membrosFiltrados = computed(() => ({ length: this.totalMembros() }));
+
+  mostrarBotaoCarregarMais = computed(() => this.membrosLista().length < this.totalMembros());
+
+  aniversariantesDaSemana = computed(() => this.aniversariantes());
 
   ehHoje(dataNascimento: string): boolean {
     if (!dataNascimento) return false;
@@ -383,11 +379,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
       }
     });
-  }
-
-  definirFiltroMinisterio(ministerio: string | 'TODOS') {
-    this.filtroMinisterio.set(ministerio);
-    this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
   }
 
   obterNomeDepartamento(valor: string): string {

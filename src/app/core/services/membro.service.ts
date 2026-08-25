@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, catchError, from, map, of, switchMap, shareReplay, tap } from 'rxjs';
+import { Observable, catchError, from, map, of, shareReplay, switchMap, tap } from 'rxjs';
 import {
   Membro,
   MembroAtualizacaoAdmin,
   UsuarioAtualizacao,
 } from '../../shared/models/membro.model';
 import { SupabaseService } from './supabase';
-import { EStatusMembro } from '../../shared/models/consts';
+import { EStatusMembro, LIMITE_CARREGAMENTO_INICIAL } from '../../shared/models/consts';
 import { AuthService } from './auth.service';
 
 export const colunasHome =
@@ -27,6 +27,9 @@ export class MembroService {
 
   private cacheMeuPerfil$: Observable<Membro> | null = null;
   private cacheTodosMembros = new Map<string, Observable<Membro[]>>();
+  private cachePaginado = new Map<string, Observable<{ data: Membro[]; total: number }>>();
+  private cacheAniversariantes = new Map<number, Observable<Membro[]>>();
+  private cacheMembroPorId = new Map<string, Observable<Membro | null>>();
 
   constructor() {
     this.supabaseService.supabase.auth.onAuthStateChange((event) => {
@@ -39,14 +42,15 @@ export class MembroService {
   limparCache(): void {
     this.cacheMeuPerfil$ = null;
     this.cacheTodosMembros.clear();
+    this.cachePaginado.clear();
+    this.cacheAniversariantes.clear();
+    this.cacheMembroPorId.clear();
   }
 
   buscarTodos(todosStatus = false, colunas = colunasHome): Observable<Membro[]> {
     const cacheKey = `${todosStatus}-${colunas}`;
 
     if (this.cacheTodosMembros.has(cacheKey)) {
-      console.log('TEM CACHE');
-
       return this.cacheTodosMembros.get(cacheKey)!;
     }
 
@@ -68,8 +72,70 @@ export class MembroService {
     return request$;
   }
 
+  buscarAniversariantes(dias = 7): Observable<Membro[]> {
+    if (this.cacheAniversariantes.has(dias)) {
+      return this.cacheAniversariantes.get(dias)!;
+    }
+
+    const request$ = from(
+      this.supabaseService.supabase.rpc('aniversariantes_proximos', { dias }),
+    ).pipe(
+      map((res) => (res.data ?? []) as Membro[]),
+      shareReplay(1),
+    );
+
+    this.cacheAniversariantes.set(dias, request$);
+    return request$;
+  }
+
+  buscarPaginado(opts: {
+    offset: number;
+    limite?: number;
+    busca?: string;
+    ministerio?: string;
+  }): Observable<{ data: Membro[]; total: number }> {
+    const limite = opts.limite ?? LIMITE_CARREGAMENTO_INICIAL;
+    const busca = (opts.busca ?? '').trim().replace(/[,()]/g, '');
+
+    const cacheKey = `${opts.offset}-${limite}-${busca}-${opts.ministerio || 'TODOS'}`;
+
+    if (this.cachePaginado.has(cacheKey)) {
+      return this.cachePaginado.get(cacheKey)!;
+    }
+
+    let query = this.supabaseService.supabase
+      .from('membros')
+      .select(colunasHome, { count: 'exact' })
+      .eq('status', EStatusMembro.ATIVO)
+      .order('nome', { ascending: true })
+      .range(opts.offset, opts.offset + limite - 1);
+
+    if (opts.ministerio && opts.ministerio !== 'TODOS') {
+      query = query.contains('ministerios', [opts.ministerio]);
+    }
+
+    if (busca) {
+      query = query.or(`nome.ilike.%${busca}%,sobrenome.ilike.%${busca}%,cargo.ilike.%${busca}%`);
+    }
+
+    const request$ = from(query).pipe(
+      map((res) => ({
+        data: (res.data ?? []) as unknown as Membro[],
+        total: res.count ?? 0,
+      })),
+      shareReplay(1),
+    );
+
+    this.cachePaginado.set(cacheKey, request$);
+    return request$;
+  }
+
   buscarPorId(id: string): Observable<Membro | null> {
-    return from(
+    if (this.cacheMembroPorId.has(id)) {
+      return this.cacheMembroPorId.get(id)!;
+    }
+
+    const request$ = from(
       this.supabaseService.supabase.from('membros').select('*').eq('id', id).single(),
     ).pipe(
       map((res) => res.data as Membro),
@@ -77,7 +143,11 @@ export class MembroService {
         console.error('Erro ao buscar membro por ID:', erro);
         return of(null);
       }),
+      shareReplay(1),
     );
+
+    this.cacheMembroPorId.set(id, request$);
+    return request$;
   }
 
   buscarMeuPerfil(): Observable<Membro> {
@@ -85,14 +155,15 @@ export class MembroService {
       return this.cacheMeuPerfil$;
     }
 
-    this.cacheMeuPerfil$ = from(this.supabaseService.supabase.auth.getUser()).pipe(
-      switchMap(({ data }) =>
-        this.supabaseService.supabase
-          .from('membros')
-          .select(colunasMeuPerfil)
-          .eq('id', data.user?.id)
-          .single(),
-      ),
+    const meuId = this.authService.obterUsuarioLogado().id;
+
+    this.cacheMeuPerfil$ = from(
+      this.supabaseService.supabase
+        .from('membros')
+        .select(colunasMeuPerfil)
+        .eq('id', meuId)
+        .single(),
+    ).pipe(
       map((res) => res.data as Membro),
       shareReplay(1),
     );

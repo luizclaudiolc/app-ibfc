@@ -25,7 +25,7 @@ export class EstudoService {
       .from(this.bucketName)
       .upload(filePath, file, {
         contentType: 'application/pdf',
-        cacheControl: '3600',
+        cacheControl: '31536000',
         upsert: true,
       });
 

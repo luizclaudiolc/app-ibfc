@@ -86,7 +86,6 @@ export class CardAniversarianteComponent {
 
   saudacao = computed(() => {
     const generoId = this.membro()?.genero;
-
     const generoText = generoId != null ? GENERO_MAP[generoId] : null;
 
     if (generoText === 'Masculino') {

@@ -89,6 +89,10 @@ export const EVENTOS_MAP: Record<string, string> = Object.fromEntries(
   EVENTOS_OPCOES.map((e) => [e.value, e.label]),
 );
 
+export const MINISTERIOS_DISPONIVEIS_MAP: Record<string, string> = Object.fromEntries(
+  MINISTERIOS_DISPONIVEIS.map((m) => [m.value, m.label]),
+);
+
 export enum EGenero {
   MASCULINO = 1,
   FEMININO = 2,

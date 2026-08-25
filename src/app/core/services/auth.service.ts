@@ -236,7 +236,7 @@ export class AuthService {
         const { error: uploadError } = await this.supabaseService.supabase.storage
           .from('fotos_membros')
           .upload(nomeArquivo, membro.foto, {
-            cacheControl: '3600',
+            cacheControl: '31536000',
             upsert: true,
           });
 
