@@ -11,30 +11,22 @@ jobs:
     steps:
       - name: Instalar ferramentas
         run: |
-          sudo apt-get update
-          sudo apt-get install -y curl ca-certificates gnupg
-          sudo install -d /usr/share/postgresql-common/pgdg
-          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
-            | sudo gpg --dearmor -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
-          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" \
-            | sudo tee /etc/apt/sources.list.d/pgdg.list
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client-17
-          /usr/lib/postgresql/17/bin/pg_dump --version
           aws --version
+          gpg --version
+          docker pull postgres:17
 
       - name: Dump do banco
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           set -euo pipefail
-          mkdir -p backup
-          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
-            --no-owner --no-acl \
-            --schema=public --schema=auth \
-            -F p \
-            -f backup/db.sql
-          gzip -9 backup/db.sql
+          mkdir -p "$GITHUB_WORKSPACE/backup"
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/backup:/backup" \
+            -e DATABASE_URL="$SUPABASE_DB_URL" \
+            postgres:17 \
+            sh -c 'pg_dump "$DATABASE_URL" --no-owner --no-acl --schema=public --schema=auth -F p -f /backup/db.sql'
+          gzip -9 "$GITHUB_WORKSPACE/backup/db.sql"
 
       - name: Copiar Storage
         env:
