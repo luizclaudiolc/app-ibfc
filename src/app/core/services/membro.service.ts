@@ -99,6 +99,13 @@ export class MembroService {
     const limite = opts.limite ?? 10;
     const busca = (opts.busca ?? '').trim().replace(/[,()]/g, '');
     const colunas = opts.colunas ?? colunasHome;
+    const statusFiltro = opts.status ?? EStatusMembro.ATIVO;
+
+    const cacheKey = `paginado_${opts.offset}_${limite}_${busca}_${opts.ministerio || 'TODOS'}_${statusFiltro}_${colunas}`;
+
+    if (this.cachePaginado.has(cacheKey)) {
+      return this.cachePaginado.get(cacheKey)!;
+    }
 
     let query = this.supabaseService.supabase
       .from('membros')
@@ -122,12 +129,16 @@ export class MembroService {
       );
     }
 
-    return from(query).pipe(
+    const request$ = from(query).pipe(
       map((res) => ({
         data: (res.data ?? []) as unknown as Membro[],
         total: res.count ?? 0,
       })),
+      shareReplay(1),
     );
+
+    this.cachePaginado.set(cacheKey, request$);
+    return request$;
   }
 
   contarPorStatus(): Observable<{
