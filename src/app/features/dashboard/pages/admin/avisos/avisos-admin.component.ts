@@ -54,7 +54,7 @@ export class AvisosAdminComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.verificarEExecutarLimpezaMensal();
+    this.verificarEExecutarLimpezaPeriodica();
     this.carregarAvisos();
   }
 
@@ -174,24 +174,25 @@ export class AvisosAdminComponent implements OnInit {
     });
   }
 
-  async verificarEExecutarLimpezaMensal() {
-    const hoje = new Date();
-    const diaAtual = hoje.getDate();
-    const mesAtual = hoje.getMonth();
-    const anoAtual = hoje.getFullYear();
+  async verificarEExecutarLimpezaPeriodica() {
+    const hojeMs = new Date().getTime();
+    const ultimaLimpezaStr = localStorage.getItem('ultima_limpeza_avisos');
 
-    if (diaAtual > 7) return;
+    const DEZ_DIAS_MS = 10 * 24 * 60 * 60 * 1000;
 
-    const chaveLocalStorage = `limpeza_avisos_${mesAtual}_${anoAtual}`;
-    const limpezaJaExecutada = localStorage.getItem(chaveLocalStorage);
+    if (ultimaLimpezaStr) {
+      const ultimaLimpezaMs = parseInt(ultimaLimpezaStr, 10);
 
-    if (limpezaJaExecutada) return;
+      if (hojeMs - ultimaLimpezaMs < DEZ_DIAS_MS) {
+        return;
+      }
+    }
 
     const resultado = await this.avisoService.limparAvisosPassados();
 
     if (resultado.sucesso) {
-      localStorage.setItem(chaveLocalStorage, 'true');
-      console.log('Rotina mensal de limpeza de avisos executada com sucesso.');
+      localStorage.setItem('ultima_limpeza_avisos', hojeMs.toString());
+      console.log('Rotina de limpeza de avisos executada com sucesso (intervalo de 10 dias).');
     }
   }
 }

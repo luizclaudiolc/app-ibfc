@@ -96,7 +96,8 @@ export class AvisoService {
 
   async excluir(id: string, foto_url: string): Promise<void> {
     const urlParts = foto_url.split('/');
-    const fileName = urlParts.pop();
+
+    const fileName = urlParts.pop()?.split('?')[0];
     const filePath = `banners/${fileName}`;
 
     const { error: dbError } = await this.supabaseService.supabase
@@ -116,12 +117,14 @@ export class AvisoService {
       const hoje = new Date();
       const ano = hoje.getFullYear();
       const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-      const primeiroDiaMesAtual = `${ano}-${mes}-01`;
+      const dia = String(hoje.getDate()).padStart(2, '0');
+
+      const hojeFormatado = `${ano}-${mes}-${dia}`;
 
       const { data: avisosAntigos, error: erroBusca } = await this.supabaseService.supabase
         .from('avisos')
         .select('id, foto_url')
-        .lt('data_evento', primeiroDiaMesAtual);
+        .lt('data_evento', hojeFormatado);
 
       if (erroBusca) throw erroBusca;
 
