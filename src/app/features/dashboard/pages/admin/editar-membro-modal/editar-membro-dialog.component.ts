@@ -246,9 +246,9 @@ export class EditarMembroDialogComponent {
         this.dialog.open(GenericDialogComponent, {
           data: {
             titulo: 'Falha na Atualização',
-            mensagem: 'Não foi possível atualizar os dados deste membro. Tente novamente.',
+            mensagem: `${err.code === 'P0001' ? 'Você não tem permissão!' : 'Não foi possível atualizar os dados deste membro. Tente novamente.'}`,
             textoConfirmar: 'Entendi',
-            tipo: 'perigo',
+            tipo: `${err.code === 'P0001' ? 'info' : 'perigo'}`,
             ocultarCancelar: true,
           },
           panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],

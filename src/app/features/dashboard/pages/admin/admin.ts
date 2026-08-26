@@ -8,7 +8,9 @@ import { Membro } from '../../../../shared/models/membro.model';
 import { PageLayoutComponent } from '../../../../shared/components/page-layout/page-layout.component';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import {
+  ENiveisAcesso,
   LIMITE_CARREGAMENTO_INICIAL,
+  MASTERS_SUPREMOS,
   MINISTERIOS_DISPONIVEIS,
   StatusMembro,
 } from '../../../../shared/models/consts';
@@ -24,6 +26,8 @@ import {
   switchMap,
 } from 'rxjs';
 import { Filho } from '../../../../shared/models/filhos.model';
+import { AuthService } from '../../../../core/services/auth.service';
+import { NotificationService } from '../../../../core/services/notifications.service';
 
 @Component({
   selector: 'app-admin',
@@ -63,6 +67,10 @@ export class AdminComponent implements OnInit {
   private dialog = inject(MatDialog);
   private membroService = inject(MembroService);
   private filhoService = inject(FilhoService);
+  private authService = inject(AuthService);
+  private notification = inject(NotificationService);
+
+  usuarioLogado = this.authService.obterUsuarioLogado();
 
   mostrarFiltrosAvancados = signal<boolean>(false);
   filtroMinisterio = signal<string | 'TODOS'>('TODOS');
@@ -185,6 +193,11 @@ export class AdminComponent implements OnInit {
   abrirEdicaoMembro(membro: Membro) {
     if (!membro.id) return;
 
+    if (!this.podeEditarMembro(membro)) {
+      this.notification.aviso('Permissão negada. Apenas Masters podem editar Super Admins.');
+      return;
+    }
+
     forkJoin({
       completo: this.membroService.buscarPorId(membro.id),
       filhos: this.filhoService.buscarPorMembro(membro.id),
@@ -228,5 +241,27 @@ export class AdminComponent implements OnInit {
     }
 
     return `${idade} ano${idade !== 1 ? 's' : ''}`;
+  }
+
+  podeEditarMembro(membroAlvo: Membro): boolean {
+    const meuId = this.usuarioLogado.id;
+    const meuNivel = this.usuarioLogado.nivel;
+
+    if (MASTERS_SUPREMOS.includes(meuId)) {
+      return true;
+    }
+
+    if (membroAlvo.id === meuId) {
+      return true;
+    }
+
+    if (
+      (meuNivel === ENiveisAcesso.SuperAdmin || meuNivel === ENiveisAcesso.Admin) &&
+      membroAlvo.nivel_acesso === ENiveisAcesso.SuperAdmin
+    ) {
+      return false;
+    }
+
+    return true;
   }
 }

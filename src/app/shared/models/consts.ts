@@ -150,3 +150,8 @@ export const GRADIENTES_PASTEIS = [
 ];
 
 export const LIMITE_CARREGAMENTO_INICIAL = 10;
+
+export const MASTERS_SUPREMOS = [
+  'f1dc85da-68d8-4c5b-948d-167832b27bfd',
+  '940ae253-093b-4190-a191-cbeccbfc2262',
+];

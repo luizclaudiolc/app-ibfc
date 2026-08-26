@@ -161,16 +161,26 @@
       <div class="space-y-3">
         @for (membro of membrosExibidos(); track membro.id) {
           <div
-            (click)="abrirEdicaoMembro(membro)"
-            class="p-4 rounded-3xl border shadow-sm flex flex-col gap-3 cursor-pointer transition-all active:scale-[0.98] bg-white relative overflow-hidden"
+            (click)="podeEditarMembro(membro) ? abrirEdicaoMembro(membro) : null"
+            class="p-4 rounded-3xl border shadow-sm flex flex-col gap-3 transition-all relative overflow-hidden"
             [ngClass]="{
               'bg-red-50/50 border-red-100 hover:border-red-200 opacity-80':
-                membro.status === 'INATIVO',
+                membro.status === 'INATIVO' && podeEditarMembro(membro),
               'bg-amber-50/30 border-amber-200 hover:border-amber-400 shadow-amber-100/50 hover:shadow-md':
-                membro.status === 'PENDENTE',
-              'border-slate-100 hover:border-sky-300 hover:shadow-md': membro.status === 'ATIVO',
+                membro.status === 'PENDENTE' && podeEditarMembro(membro),
+              'border-slate-100 hover:border-sky-300 hover:shadow-md':
+                membro.status === 'ATIVO' && podeEditarMembro(membro),
+              'cursor-pointer active:scale-[0.98] bg-white': podeEditarMembro(membro),
+              'cursor-not-allowed opacity-60 bg-slate-50 grayscale-[20%]':
+                !podeEditarMembro(membro),
             }"
           >
+            @if (!podeEditarMembro(membro)) {
+              <div class="absolute top-3 right-3 text-slate-300" title="Protegido por Hierarquia">
+                <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">lock</mat-icon>
+              </div>
+            }
+
             @if (membro.status === 'PENDENTE') {
               <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-400"></div>
             }
