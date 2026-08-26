@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { forkJoin, from, map, Observable, shareReplay } from 'rxjs';
 import { SupabaseService } from './supabase';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface PedidoOracao {
   id: string;
@@ -168,5 +169,37 @@ export class PedidoOracaoService {
 
     if (error) throw error;
     return count || 0;
+  }
+
+  ouvirMural(
+    onEvento: (tipo: 'INSERT' | 'UPDATE' | 'DELETE', row: PedidoOracao) => void,
+  ): () => void {
+    const canal: RealtimeChannel = this.supabase.supabase
+      .channel('mural-oracoes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'pedidos_oracao' },
+        (payload) => {
+          const tipo = payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE';
+          const row = (tipo === 'DELETE' ? payload.old : payload.new) as PedidoOracao;
+          this.limparCache();
+          onEvento(tipo, row);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void this.supabase.supabase.removeChannel(canal);
+    };
+  }
+
+  buscarPorId(id: string): Observable<PedidoOracao | null> {
+    return from(
+      this.supabase.supabase
+        .from('pedidos_oracao')
+        .select(this.selectComMembro)
+        .eq('id', id)
+        .single(),
+    ).pipe(map((res) => (res.data as PedidoOracao) ?? null));
   }
 }

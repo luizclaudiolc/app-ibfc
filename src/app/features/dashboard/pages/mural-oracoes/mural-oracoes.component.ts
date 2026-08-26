@@ -49,6 +49,8 @@ export class MuralOracoesComponent implements OnInit {
 
   usuarioLogadoId: string;
 
+  private pararRealtime?: () => void;
+
   oracaoForm = this.fb.nonNullable.group({
     descricao: ['', [Validators.required, Validators.maxLength(160)]],
   });
@@ -121,6 +123,37 @@ export class MuralOracoesComponent implements OnInit {
 
   ngOnInit() {
     this.carregarTodosPedidos();
+
+    this.pararRealtime = this.pedidoService.ouvirMural((tipo, row) => {
+      if (tipo === 'INSERT') {
+        const jaTem = this.pedidos().some((p) => p.id === row.id);
+        if (jaTem) return; // você mesmo publicou (já inseriu na lista)
+
+        this.pedidoService.buscarPorId(row.id).subscribe((completo) => {
+          if (completo) this.pedidos.update((lista) => [completo, ...lista]);
+        });
+        return;
+      }
+
+      if (tipo === 'UPDATE') {
+        this.pedidos.update((lista) =>
+          lista.map((p) =>
+            p.id === row.id
+              ? { ...p, ...row, membro: p.membro } // preserva nome/foto
+              : p,
+          ),
+        );
+        return;
+      }
+
+      if (tipo === 'DELETE') {
+        this.pedidos.update((lista) => lista.filter((p) => p.id !== row.id));
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.pararRealtime?.();
   }
 
   carregarTodosPedidos() {
