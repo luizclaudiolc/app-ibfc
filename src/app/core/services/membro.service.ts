@@ -170,7 +170,7 @@ export class MembroService {
       this.supabaseService.supabase
         .from('membros')
         .select(
-          'id, nome, sobrenome, email, telefone, cargo, ministerios, data_nascimento, genero, estado_civil, nivel_escolaridade, endereco, foto_url, status, nivel_acesso, setor_responsavel, motivo_inativacao',
+          'id, nome, sobrenome, email, telefone, cargo, ministerios, data_nascimento, genero, estado_civil, nivel_escolaridade, endereco, foto_url, status, nivel_acesso, setor_responsavel, motivo_inativacao, progresso_leitura',
         )
         .eq('id', id)
         .single(),
