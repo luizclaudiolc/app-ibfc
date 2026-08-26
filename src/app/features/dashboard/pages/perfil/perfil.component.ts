@@ -22,6 +22,7 @@ import { Membro, UsuarioAtualizacao } from '../../../../shared/models/membro.mod
 import { CepService } from '../../../../core/services/busca-cep.service';
 import { FilhoService } from '../../../../core/services/filhos.service';
 import { firstValueFrom } from 'rxjs';
+import { WebPushService } from '../../../../core/services/web-push.service';
 
 @Component({
   selector: 'app-perfil',
@@ -38,6 +39,7 @@ export class PerfilComponent implements OnInit {
   private notification = inject(NotificationService);
   private cepService = inject(CepService);
   private filhoService = inject(FilhoService);
+  webPush = inject(WebPushService);
 
   carregando = signal<boolean>(false);
   carregandoDados = signal<boolean>(true);
@@ -512,5 +514,16 @@ export class PerfilComponent implements OnInit {
         });
       }
     });
+  }
+
+  async alternarPush() {
+    if (this.webPush.ativado()) {
+      await this.webPush.desativar();
+      this.notification.sucesso('Notificações desativadas neste aparelho.');
+      return;
+    }
+    const res = await this.webPush.ativar();
+    if (res.sucesso) this.notification.sucesso('Avisos da igreja neste aparelho: ativados.');
+    else this.notification.erro(res.mensagem || 'Não foi possível ativar.');
   }
 }

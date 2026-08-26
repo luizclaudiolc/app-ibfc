@@ -77,6 +77,39 @@
         </div>
       </div>
 
+      @if (webPush.suportado()) {
+        <button
+          type="button"
+          (click)="alternarPush()"
+          [disabled]="webPush.processando()"
+          class="w-full mt-4 p-4 rounded-2xl border flex items-center justify-between"
+          [ngClass]="
+            webPush.ativado() ? 'bg-sky-50 border-sky-200' : 'bg-slate-50 border-slate-200'
+          "
+        >
+          <div class="flex items-center gap-3 text-left">
+            <mat-icon>{{
+              webPush.ativado() ? 'notifications_active' : 'notifications_off'
+            }}</mat-icon>
+            <div>
+              <p class="text-sm font-bold text-slate-800">Avisos no celular</p>
+              <p class="text-[11px] text-slate-500">
+                {{
+                  webPush.ativado() ? 'Ativado neste aparelho' : 'Receba quando sair um aviso novo'
+                }}
+              </p>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-sky-700">
+            {{ webPush.ativado() ? 'Desativar' : 'Ativar' }}
+          </span>
+        </button>
+      } @else {
+        <p class="text-[11px] text-slate-400 mt-4">
+          Para receber avisos no iPhone, instale o app na tela inicial.
+        </p>
+      }
+
       @if (carregando()) {
         <div class="text-xs text-sky-600 font-bold mt-3 flex items-center gap-1.5 animate-pulse">
           <mat-spinner diameter="14"></mat-spinner> Processando imagem...

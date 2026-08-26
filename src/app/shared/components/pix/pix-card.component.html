@@ -22,14 +22,16 @@
   >
     <div class="min-w-0 flex-1">
       <span class="text-[10px] uppercase tracking-wider text-emerald-200 font-bold block"
-        >Chave PIX (CNPJ)</span
+        >Chave PIX (EMAIL)</span
       >
-      <p class="text-xs sm:text-sm font-mono font-bold text-white truncate">00.000.000/0001-00</p>
+      <p class="text-xs sm:text-sm font-mono font-bold text-white truncate">
+        igrejadefiladelfiabonsucesso@gmail.com
+      </p>
     </div>
 
     <button
       type="button"
-      (click)="copiarChavePix('00.000.000/0001-00')"
+      (click)="copiarChavePix('igrejadefiladelfiabonsucesso@gmail.com')"
       class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer active:scale-95 shadow-xs"
       [ngClass]="
         copiado()
