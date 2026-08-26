@@ -20,25 +20,117 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
 
-    // 💡 Se for o webhook nativo do Supabase, os dados da linha inserida estarão em 'body.record'.
-    // Se for uma chamada manual, usamos o próprio 'body'.
-    const dados = body.record ?? body;
-
-    // Mapeie de acordo com as colunas reais da sua tabela (ex: se a coluna se chama 'descricao')
-    const titulo = dados.titulo ?? 'IBFC';
-    const texto = dados.texto ?? dados.descricao ?? 'Você tem um novo aviso.';
-    const url = dados.url ?? '/dashboard/home';
+    const table = body.table;
+    const record = body.record ?? body;
+    const tipoManual = body.tipo;
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    const { data: inscricoes, error } = await supabase
-      .from('push_subscriptions')
-      .select('id, endpoint, p256dh, auth');
+    let titulo = 'IBFC';
+    let texto = 'Você tem uma nova notificação.';
+    let url = '/dashboard/home';
 
+    // Por padrão, começa buscando todas as inscrições (para Avisos e Aniversários)
+    let queryInscricoes = supabase.from('push_subscriptions').select('id, endpoint, p256dh, auth');
+
+    // ==========================================
+    // 1. CENÁRIO: AVISOS (Broadcast para todos)
+    // ==========================================
+    if (table === 'avisos' || tipoManual === 'aviso') {
+      titulo = 'Novo aviso - IBFC! 📣';
+      texto = record.descricao ?? 'Novo evento postado, confira!';
+      url = '/dashboard/home';
+    }
+
+    // ==========================================
+    // 2. CENÁRIO: ESCALA (Direcionado aos voluntários)
+    // ==========================================
+    else if (table === 'escalas' || tipoManual === 'escala') {
+      titulo = 'Nova Escala Atribuída! 📅';
+      const departamento = record.departamento ?? 'seu departamento';
+      texto = `Você foi escalado(a) para servir em: ${departamento}.`;
+      url = '/dashboard/home';
+
+      const textoVoluntarios = record.voluntarios;
+
+      if (!textoVoluntarios) {
+        return new Response(
+          JSON.stringify({
+            ok: true,
+            enviados: 0,
+            mensagem: 'Nenhum voluntário informado na escala.',
+          }),
+          {
+            headers: { ...cors, 'Content-Type': 'application/json' },
+          },
+        );
+      }
+
+      const nomesEscalados = textoVoluntarios
+        .split(',')
+        .map((n: string) => n.trim())
+        .filter(Boolean);
+
+      const { data: membrosEncontrados, error: erroMembros } = await supabase
+        .from('membros')
+        .select('id, nome, sobrenome');
+
+      if (erroMembros) throw erroMembros;
+
+      const idsUsuariosParaNotificar = (membrosEncontrados || [])
+        .filter((membro) => {
+          const nomeCompleto = `${membro.nome} ${membro.sobrenome ?? ''}`.trim();
+          return nomesEscalados.some(
+            (escalado: string) =>
+              nomeCompleto.toLowerCase() === escalado.toLowerCase() ||
+              membro.nome.toLowerCase() === escalado.toLowerCase(),
+          );
+        })
+        .map((m) => m.id);
+
+      if (idsUsuariosParaNotificar.length === 0) {
+        return new Response(
+          JSON.stringify({
+            ok: true,
+            enviados: 0,
+            mensagem: 'Nenhum usuário correspondente encontrado para os voluntários.',
+          }),
+          {
+            headers: { ...cors, 'Content-Type': 'application/json' },
+          },
+        );
+      }
+
+      queryInscricoes = queryInscricoes.in('user_id', idsUsuariosParaNotificar);
+    }
+
+    // ==========================================
+    // 3. CENÁRIO: ANIVERSARIANTE DO DIA (Broadcast)
+    // ==========================================
+    else if (table === 'membros_aniversario' || tipoManual === 'aniversario') {
+      titulo = 'Aniversariante do Dia! 🎂🎉';
+      texto = `Hoje é o aniversário de ${record.nome}. Deixe sua felicitação!`;
+      url = '/dashboard/home';
+    }
+
+    const { data: inscricoes, error } = await queryInscricoes;
     if (error) throw error;
+
+    if (!inscricoes || inscricoes.length === 0) {
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          enviados: 0,
+          mensagem: 'Nenhum dispositivo encontrado para notificar.',
+        }),
+        {
+          headers: { ...cors, 'Content-Type': 'application/json' },
+        },
+      );
+    }
 
     const payload = JSON.stringify({
       notification: {
@@ -55,7 +147,7 @@ Deno.serve(async (req) => {
     });
 
     const resultados = await Promise.allSettled(
-      (inscricoes ?? []).map(async (row) => {
+      inscricoes.map(async (row) => {
         try {
           await webpush.sendNotification(
             {
