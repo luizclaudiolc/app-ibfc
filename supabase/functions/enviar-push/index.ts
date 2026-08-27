@@ -12,6 +12,12 @@ webpush.setVapidDetails(
   Deno.env.get('VAPID_PRIVATE_KEY')!,
 );
 
+// 💡 Função auxiliar para remover acentos e espaços extras (ex: "João " -> "joao")
+const normalizarNome = (str: string) => {
+  if (!str) return '';
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+};
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: cors });
@@ -33,22 +39,30 @@ Deno.serve(async (req) => {
     let texto = 'Você tem uma nova notificação.';
     let url = '/dashboard/home';
 
-    // Por padrão, começa buscando todas as inscrições (para Avisos e Aniversários)
     let queryInscricoes = supabase.from('push_subscriptions').select('id, endpoint, p256dh, auth');
 
+    // 💡 INFERÊNCIA INTELIGENTE
+    // Verifica pelo nome da tabela, pelo tipo ou se os dados passados possuem colunas específicas
+    const isAviso = table === 'avisos' || tipoManual === 'aviso' || record.data_evento !== undefined;
+    
+    // Na sua modelagem de banco de dados, a tabela de escalas se chama "data_escala"
+    const isEscala = table === 'data_escala' || table === 'escalas' || tipoManual === 'escala' || record.departamento !== undefined;
+    
+    const isAniversario = table === 'membros_aniversario' || tipoManual === 'aniversario';
+
     // ==========================================
-    // 1. CENÁRIO: AVISOS (Broadcast para todos)
+    // 1. CENÁRIO: AVISOS 
     // ==========================================
-    if (table === 'avisos' || tipoManual === 'aviso') {
+    if (isAviso) {
       titulo = 'Novo aviso - IBFC! 📣';
       texto = record.descricao ?? 'Novo evento postado, confira!';
       url = '/dashboard/home';
     }
 
     // ==========================================
-    // 2. CENÁRIO: ESCALA (Direcionado aos voluntários)
+    // 2. CENÁRIO: ESCALA 
     // ==========================================
-    else if (table === 'escalas' || tipoManual === 'escala') {
+    else if (isEscala) {
       titulo = 'Nova Escala Atribuída! 📅';
       const departamento = record.departamento ?? 'seu departamento';
       texto = `Você foi escalado(a) para servir em: ${departamento}.`;
@@ -63,15 +77,14 @@ Deno.serve(async (req) => {
             enviados: 0,
             mensagem: 'Nenhum voluntário informado na escala.',
           }),
-          {
-            headers: { ...cors, 'Content-Type': 'application/json' },
-          },
+          { headers: { ...cors, 'Content-Type': 'application/json' } },
         );
       }
 
+      // Normaliza os nomes que vieram da string "João, Maria"
       const nomesEscalados = textoVoluntarios
         .split(',')
-        .map((n: string) => n.trim())
+        .map((n: string) => normalizarNome(n))
         .filter(Boolean);
 
       const { data: membrosEncontrados, error: erroMembros } = await supabase
@@ -82,11 +95,12 @@ Deno.serve(async (req) => {
 
       const idsUsuariosParaNotificar = (membrosEncontrados || [])
         .filter((membro) => {
-          const nomeCompleto = `${membro.nome} ${membro.sobrenome ?? ''}`.trim();
+          const nomeCompleto = normalizarNome(`${membro.nome} ${membro.sobrenome ?? ''}`);
+          const apenasNome = normalizarNome(membro.nome);
+          
           return nomesEscalados.some(
             (escalado: string) =>
-              nomeCompleto.toLowerCase() === escalado.toLowerCase() ||
-              membro.nome.toLowerCase() === escalado.toLowerCase(),
+              nomeCompleto === escalado || apenasNome === escalado
           );
         })
         .map((m) => m.id);
@@ -98,19 +112,18 @@ Deno.serve(async (req) => {
             enviados: 0,
             mensagem: 'Nenhum usuário correspondente encontrado para os voluntários.',
           }),
-          {
-            headers: { ...cors, 'Content-Type': 'application/json' },
-          },
+          { headers: { ...cors, 'Content-Type': 'application/json' } },
         );
       }
 
+      // ⚠️ DICA: Verifique se a sua coluna de vínculo na tabela 'push_subscriptions' se chama realmente 'user_id' ou 'membro_id'
       queryInscricoes = queryInscricoes.in('user_id', idsUsuariosParaNotificar);
     }
 
     // ==========================================
-    // 3. CENÁRIO: ANIVERSARIANTE DO DIA (Broadcast)
+    // 3. CENÁRIO: ANIVERSARIANTE 
     // ==========================================
-    else if (table === 'membros_aniversario' || tipoManual === 'aniversario') {
+    else if (isAniversario) {
       titulo = 'Aniversariante do Dia! 🎂🎉';
       texto = `Hoje é o aniversário de ${record.nome}. Deixe sua felicitação!`;
       url = '/dashboard/home';
@@ -121,14 +134,8 @@ Deno.serve(async (req) => {
 
     if (!inscricoes || inscricoes.length === 0) {
       return new Response(
-        JSON.stringify({
-          ok: true,
-          enviados: 0,
-          mensagem: 'Nenhum dispositivo encontrado para notificar.',
-        }),
-        {
-          headers: { ...cors, 'Content-Type': 'application/json' },
-        },
+        JSON.stringify({ ok: true, enviados: 0, mensagem: 'Nenhum dispositivo encontrado para notificar.' }),
+        { headers: { ...cors, 'Content-Type': 'application/json' } },
       );
     }
 
