@@ -33,7 +33,7 @@ export class FooterComponent implements OnInit {
 
     const isAdmin = nivel === ENiveisAcesso.Admin || nivel === ENiveisAcesso.SuperAdmin;
     const isLider = setor && setor !== 'null' && setor !== 'undefined' && setor !== 'membro';
-    const isLiderMidia = isLider && (setor === 'midia' || setor === 'comunicacao');
+    const isLiderMidia = isLider && setor === 'midia';
 
     const podeAcessarEscalas = isAdmin || !!isLider;
     const podeAcessarAvisos = isAdmin || !!isLiderMidia;
@@ -44,7 +44,6 @@ export class FooterComponent implements OnInit {
       { label: 'Mídias', icon: 'smart_display', route: '/dashboard/midias' },
       { label: 'Orações', icon: 'volunteer_activism', route: '/dashboard/mural-oracoes' },
       { label: 'Estudos', icon: 'menu_book', route: '/dashboard/estudos' },
-      { label: 'Ajustes', icon: 'manage_accounts', route: '/dashboard/perfil' },
     ];
 
     if (id) {
@@ -68,6 +67,8 @@ export class FooterComponent implements OnInit {
         route: '/dashboard/admin/estudos',
       });
     }
+
+    allItems.push({ label: 'Ajustes', icon: 'manage_accounts', route: '/dashboard/perfil' });
 
     if (allItems.length <= 5) {
       this.visibleItems.set(allItems);
