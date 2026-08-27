@@ -15,7 +15,11 @@ webpush.setVapidDetails(
 // 💡 Função auxiliar para remover acentos e espaços extras (ex: "João " -> "joao")
 const normalizarNome = (str: string) => {
   if (!str) return '';
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 };
 
 Deno.serve(async (req) => {
@@ -43,15 +47,20 @@ Deno.serve(async (req) => {
 
     // 💡 INFERÊNCIA INTELIGENTE
     // Verifica pelo nome da tabela, pelo tipo ou se os dados passados possuem colunas específicas
-    const isAviso = table === 'avisos' || tipoManual === 'aviso' || record.data_evento !== undefined;
-    
+    const isAviso =
+      table === 'avisos' || tipoManual === 'aviso' || record.data_evento !== undefined;
+
     // Na sua modelagem de banco de dados, a tabela de escalas se chama "data_escala"
-    const isEscala = table === 'data_escala' || table === 'escalas' || tipoManual === 'escala' || record.departamento !== undefined;
-    
+    const isEscala =
+      table === 'data_escala' ||
+      table === 'escalas' ||
+      tipoManual === 'escala' ||
+      record.departamento !== undefined;
+
     const isAniversario = table === 'membros_aniversario' || tipoManual === 'aniversario';
 
     // ==========================================
-    // 1. CENÁRIO: AVISOS 
+    // 1. CENÁRIO: AVISOS
     // ==========================================
     if (isAviso) {
       titulo = 'Novo aviso - IBFC! 📣';
@@ -60,7 +69,7 @@ Deno.serve(async (req) => {
     }
 
     // ==========================================
-    // 2. CENÁRIO: ESCALA 
+    // 2. CENÁRIO: ESCALA
     // ==========================================
     else if (isEscala) {
       titulo = 'Nova Escala Atribuída! 📅';
@@ -97,10 +106,9 @@ Deno.serve(async (req) => {
         .filter((membro) => {
           const nomeCompleto = normalizarNome(`${membro.nome} ${membro.sobrenome ?? ''}`);
           const apenasNome = normalizarNome(membro.nome);
-          
+
           return nomesEscalados.some(
-            (escalado: string) =>
-              nomeCompleto === escalado || apenasNome === escalado
+            (escalado: string) => nomeCompleto === escalado || apenasNome === escalado,
           );
         })
         .map((m) => m.id);
@@ -121,7 +129,7 @@ Deno.serve(async (req) => {
     }
 
     // ==========================================
-    // 3. CENÁRIO: ANIVERSARIANTE 
+    // 3. CENÁRIO: ANIVERSARIANTE
     // ==========================================
     else if (isAniversario) {
       titulo = 'Aniversariante do Dia! 🎂🎉';
@@ -134,7 +142,11 @@ Deno.serve(async (req) => {
 
     if (!inscricoes || inscricoes.length === 0) {
       return new Response(
-        JSON.stringify({ ok: true, enviados: 0, mensagem: 'Nenhum dispositivo encontrado para notificar.' }),
+        JSON.stringify({
+          ok: true,
+          enviados: 0,
+          mensagem: 'Nenhum dispositivo encontrado para notificar.',
+        }),
         { headers: { ...cors, 'Content-Type': 'application/json' } },
       );
     }

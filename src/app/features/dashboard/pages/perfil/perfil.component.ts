@@ -72,7 +72,7 @@ export class PerfilComponent implements OnInit {
     telefone: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
     cargo: ['membro', [Validators.required]],
     ministerios: [[] as string[]],
-    data_nascimento: ['', [Validators.required]],
+    data_nascimento: ['', [Validators.required]], // 💡 Permitida a edição da data de nascimento
 
     genero: [null as number | null, [Validators.required]],
     estado_civil: [null as number | null, [Validators.required]],
@@ -320,24 +320,22 @@ export class PerfilComponent implements OnInit {
 
       if (usuarioLogado.id) {
         for (const f of formValues.filhos as any[]) {
-          const membroPrincipalId = f.membro_id || usuarioLogado.id;
-
-          let outroRespId = f.outro_responsavel_id || null;
-          if (f.membro_id && f.membro_id !== usuarioLogado.id) {
-            outroRespId = f.membro_id;
-          }
-
-          const payloadFilho = {
-            membro_id: membroPrincipalId,
-            outro_responsavel_id: outroRespId,
+          const payloadFilho: any = {
             nome: f.nome.trim(),
             data_nascimento: f.data_nascimento,
             informacoes_medicas: f.informacoes_medicas?.trim() || null,
           };
 
           if (f.id) {
+            if (f.membro_id === usuarioLogado.id) {
+              payloadFilho.outro_responsavel_id = f.outro_responsavel_id || null;
+            }
+
             await this.filhoService.atualizar(f.id, payloadFilho);
           } else {
+            payloadFilho.membro_id = usuarioLogado.id;
+            payloadFilho.outro_responsavel_id = f.outro_responsavel_id || null;
+
             await this.filhoService.criar(payloadFilho);
           }
         }

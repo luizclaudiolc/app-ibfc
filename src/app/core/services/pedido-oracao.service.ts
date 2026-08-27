@@ -171,11 +171,16 @@ export class PedidoOracaoService {
     return count || 0;
   }
 
-  ouvirMural(
-    onEvento: (tipo: 'INSERT' | 'UPDATE' | 'DELETE', row: PedidoOracao) => void,
-  ): () => void {
+  ouvirMural(handlers: {
+    onEvento: (tipo: 'INSERT' | 'UPDATE' | 'DELETE', row: PedidoOracao) => void;
+    onPresenca: (quantidade: number) => void;
+    meuId: string;
+    meuNome: string;
+  }): () => void {
     const canal: RealtimeChannel = this.supabase.supabase
-      .channel('mural-oracoes')
+      .channel('mural-oracoes', {
+        config: { presence: { key: handlers.meuId } },
+      })
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'pedidos_oracao' },
@@ -183,14 +188,33 @@ export class PedidoOracaoService {
           const tipo = payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE';
           const row = (tipo === 'DELETE' ? payload.old : payload.new) as PedidoOracao;
           this.limparCache();
-          onEvento(tipo, row);
+          handlers.onEvento(tipo, row);
         },
       )
-      .subscribe();
+      .on('presence', { event: 'sync' }, () => {
+        handlers.onPresenca(Object.keys(canal.presenceState()).length);
+      })
+      .subscribe((status) => {
+        if (status !== 'SUBSCRIBED') return;
+        void canal.track({
+          user_id: handlers.meuId,
+          nome: handlers.meuNome,
+        });
+      });
 
     return () => {
+      void canal.untrack();
       void this.supabase.supabase.removeChannel(canal);
     };
+  }
+
+  nomePresente(userId: string): string | null {
+    const canal = this.supabase.supabase
+      .getChannels()
+      .find((c) => c.topic.endsWith('mural-oracoes'));
+    if (!canal) return null;
+    const lista = canal.presenceState()[userId] as { nome?: string }[] | undefined;
+    return lista?.[0]?.nome ?? null;
   }
 
   buscarPorId(id: string): Observable<PedidoOracao | null> {

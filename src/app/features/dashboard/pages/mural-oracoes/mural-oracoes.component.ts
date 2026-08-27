@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -31,7 +31,7 @@ import { PedidoOracao, PedidoOracaoService } from '../../../../core/services/ped
   ],
   templateUrl: './mural-oracoes.component.html',
 })
-export class MuralOracoesComponent implements OnInit {
+export class MuralOracoesComponent implements OnInit, OnDestroy {
   pedidos = signal<PedidoOracao[]>([]);
   carregando = signal<boolean>(true);
   salvando = signal<boolean>(false);
@@ -39,6 +39,9 @@ export class MuralOracoesComponent implements OnInit {
 
   limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
   filtroTipo = signal<'TODOS' | 'MEUS'>('TODOS');
+
+  presentes = signal(1);
+  toastOracao = signal<string | null>(null);
 
   private pedidoService = inject(PedidoOracaoService);
   private authService = inject(AuthService);
@@ -50,6 +53,8 @@ export class MuralOracoesComponent implements OnInit {
   usuarioLogadoId: string;
 
   private pararRealtime?: () => void;
+  private ultimoToastEm = 0;
+  private toastTimer?: ReturnType<typeof setTimeout>;
 
   oracaoForm = this.fb.nonNullable.group({
     descricao: ['', [Validators.required, Validators.maxLength(160)]],
@@ -124,36 +129,63 @@ export class MuralOracoesComponent implements OnInit {
   ngOnInit() {
     this.carregarTodosPedidos();
 
-    this.pararRealtime = this.pedidoService.ouvirMural((tipo, row) => {
-      if (tipo === 'INSERT') {
-        const jaTem = this.pedidos().some((p) => p.id === row.id);
-        if (jaTem) return; // você mesmo publicou (já inseriu na lista)
+    const eu = this.authService.obterUsuarioLogado();
+    const meuNome = (eu.nome || 'Irmão').split(' ')[0];
 
-        this.pedidoService.buscarPorId(row.id).subscribe((completo) => {
-          if (completo) this.pedidos.update((lista) => [completo, ...lista]);
-        });
-        return;
-      }
-
-      if (tipo === 'UPDATE') {
-        this.pedidos.update((lista) =>
-          lista.map((p) =>
-            p.id === row.id
-              ? { ...p, ...row, membro: p.membro } // preserva nome/foto
-              : p,
-          ),
-        );
-        return;
-      }
-
-      if (tipo === 'DELETE') {
-        this.pedidos.update((lista) => lista.filter((p) => p.id !== row.id));
-      }
+    this.pararRealtime = this.pedidoService.ouvirMural({
+      meuId: eu.id,
+      meuNome,
+      onPresenca: (qtd) => this.presentes.set(qtd),
+      onEvento: (tipo, row) => this.aplicarEventoRealtime(tipo, row),
     });
   }
 
   ngOnDestroy() {
+    clearTimeout(this.toastTimer);
     this.pararRealtime?.();
+  }
+
+  private aplicarEventoRealtime(tipo: 'INSERT' | 'UPDATE' | 'DELETE', row: PedidoOracao): void {
+    if (tipo === 'INSERT') {
+      if (this.pedidos().some((p) => p.id === row.id)) return;
+
+      this.pedidoService.buscarPorId(row.id).subscribe((completo) => {
+        if (completo) this.pedidos.update((lista) => [completo, ...lista]);
+      });
+      return;
+    }
+
+    if (tipo === 'UPDATE') {
+      const anterior = this.pedidos().find((p) => p.id === row.id);
+      const antes = anterior?.intercessores ?? [];
+      const depois = row.intercessores ?? [];
+      const novos = depois.filter((id) => !antes.includes(id));
+
+      this.pedidos.update((lista) =>
+        lista.map((p) => (p.id === row.id ? { ...p, ...row, membro: p.membro } : p)),
+      );
+
+      const quemOrou = novos.find((id) => id !== this.usuarioLogadoId);
+      if (quemOrou) {
+        const nome = this.pedidoService.nomePresente(quemOrou) ?? 'Alguém';
+        this.mostrarToastOracao(`${nome} está orando agora`);
+      }
+      return;
+    }
+
+    if (tipo === 'DELETE') {
+      this.pedidos.update((lista) => lista.filter((p) => p.id !== row.id));
+    }
+  }
+
+  private mostrarToastOracao(texto: string): void {
+    const agora = Date.now();
+    if (agora - this.ultimoToastEm < 3000) return;
+    this.ultimoToastEm = agora;
+
+    this.toastOracao.set(texto);
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.toastOracao.set(null), 2500);
   }
 
   carregarTodosPedidos() {
