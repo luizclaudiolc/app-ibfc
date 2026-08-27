@@ -2,7 +2,8 @@ import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { debounceTime, map } from 'rxjs';
+import { debounceTime, map, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 
 import { MaterialModule } from '../../../../core/modules/material.module';
@@ -14,7 +15,7 @@ import { PageHeaderComponent } from '../../../../shared/components/page-header/p
 import { BotaoCarregarMaisComponent } from '../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
 import { EditarPedidoDialogComponent } from '../../../../shared/components/editar-oracao/editar-pedido-dialog.component';
-import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/models/consts';
+import { ENiveisAcesso, LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/models/consts';
 import { PedidoOracao, PedidoOracaoService } from '../../../../core/services/pedido-oracao.service';
 
 @Component({
@@ -42,6 +43,7 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
 
   presentes = signal(1);
   toastOracao = signal<string | null>(null);
+  eSuperAdmin = signal<boolean>(false);
 
   private pedidoService = inject(PedidoOracaoService);
   private authService = inject(AuthService);
@@ -56,6 +58,8 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
   private ultimoToastEm = 0;
   private toastTimer?: ReturnType<typeof setTimeout>;
 
+  private destroy$ = new Subject<void>();
+
   oracaoForm = this.fb.nonNullable.group({
     descricao: ['', [Validators.required, Validators.maxLength(160)]],
   });
@@ -64,6 +68,7 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
 
   termoBusca = toSignal(
     this.buscaControl.valueChanges.pipe(
+      takeUntil(this.destroy$),
       debounceTime(150),
       map((termo) => {
         this.limiteExibicao.set(LIMITE_CARREGAMENTO_INICIAL);
@@ -129,11 +134,15 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.carregarTodosPedidos();
 
-    const eu = this.authService.obterUsuarioLogado();
-    const meuNome = (eu.nome || 'Irmão').split(' ')[0];
+    const { id, nome, nivel } = this.authService.obterUsuarioLogado();
+    const meuNome = (nome || 'Irmão').split(' ')[0];
+
+    if (nivel === ENiveisAcesso.SuperAdmin) {
+      this.eSuperAdmin.set(true);
+    }
 
     this.pararRealtime = this.pedidoService.ouvirMural({
-      meuId: eu.id,
+      meuId: id,
       meuNome,
       onPresenca: (qtd) => this.presentes.set(qtd),
       onEvento: (tipo, row) => this.aplicarEventoRealtime(tipo, row),
@@ -142,16 +151,23 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     clearTimeout(this.toastTimer);
+
     this.pararRealtime?.();
+
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private aplicarEventoRealtime(tipo: 'INSERT' | 'UPDATE' | 'DELETE', row: PedidoOracao): void {
     if (tipo === 'INSERT') {
       if (this.pedidos().some((p) => p.id === row.id)) return;
 
-      this.pedidoService.buscarPorId(row.id).subscribe((completo) => {
-        if (completo) this.pedidos.update((lista) => [completo, ...lista]);
-      });
+      this.pedidoService
+        .buscarPorId(row.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((completo) => {
+          if (completo) this.pedidos.update((lista) => [completo, ...lista]);
+        });
       return;
     }
 
@@ -166,6 +182,7 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
       );
 
       const quemOrou = novos.find((id) => id !== this.usuarioLogadoId);
+
       if (quemOrou) {
         const nome = this.pedidoService.nomePresente(quemOrou) ?? 'Alguém';
         this.mostrarToastOracao(`${nome} está orando agora`);
@@ -191,16 +208,19 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
   carregarTodosPedidos() {
     this.carregando.set(true);
 
-    this.pedidoService.buscarParaMural().subscribe({
-      next: ({ ativos, atendidos }) => {
-        this.pedidos.set([...ativos, ...atendidos]);
-        this.carregando.set(false);
-      },
-      error: () => {
-        this.notification.erro('Erro ao carregar o mural de orações.');
-        this.carregando.set(false);
-      },
-    });
+    this.pedidoService
+      .buscarParaMural()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: ({ ativos, atendidos }) => {
+          this.pedidos.set([...ativos, ...atendidos]);
+          this.carregando.set(false);
+        },
+        error: () => {
+          this.notification.erro('Erro ao carregar o mural de orações.');
+          this.carregando.set(false);
+        },
+      });
   }
 
   setFiltroTipo(tipo: 'TODOS' | 'MEUS'): void {

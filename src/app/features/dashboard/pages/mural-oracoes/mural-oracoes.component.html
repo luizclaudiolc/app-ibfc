@@ -145,7 +145,7 @@
           <div class="space-y-4 pt-4 pb-4">
             @for (pedido of pedidosExibidos(); track pedido.id) {
               <div class="relative">
-                @if (pedido.membro_id === usuarioLogadoId) {
+                @if (pedido.membro_id === usuarioLogadoId || eSuperAdmin()) {
                   <div class="absolute top-4 right-4 z-20">
                     <button
                       mat-icon-button
