@@ -175,8 +175,8 @@
                       Criança {{ $index + 1 }}
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <mat-form-field appearance="outline" class="w-full">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                      <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
                         <mat-label>Nome da Criança</mat-label>
                         <input matInput formControlName="nome" />
                         @if (filhoForm.get('nome')?.hasError('required')) {
@@ -184,18 +184,25 @@
                         }
                       </mat-form-field>
 
-                      <mat-form-field appearance="outline" class="w-full">
+                      <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
                         <mat-label>Nascimento</mat-label>
                         <input matInput type="date" formControlName="dataNascimento" />
                         @if (filhoForm.get('dataNascimento')?.hasError('required')) {
                           <mat-error>Obrigatório.</mat-error>
+                        } @else if (
+                          filhoForm.get('dataNascimento')?.hasError('idadeMaximaExcedida')
+                        ) {
+                          <mat-error
+                            >A idade máxima é 12 anos. Maiores devem criar uma conta
+                            própria.</mat-error
+                          >
                         }
                       </mat-form-field>
                     </div>
 
                     <mat-form-field
                       appearance="outline"
-                      class="w-full mt-1"
+                      class="w-full mt-8"
                       subscriptSizing="dynamic"
                     >
                       <mat-label>Informações Médicas (Alergias, etc.)</mat-label>

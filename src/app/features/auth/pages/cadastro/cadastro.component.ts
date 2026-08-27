@@ -88,6 +88,29 @@ export class CadastroComponent {
     return null;
   }
 
+  validarIdadeCrianca(control: AbstractControl): ValidationErrors | null {
+    const dataNascimento = control.value;
+    if (!dataNascimento) return null;
+
+    const hoje = new Date();
+    const nascimento = new Date(dataNascimento);
+
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const m = hoje.getMonth() - nascimento.getMonth();
+
+    // Ajusta a idade caso ainda não tenha feito aniversário no ano atual
+    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+      idade--;
+    }
+
+    // Se a idade for maior que 12 anos, retorna o erro
+    if (idade > 12) {
+      return { idadeMaximaExcedida: true };
+    }
+
+    return null;
+  }
+
   carregando = signal<boolean>(false);
   buscandoCep = signal<boolean>(false);
   esconderSenha = signal(true);
@@ -366,7 +389,7 @@ export class CadastroComponent {
   adicionarFilho(): void {
     const filhoForm = this.fb.group({
       nome: ['', [Validators.required]],
-      dataNascimento: ['', [Validators.required]],
+      dataNascimento: ['', [Validators.required, this.validarIdadeCrianca.bind(this)]],
       informacoesMedicas: [''],
     });
 
