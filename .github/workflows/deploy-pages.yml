@@ -1,0 +1,54 @@
+name: Deploy Angular to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Injetar Variáveis do Supabase nos Environments
+        run: |
+          # Sobrescreve o environment de produção com os Secrets do GitHub
+          cat << EOF > src/environments/environment.prod.ts
+          export const environment = {
+            production: true,
+            supabaseUrl: '${{ secrets.SUPABASE_URL }}',
+            supabaseKey: '${{ secrets.SUPABASE_KEY }}'
+          };
+          EOF
+
+          # Caso seu build leia o environment.ts padrão, ele também será sobrescrito
+          cat << EOF > src/environments/environment.ts
+          export const environment = {
+            production: true,
+            supabaseUrl: '${{ secrets.SUPABASE_URL }}',
+            supabaseKey: '${{ secrets.SUPABASE_KEY }}'
+          };
+          EOF
+
+      - name: Build do Projeto (Angular)
+        run: npm run build -- --configuration production --base-href /app-ibfc/
+
+      - name: Deploy para GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/app-ibfc/browser
