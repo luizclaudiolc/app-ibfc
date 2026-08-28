@@ -26,7 +26,7 @@ jobs:
 
       - name: Injetar Variáveis nos Environments
         run: |
-          cat << EOF > src/environments/environments.prod.ts
+          cat << EOF > src/environments/environments.ts
           export const environment = {
             production: true,
             supabaseUrl: '${{ secrets.SUPABASE_URL }}',
