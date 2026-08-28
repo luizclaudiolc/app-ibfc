@@ -1,75 +1,129 @@
-# ⛪ App IBFC
+# Rede de Membros IBFC
 
-Um PWA (Progressive Web App) moderno desenvolvido para a gestão interna da igreja. Focado na experiência do usuário e facilidade de acesso via dispositivos móveis, o aplicativo centraliza o gerenciamento de escalas, anúncios, e cadastro de membros, utilizando recursos nativos de aplicativos em uma interface web responsiva e elegante.
+PWA da **Igreja Batista Filadélfia Church** para a vida da comunidade: membros, escalas, avisos, oração, estudos, mídias, leitura bíblica e gestão pastoral.
 
-## 🚀 Tecnologias Utilizadas
+Instala na tela inicial do celular, funciona como app e roda no **plano Free do Supabase** (paginação, RPCs, Storage com cache longo, Realtime só no mural).
 
-Este projeto foi construído utilizando as seguintes tecnologias:
+**Nome no aparelho:** Rede IBFC  
+**Título:** Rede de Membros IBFC
 
-*   **Frontend:** [Angular](https://angular.dev/) (Framework principal, versão v16+) com reatividade baseada em Signals.
-*   **Estilização:** [Tailwind CSS](https://tailwindcss.com/) (para um design responsivo, rápido e limpo).
-*   **Componentes de UI:** [Angular Material](https://material.angular.io/) (para modais, snackbars e ícones integrados).
-*   **Backend & Banco de Dados:** [Supabase](https://supabase.com/) (Autenticação, PostgreSQL e Storage).
-*   **Compressão de Imagens:** `browser-image-compression` (Otimização local de imagens antes do upload).
+---
 
-## ✨ Funcionalidades Principais
+## Sumário
 
-*   **PWA Integrado:** Pode ser instalado diretamente na tela inicial do celular.
-*   **Dashboard Personalizado:** Exibição da saudação do usuário, notificações importantes e avisos globais no formato de carrossel.
-*   **Gestão de Escalas:** 
-    *   Visualização de escalas pessoais diretamente na Home.
-    *   Filtro dinâmico para carregar as escalas dos próximos 30 dias.
-*   **Quadro de Aniversariantes:** Visualização dos aniversariantes da semana, com integração para envio direto de mensagens via WhatsApp.
-*   **Perfil do Usuário:**
-    *   Atualização de dados cadastrais.
-    *   Upload, compressão automática e remoção da foto de perfil.
-*   **Gestão de Membros:** 
-    *   Busca inteligente de membros ativos.
-    *   Visualização de cargos, setores e controle de inatividade.
-*   **Modais e Alertas Nativos:** Sistema de notificações globais (`Snackbars`) e diálogos de confirmação padronizados e animados.
+- [Stack](#stack)
+- [Como usar (membros)](#como-usar-membros)
+- [Como usar (líderes e admin)](#como-usar-líderes-e-admin)
+- [Papéis e permissões](#papéis-e-permissões)
+- [Arquitetura](#arquitetura)
+- [Backend (Supabase)](#backend-supabase)
+- [Instalação local](#instalação-local)
+- [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Deploy](#deploy)
+- [Automações (GitHub Actions)](#automações-github-actions)
+- [Push, Realtime e PWA](#push-realtime-e-pwa)
+- [Scripts](#scripts)
 
-## 📦 Estrutura do Projeto
+---
 
-O projeto segue uma arquitetura modular focada em escalabilidade:
+## Stack
 
-```bash
-src/
-├── app/
-│   ├── core/              # Serviços globais (AuthService, SupabaseService, NotificationService)
-│   ├── shared/            # Componentes reutilizáveis (Modais, Header, Footer, Custom-Snackbar)
-│   └── dashboard/         # Telas principais da aplicação (Home, Perfil, Escalas, Avisos)
-├── assets/                # Imagens (incluindo logo) e arquivos estáticos
-└── styles.scss            # Estilos globais (Tailwind base e overrides do Angular Material)
-```
+| Camada | Tecnologia |
+|---|---|
+| App | Angular **21** (standalone, Signals, lazy routes) |
+| UI | Tailwind CSS 4 + Angular Material 21 |
+| Auth / DB / Storage | Supabase (Postgres, Auth, Storage, Realtime, Edge Functions) |
+| PWA | `@angular/service-worker` (`ngsw-config.json`) |
+| Push | Web Push + VAPID + Edge Function `enviar-push` |
+| Vídeos | YouTube Data API (metadados / thumbnail) |
+| Carteirinha | `angularx-qrcode` + `html-to-image` + `jsPDF` |
+| Gráficos | Chart.js + `ng2-charts` |
+| Fotos | `browser-image-compression` antes do upload |
+| Hosting | Vercel (`vercel.json` SPA rewrite) e/ou GitHub Pages |
+| CI | GitHub Actions: deploy, keep-alive, backup semanal |
 
-## 🛠️ Como executar o projeto localmente
+---
 
-### 1. Pré-requisitos
-* **Node.js** instalado na máquina.
-* **Angular CLI** instalado globalmente (`npm install -g @angular/cli`).
-* Uma conta no **Supabase** com as tabelas configuradas (Membros, Escalas, Avisos) e Storage para fotos.
+## Como usar (membros)
 
-### 2. Instalação
-Clone o repositório:
-`git clone https://github.com/SeuUsuario/app-ibfc.git`
+Cadastro público → status **PENDENTE** até um admin aprovar (`/aguardando-aprovacao`). Depois entra no dashboard.
 
-Acesse a pasta do projeto:
-`cd app-ibfc`
+### Home (`/dashboard/home`)
 
-Instale as dependências:
-`npm install`
+- Versículo do dia
+- **Pulso da semana** (check-in pastoral; some depois de responder)
+- Banner para **instalar o PWA** (Android) ou instruções (iOS)
+- **Suas escalas** (próximos 30 dias) e pedido de substituição
+- **Aniversariantes da semana** + WhatsApp
+- **Quadro de avisos** (carrossel; toque amplia a arte)
+- **PIX** da igreja
+- Lista de **membros ativos** (busca + filtro por ministério, paginação de 10)
 
-### 3. Configuração de Ambiente
-Crie o arquivo de ambiente em `src/environments/environment.ts` com as chaves do Supabase:
+### Bíblia — Jornada de leitura (`/dashboard/plano-leitura`)
 
-`export const environment = {`
-`  production: false,`
-`  supabaseUrl: 'SUA_URL_DO_SUPABASE',`
-`  supabaseKey: 'SUA_CHAVE_ANONIMA_DO_SUPABASE'`
-`};`
+- Vários planos; progresso em `%`
+- Grade de dias; “Próxima leitura” destacada
+- Toque no dia abre o capítulo no dialog
 
-### 4. Executando a Aplicação
-Inicie o servidor de desenvolvimento:
-`ng serve`
+### Mídias (`/dashboard/midias`)
 
-Acesse a aplicação no seu navegador: `http://localhost:4200/`. A página será recarregada automaticamente se houverem mudanças no código.
+- Pregações/louvores do YouTube (capa + player em modal)
+- Líder de mídia / admin cadastra pela URL do vídeo
+
+### Mural de orações (`/dashboard/mural-oracoes`)
+
+- Feed de pedidos para interceder (botão **Vou orar**)
+- Composer recolhido: “Compartilhar um pedido…”
+- Presence: “N irmãos intercedendo agora”
+- Toast ao vivo quando alguém ora
+- Aba **Testemunhos** (pedidos atendidos)
+- Dono (e Super Admin) edita/exclui
+
+Realtime **só nesta tela**, no canal `mural-oracoes`. Sai da rota → desconecta.
+
+### Estudos (`/dashboard/estudos`)
+
+- PDF no Storage **ou** link do Google Drive
+- Abrir / baixar
+
+### Perfil público (`/dashboard/perfil/:id`)
+
+- Dados, ministérios, planos de leitura, pedidos da pessoa
+
+### Ajustes (`/dashboard/perfil`)
+
+- Editar cadastro, foto (comprimida), dependentes (até 12 anos)
+- Ativar/desativar **notificações push**
+- Sair
+
+### Carteirinha (`/dashboard/carteirinha`)
+
+- Cartão digital + QR + exportar PNG/PDF
+
+---
+
+## Como usar (líderes e admin)
+
+O menu extra aparece no overflow do rodapé, conforme o papel.
+
+| Tela | Quem acessa | O que faz |
+|---|---|---|
+| Escalas `/dashboard/escala` | Admin ou líder de departamento | Calendário do mês, criar escala, voluntários, ver pedidos de troca |
+| Avisos `/dashboard/avisos` | Admin ou líder de **mídia** | Banners da Home (imagem + data + texto). Insert dispara push |
+| Estatísticas `/dashboard/analytics` | Admin / Super Admin | RPC `dashboard_estatisticas`: membros, pulso, ministérios |
+| Membros `/dashboard/admin` | Admin / Super Admin | Aprovar pendentes, editar, inativar, paginação, filhos na página |
+| Ger. Estudos `/dashboard/admin/estudos` | Admin / Super Admin | PDF ou link Drive |
+
+**Níveis**
+
+- `USER` — membro
+- `ADMIN` — gestão
+- `SUPER_ADMIN` — gestão + apagar pedido de oração de qualquer um
+
+**Status:** `PENDENTE` → `ATIVO` → `INATIVO` (exclusão pedida, decisão admin ou falta de acesso).
+
+Cadastro pede dados pessoais, ministérios, cargos e filhos. CEP via BrasilAPI.
+
+---
+
+## Papéis e permissões
