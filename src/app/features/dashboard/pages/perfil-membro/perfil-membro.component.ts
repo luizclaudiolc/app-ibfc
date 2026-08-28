@@ -21,11 +21,20 @@ import {
 } from '../../../../shared/models/consts';
 import { Membro } from '../../../../shared/models/membro.model';
 import { PLANOS_LEITURA } from '../../../../shared/models/plano-leitura.const';
+import { SkeletonCardComponent } from '../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
+import { LoadingSpinnerComponent } from '../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
 
 @Component({
   selector: 'app-membro-perfil',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent, BotaoCarregarMaisComponent],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    PageLayoutComponent,
+    BotaoCarregarMaisComponent,
+    SkeletonCardComponent,
+    LoadingSpinnerComponent,
+  ],
   templateUrl: './perfil-membro.component.html',
 })
 export class PerfilMembroComponent implements OnInit {

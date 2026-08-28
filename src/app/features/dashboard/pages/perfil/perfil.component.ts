@@ -23,11 +23,20 @@ import { CepService } from '../../../../core/services/busca-cep.service';
 import { FilhoService } from '../../../../core/services/filhos.service';
 import { firstValueFrom } from 'rxjs';
 import { WebPushService } from '../../../../core/services/web-push.service';
+import { LoadingSpinnerComponent } from '../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
+import { SkeletonCardComponent } from '../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, PageLayoutComponent, MaterialModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    PageLayoutComponent,
+    MaterialModule,
+    LoadingSpinnerComponent,
+    SkeletonCardComponent,
+  ],
   templateUrl: './perfil.component.html',
 })
 export class PerfilComponent implements OnInit {
