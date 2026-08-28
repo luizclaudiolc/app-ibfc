@@ -22,6 +22,22 @@ const normalizarNome = (str: string) => {
     .trim();
 };
 
+const LISTA_BASE_MINISTERIOS_DEPARTAMENTOS = [
+  { label: 'Louvor', value: 'louvor' },
+  { label: 'Mídia', value: 'midia' },
+  { label: 'Casais', value: 'casais' },
+  { label: 'Homens', value: 'homens' },
+  { label: 'Mulheres', value: 'mulheres' },
+  { label: 'Diaconato', value: 'diaconato' },
+  { label: 'Infantil/Kids', value: 'infantil_kids' },
+  { label: 'Jovens', value: 'jovens' },
+  { label: 'Palavra', value: 'palavra' },
+];
+
+const DEPARTAMENTOS_DISPONIVEIS_MAP: Record<string, string> = Object.fromEntries(
+  LISTA_BASE_MINISTERIOS_DEPARTAMENTOS.map((d) => [d.value, d.label]),
+);
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: cors });
@@ -74,7 +90,7 @@ Deno.serve(async (req) => {
     else if (isEscala) {
       titulo = 'Nova Escala Atribuída! 📅';
       const departamento = record.departamento ?? 'seu departamento';
-      texto = `Você foi escalado(a) para servir em: ${departamento}.`;
+      texto = `Você foi escalado(a) para servir em: ${DEPARTAMENTOS_DISPONIVEIS_MAP[departamento]}.`;
       url = '/dashboard/home';
 
       const textoVoluntarios = record.voluntarios;
