@@ -24,23 +24,25 @@ jobs:
       - name: Instalar Dependências
         run: npm ci --legacy-peer-deps
 
-      - name: Injetar Variáveis do Supabase nos Environments
+      - name: Injetar Variáveis nos Environments
         run: |
-          # Sobrescreve o environment de produção com os Secrets do GitHub
-          cat << EOF > src/environments/environment.prod.ts
+          cat << EOF > src/environments/environments.prod.ts
           export const environment = {
             production: true,
             supabaseUrl: '${{ secrets.SUPABASE_URL }}',
-            supabaseKey: '${{ secrets.SUPABASE_KEY }}'
+            supabaseKey: '${{ secrets.SUPABASE_ANON_KEY }}',
+            youtubeApiKey: '${{ secrets.YOUTUBE_API_KEY }}',
+            vapidPublicKey: '${{ secrets.VAPID_PUBLIC_KEY }}'
           };
           EOF
 
-          # Caso seu build leia o environment.ts padrão, ele também será sobrescrito
-          cat << EOF > src/environments/environment.ts
+          cat << EOF > src/environments/environments.ts
           export const environment = {
-            production: true,
+            production: false,
             supabaseUrl: '${{ secrets.SUPABASE_URL }}',
-            supabaseKey: '${{ secrets.SUPABASE_KEY }}'
+            supabaseKey: '${{ secrets.SUPABASE_ANON_KEY }}',
+            youtubeApiKey: '${{ secrets.YOUTUBE_API_KEY }}',
+            vapidPublicKey: '${{ secrets.VAPID_PUBLIC_KEY }}'
           };
           EOF
 
