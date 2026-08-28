@@ -22,7 +22,7 @@ jobs:
           node-version: 22
 
       - name: Instalar Dependências
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Injetar Variáveis do Supabase nos Environments
         run: |
