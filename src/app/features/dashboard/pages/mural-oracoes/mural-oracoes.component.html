@@ -1,134 +1,171 @@
 <app-page-layout>
-  <div class="max-w-xl mx-auto pb-12">
+  <div class="w-full space-y-5 pb-12">
     <button
       type="button"
       (click)="voltar()"
-      class="inline-flex items-center gap-1.5 text-slate-500 hover:text-sky-600 transition-colors font-bold text-xs uppercase tracking-wider px-3 py-2 rounded-xl hover:bg-slate-100 cursor-pointer active:scale-95 mb-4"
+      class="mb-1 inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold tracking-wider text-slate-500 uppercase transition-colors hover:bg-slate-100 hover:text-sky-600 active:scale-95"
     >
-      <mat-icon class="!w-4 !h-4 !text-[16px]">arrow_back_ios_new</mat-icon>
+      <mat-icon class="!h-4 !w-4 !text-[16px]">arrow_back_ios_new</mat-icon>
       <span>Voltar</span>
     </button>
 
-    <div
-      class="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-800"
-    >
-      <span class="relative flex h-2 w-2">
-        <span
-          class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"
-        ></span>
-        <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
-      </span>
-      @if (presentes() <= 1) {
-        Você está no mural
-      } @else {
-        {{ presentes() }} irmãos intercedendo agora
-      }
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <app-page-header
+        class="min-w-0 flex-1"
+        titulo="Mural de Intercessão"
+        subtitulo="Ore pelos irmãos e acompanhe os motivos da comunidade."
+        icone="volunteer_activism"
+      />
+
+      <div
+        class="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-800 sm:self-center"
+      >
+        <span class="relative flex h-2 w-2">
+          <span
+            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"
+          ></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        </span>
+        @if (presentes() <= 1) {
+          Você está no mural
+        } @else {
+          {{ presentes() }} irmãos intercedendo agora
+        }
+      </div>
     </div>
 
-    <app-page-header
-      titulo="Mural de Intercessão"
-      subtitulo="Apoie os irmãos em oração e acompanhe os motivos da nossa comunidade."
-      icone="volunteer_activism"
-    >
-      <div class="flex items-center gap-2 pb-2 border-b border-slate-50 mt-8">
-        <mat-icon class="text-rose-500 !w-5 !h-5 !text-[20px]">edit_note</mat-icon>
-        <h3 class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
-          Compartilhar Pedido de Oração
-        </h3>
-      </div>
-
-      <p class="text-xs text-slate-500 leading-relaxed mb-3">
-        Escreva um novo pedido para que a comunidade possa interceder por você.
-        <span class="block mt-1 text-sky-600 font-medium"
-          >Você poderá gerenciar seus pedidos posteriormente no seu Perfil.</span
+    @if (!composerAberto()) {
+      <button
+        type="button"
+        (click)="abrirComposer()"
+        class="flex w-full cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-left shadow-sm transition-all hover:border-sky-200 hover:shadow-md"
+      >
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-600"
         >
-      </p>
-
-      <form [formGroup]="oracaoForm" class="space-y-3">
-        <mat-form-field appearance="outline" class="w-full !mt-1">
-          <mat-label>Seu Pedido de Oração / Motivo de Fé</mat-label>
-          <textarea
-            matInput
-            formControlName="descricao"
-            rows="3"
-            placeholder="Ex: Peço oração pela minha saúde e família..."
-            maxlength="160"
-          ></textarea>
-          <mat-hint align="end" class="text-xs font-medium"
-            >{{ oracaoForm.controls.descricao.value.length || 0 }}/160</mat-hint
-          >
-        </mat-form-field>
-
-        <div class="flex items-center justify-end gap-2 pt-1">
-          @if (oracaoForm.controls.descricao.value) {
-            <button
-              type="button"
-              (click)="limparTexto()"
-              class="flex items-center gap-1.5 text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
-              [disabled]="salvando()"
-            >
-              <mat-icon class="!w-[16px] !h-[16px] !text-[16px]">backspace</mat-icon>
-              <span>Limpar</span>
-            </button>
-          }
-
+          <mat-icon class="!h-5 !w-5 !text-[20px]">edit_note</mat-icon>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-bold text-slate-700">Compartilhar um pedido de oração</p>
+          <p class="truncate text-[11px] font-medium text-slate-400">
+            Toque para escrever. A comunidade intercede com você.
+          </p>
+        </div>
+        <mat-icon class="shrink-0 text-slate-300">add_circle</mat-icon>
+      </button>
+    } @else {
+      <div class="rounded-3xl border border-sky-100 bg-white p-5 shadow-sm">
+        <div class="mb-3 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <mat-icon class="text-rose-500 !h-5 !w-5 !text-[20px]">edit_note</mat-icon>
+            <h3 class="text-xs font-extrabold tracking-wider text-slate-700 uppercase">
+              Novo pedido
+            </h3>
+          </div>
           <button
-            mat-flat-button
             type="button"
-            (click)="salvarPedidoOracao()"
-            class="!rounded-xl !h-10 !bg-sky-600 hover:!bg-sky-700 !text-white !font-bold shadow-md shadow-sky-600/20 transition-all !text-xs px-5"
-            [disabled]="salvando() || oracaoForm.invalid"
+            (click)="fecharComposer()"
+            class="cursor-pointer rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            [disabled]="salvando()"
           >
-            @if (salvando()) {
-              <mat-spinner diameter="16" class="!inline-block !mr-2"></mat-spinner>
-            }
-            {{ salvando() ? 'Publicando...' : 'Publicar no Mural' }}
+            <mat-icon class="!h-5 !w-5 !text-[20px]">close</mat-icon>
           </button>
         </div>
-      </form>
-    </app-page-header>
 
-    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" class="mt-6">
+        <p class="mb-3 text-xs leading-relaxed text-slate-500">
+          Escreva um motivo para a comunidade interceder.
+          <span class="mt-1 block font-medium text-sky-600"
+            >Você gerencia seus pedidos depois no Perfil.</span
+          >
+        </p>
+
+        <form [formGroup]="oracaoForm" class="space-y-3">
+          <mat-form-field appearance="outline" class="w-full !mt-1">
+            <mat-label>Seu Pedido de Oração / Motivo de Fé</mat-label>
+            <textarea
+              matInput
+              formControlName="descricao"
+              rows="3"
+              placeholder="Ex: Peço oração pela minha saúde e família..."
+              maxlength="160"
+            ></textarea>
+            <mat-hint align="end" class="text-xs font-medium"
+              >{{ oracaoForm.controls.descricao.value.length || 0 }}/160</mat-hint
+            >
+          </mat-form-field>
+
+          <div class="flex items-center justify-end gap-2 pt-1">
+            @if (oracaoForm.controls.descricao.value) {
+              <button
+                type="button"
+                (click)="limparTexto()"
+                class="flex cursor-pointer items-center gap-1.5 rounded-xl bg-slate-100 px-3.5 py-2.5 text-xs font-bold text-slate-500 shadow-sm transition-all hover:bg-slate-200 hover:text-slate-700"
+                [disabled]="salvando()"
+              >
+                <mat-icon class="!h-[16px] !w-[16px] !text-[16px]">backspace</mat-icon>
+                <span>Limpar</span>
+              </button>
+            }
+
+            <button
+              mat-flat-button
+              type="button"
+              (click)="salvarPedidoOracao()"
+              class="!h-10 !rounded-xl !bg-sky-600 !px-5 !text-xs !font-bold !text-white shadow-md shadow-sky-600/20 transition-all hover:!bg-sky-700"
+              [disabled]="salvando() || oracaoForm.invalid"
+            >
+              @if (salvando()) {
+                <mat-spinner diameter="16" class="!mr-2 !inline-block"></mat-spinner>
+              }
+              {{ salvando() ? 'Publicando...' : 'Publicar no Mural' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" class="mt-2">
       <mat-tab label="Para Interceder">
         @if (pedidos().length > 0) {
-          <div class="space-y-2.5 mt-4 mb-4">
-            <div class="relative">
+          <div
+            class="flex h-full flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:shadow-md"
+          >
+            <div class="relative min-w-0 flex-1">
               <input
                 type="text"
                 [formControl]="buscaControl"
                 placeholder="Pesquisar pedidos..."
-                class="w-full pl-5 pr-12 py-3 text-sm bg-white border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm"
+                class="w-full rounded-2xl border border-slate-200 bg-white py-3 pr-12 pl-5 text-sm text-slate-800 shadow-sm transition-all focus:ring-2 focus:ring-sky-500/20 focus:outline-none"
               />
-              <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+              <mat-icon class="absolute top-1/2 right-4 -translate-y-1/2 text-slate-400"
                 >search</mat-icon
               >
             </div>
 
-            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 pb-1">
+            <div class="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
               <button
                 type="button"
                 (click)="setFiltroTipo('TODOS')"
-                class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer"
+                class="cursor-pointer rounded-xl border px-3.5 py-1.5 text-xs font-bold whitespace-nowrap transition-all"
                 [ngClass]="
                   filtroTipo() === 'TODOS'
-                    ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                    ? 'border-slate-800 bg-slate-800 text-white shadow-sm'
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                 "
               >
                 Todos
               </button>
-
               <button
                 type="button"
                 (click)="setFiltroTipo('MEUS')"
-                class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer flex items-center gap-1"
+                class="flex cursor-pointer items-center gap-1 rounded-xl border px-3.5 py-1.5 text-xs font-bold whitespace-nowrap transition-all"
                 [ngClass]="
                   filtroTipo() === 'MEUS'
-                    ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-200'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-sky-600'
+                    ? 'border-sky-600 bg-sky-600 text-white shadow-sm shadow-sky-200'
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-sky-600'
                 "
               >
-                <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">person</mat-icon>
+                <mat-icon class="!h-3.5 !w-3.5 !text-[14px]">person</mat-icon>
                 Meus Pedidos
               </button>
             </div>
@@ -136,28 +173,31 @@
         }
 
         @if (carregando()) {
-          <div class="space-y-4 pt-4 animate-pulse">
-            @for (i of [1, 2]; track i) {
-              <div class="h-24 bg-white rounded-3xl p-5 border border-slate-100"></div>
+          <div
+            class="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-pulse"
+          >
+            @for (i of [1, 2, 3, 4]; track i) {
+              <div class="h-32 rounded-3xl border border-slate-100 bg-white p-5"></div>
             }
           </div>
         } @else {
-          <div class="space-y-4 pt-4 pb-4">
+          <div
+            class="grid grid-cols-1 gap-4 pt-2 pb-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          >
             @for (pedido of pedidosExibidos(); track pedido.id) {
-              <div class="relative">
+              <div class="relative flex h-full flex-col">
                 @if (pedido.membro_id === usuarioLogadoId || eSuperAdmin()) {
                   <div class="absolute top-4 right-4 z-20">
                     <button
                       mat-icon-button
                       [matMenuTriggerFor]="menuAcoes"
-                      class="!w-8 !h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors cursor-pointer shadow-xs"
+                      class="!flex !h-8 !w-8 cursor-pointer items-center justify-center rounded-full bg-slate-50 text-slate-400 shadow-xs transition-colors hover:bg-slate-100 hover:text-slate-600"
                     >
                       <mat-icon
-                        class="!w-[18px] !h-[18px] !text-[18px] flex items-center justify-center"
+                        class="flex !h-[18px] !w-[18px] items-center justify-center !text-[18px]"
                         >more_vert</mat-icon
                       >
                     </button>
-
                     <mat-menu #menuAcoes="matMenu" xPosition="before" class="!rounded-2xl">
                       <button mat-menu-item (click)="editarPedido(pedido)" class="text-sky-600">
                         <mat-icon class="!text-[18px]">edit</mat-icon>
@@ -170,53 +210,53 @@
                     </mat-menu>
                   </div>
                 }
-
-                <app-oracao-card [pedido]="pedido" />
+                <app-oracao-card [pedido]="pedido" class="block h-full" />
               </div>
             } @empty {
-              <div class="text-center py-10 text-slate-400 text-xs italic">
+              <div class="col-span-full py-10 text-center text-xs text-slate-400 italic">
                 Nenhum pedido ativo no momento.
               </div>
             }
+          </div>
 
-            @if (mostrarBotaoCarregarMais()) {
+          @if (mostrarBotaoCarregarMais()) {
+            <div class="flex justify-center pt-2">
               <app-botao-carregar-mais
                 texto="Carregar mais pedidos"
                 [restantes]="pedidosAtivosFiltrados().length - pedidosExibidos().length"
                 (carregarMais)="carregarMaisPedidos()"
               />
-            }
-          </div>
+            </div>
+          }
         }
       </mat-tab>
 
       <mat-tab label="Testemunhos">
-        <div class="space-y-4 pt-6">
+        <div class="grid grid-cols-1 gap-4 pt-6 pb-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           @for (pedido of pedidosAtendidos(); track pedido.id) {
             <div
-              class="p-5 bg-gradient-to-br from-emerald-50 to-white rounded-3xl border border-emerald-100 shadow-sm relative overflow-hidden"
+              class="relative flex h-full flex-col overflow-hidden rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-5 shadow-sm"
             >
               <div class="flex items-start gap-4">
                 <div
-                  class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-inner"
+                  class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 shadow-inner"
                 >
-                  <mat-icon class="!w-6 !h-6 !text-[24px] flex items-center justify-center"
+                  <mat-icon class="flex !h-6 !w-6 items-center justify-center !text-[24px]"
                     >workspace_premium</mat-icon
                   >
                 </div>
-
-                <div class="flex-1 min-w-0 pt-0.5">
+                <div class="min-w-0 flex-1 pt-0.5">
                   <p
-                    class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 flex items-center gap-1"
+                    class="mb-1 flex items-center gap-1 text-[10px] font-bold tracking-wider text-emerald-600 uppercase"
                   >
-                    <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">check_circle</mat-icon> Oração
-                    Atendida
+                    <mat-icon class="!h-3.5 !w-3.5 !text-[14px]">check_circle</mat-icon>
+                    Oração Atendida
                   </p>
-                  <p class="text-sm font-medium text-slate-600 italic leading-relaxed">
+                  <p class="text-sm leading-relaxed font-medium text-slate-600 italic">
                     "{{ pedido.descricao }}"
                   </p>
-                  <p class="text-[11px] text-emerald-700 mt-2 font-bold flex items-center gap-1">
-                    <mat-icon class="!w-3.5 !h-3.5 !text-[14px] text-amber-500"
+                  <p class="mt-2 flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                    <mat-icon class="!h-3.5 !w-3.5 !text-[14px] text-amber-500"
                       >local_fire_department</mat-icon
                     >
                     Fruto de {{ pedido.intercessores.length || 0 }} intercessões
@@ -225,7 +265,7 @@
               </div>
             </div>
           } @empty {
-            <div class="text-center py-10 text-slate-400 text-xs italic">
+            <div class="col-span-full py-10 text-center text-xs text-slate-400 italic">
               Nenhum testemunho registrado ainda.
             </div>
           }

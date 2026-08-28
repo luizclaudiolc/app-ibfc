@@ -36,6 +36,7 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
   pedidos = signal<PedidoOracao[]>([]);
   carregando = signal<boolean>(true);
   salvando = signal<boolean>(false);
+  composerAberto = signal(false);
   processandoOracao = signal<Record<string, boolean>>({});
 
   limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
@@ -241,6 +242,7 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
 
       this.notification.sucesso('Seu pedido de oração foi publicado no mural!');
       this.oracaoForm.reset();
+      this.composerAberto.set(false);
 
       const usuarioAtual = this.authService.obterUsuarioLogado();
       this.pedidos.update((lista) => [
@@ -338,5 +340,14 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
 
   voltar(): void {
     this.location.back();
+  }
+
+  abrirComposer(): void {
+    this.composerAberto.set(true);
+  }
+
+  fecharComposer(): void {
+    this.composerAberto.set(false);
+    this.oracaoForm.reset();
   }
 }

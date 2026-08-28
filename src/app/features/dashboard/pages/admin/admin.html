@@ -1,152 +1,157 @@
 <app-page-layout>
-  <div class="max-w-xl mx-auto space-y-6 pb-12">
-    <app-page-header
-      titulo="Gestão de Membros"
-      subtitulo="Visualize, edite e aprove os cadastros da rede."
-      icone="manage_accounts"
-    >
-      <div class="space-y-4">
-        <div class="flex items-center gap-2 w-full">
-          <div class="relative flex-1">
-            <input
-              type="text"
-              (input)="aoBuscarMembro($any($event.target).value)"
-              placeholder="Buscar por nome, e-mail ou cargo..."
-              class="w-full pl-10 pr-4 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm"
-            />
-            <mat-icon
-              class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 !w-5 !h-5 !text-[20px]"
+  <div class="max-w-7xl mx-auto pb-12 px-2 sm:px-4 lg:px-6">
+    <div class="max-w-3xl mx-auto">
+      <app-page-header
+        titulo="Gestão de Membros"
+        subtitulo="Visualize, edite e aprove os cadastros da rede."
+        icone="manage_accounts"
+      >
+        <div class="space-y-4 mt-2">
+          <div class="flex items-center gap-2 w-full">
+            <div class="relative flex-1">
+              <input
+                type="text"
+                (input)="aoBuscarMembro($any($event.target).value)"
+                placeholder="Buscar por nome, e-mail ou cargo..."
+                class="w-full pl-10 pr-4 py-3 text-xs sm:text-sm bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm"
+              />
+              <mat-icon
+                class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 !w-5 !h-5 !text-[20px]"
+              >
+                search
+              </mat-icon>
+            </div>
+
+            <button
+              (click)="mostrarFiltrosAvancados.set(!mostrarFiltrosAvancados())"
+              class="shrink-0 h-[46px] w-[46px] rounded-2xl border flex items-center justify-center transition-all relative cursor-pointer"
+              [ngClass]="
+                filtroMinisterio() !== 'TODOS'
+                  ? 'bg-sky-50 border-sky-300 text-sky-600 shadow-sm shadow-sky-100'
+                  : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
+              "
             >
-              search
-            </mat-icon>
+              <mat-icon class="!w-5 !h-5 !text-[20px]">tune</mat-icon>
+
+              @if (filtroMinisterio() !== 'TODOS') {
+                <span
+                  class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-sky-500 shadow-sm border border-white"
+                ></span>
+              }
+            </button>
           </div>
 
-          <button
-            (click)="mostrarFiltrosAvancados.set(!mostrarFiltrosAvancados())"
-            class="shrink-0 h-[46px] w-[46px] rounded-2xl border flex items-center justify-center transition-all relative cursor-pointer"
-            [ngClass]="
-              filtroMinisterio() !== 'TODOS'
-                ? 'bg-sky-50 border-sky-300 text-sky-600 shadow-sm shadow-sky-100'
-                : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
-            "
-          >
-            <mat-icon class="!w-5 !h-5 !text-[20px]">tune</mat-icon>
-
-            @if (filtroMinisterio() !== 'TODOS') {
-              <span
-                class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-sky-500 shadow-sm border border-white"
-              ></span>
-            }
-          </button>
-        </div>
-
-        @if (mostrarFiltrosAvancados()) {
-          <div
-            class="animate-fade-in bg-slate-50/50 border border-slate-100 rounded-2xl p-3 shadow-inner"
-          >
-            <p
-              class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1 flex items-center gap-1"
+          @if (mostrarFiltrosAvancados()) {
+            <div
+              class="animate-fade-in bg-slate-50/50 border border-slate-100 rounded-2xl p-3 shadow-inner"
             >
-              <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">groups</mat-icon> Filtrar por Ministério
-            </p>
-
-            <div class="flex gap-2 overflow-x-auto no-scrollbar items-center pb-1">
-              <button
-                (click)="definirFiltroMinisterio('TODOS')"
-                class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border"
-                [ngClass]="
-                  filtroMinisterio() === 'TODOS'
-                    ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
-                    : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
-                "
+              <p
+                class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 pl-1 flex items-center gap-1"
               >
-                Todos
-              </button>
+                <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">groups</mat-icon> Filtrar por
+                Ministério
+              </p>
 
-              @for (min of ministeriosDisponiveis; track min.value) {
+              <div class="flex gap-2 overflow-x-auto no-scrollbar items-center pb-1">
                 <button
-                  (click)="definirFiltroMinisterio(min.value)"
-                  class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border"
+                  (click)="definirFiltroMinisterio('TODOS')"
+                  class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer"
                   [ngClass]="
-                    filtroMinisterio() === min.value
-                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-200'
-                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-sky-600'
+                    filtroMinisterio() === 'TODOS'
+                      ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+                      : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
                   "
                 >
-                  {{ min.label }}
+                  Todos
                 </button>
-              }
+
+                @for (min of ministeriosDisponiveis; track min.value) {
+                  <button
+                    (click)="definirFiltroMinisterio(min.value)"
+                    class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer"
+                    [ngClass]="
+                      filtroMinisterio() === min.value
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-200'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-sky-600'
+                    "
+                  >
+                    {{ min.label }}
+                  </button>
+                }
+              </div>
             </div>
+          }
+
+          <div class="flex gap-2 overflow-x-auto pt-1 pr-2 pb-2 no-scrollbar items-center">
+            <button
+              (click)="definirFiltroStatus('TODOS')"
+              class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-colors border cursor-pointer"
+              [ngClass]="
+                filtroStatus() === 'TODOS'
+                  ? 'bg-slate-800 text-white border-slate-800'
+                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+              "
+            >
+              Todos ({{ qtdTotal() }})
+            </button>
+
+            <button
+              (click)="definirFiltroStatus('PENDENTE')"
+              class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-colors border relative cursor-pointer"
+              [ngClass]="
+                filtroStatus() === 'PENDENTE'
+                  ? 'bg-amber-500 text-white border-amber-500'
+                  : 'bg-amber-50/50 text-amber-700 border-amber-200 hover:bg-amber-100/50'
+              "
+            >
+              Aguardando ({{ qtdPendentes() }})
+              @if (qtdPendentes() > 0 && filtroStatus() !== 'PENDENTE') {
+                <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"
+                  ></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                </span>
+              }
+            </button>
+
+            <button
+              (click)="definirFiltroStatus('ATIVO')"
+              class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-colors border cursor-pointer"
+              [ngClass]="
+                filtroStatus() === 'ATIVO'
+                  ? 'bg-emerald-600 text-white border-emerald-600'
+                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+              "
+            >
+              Ativos ({{ qtdAtivos() }})
+            </button>
+
+            <button
+              (click)="definirFiltroStatus('INATIVO')"
+              class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-colors border cursor-pointer"
+              [ngClass]="
+                filtroStatus() === 'INATIVO'
+                  ? 'bg-red-600 text-white border-red-600'
+                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+              "
+            >
+              Inativos ({{ qtdInativos() }})
+            </button>
           </div>
-        }
-
-        <div class="flex gap-2 overflow-x-auto pt-1 pr-2 pb-2 no-scrollbar items-center">
-          <button
-            (click)="definirFiltroStatus('TODOS')"
-            class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-colors border"
-            [ngClass]="
-              filtroStatus() === 'TODOS'
-                ? 'bg-slate-800 text-white border-slate-800'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-            "
-          >
-            Todos ({{ qtdTotal() }})
-          </button>
-
-          <button
-            (click)="definirFiltroStatus('PENDENTE')"
-            class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-colors border relative"
-            [ngClass]="
-              filtroStatus() === 'PENDENTE'
-                ? 'bg-amber-500 text-white border-amber-500'
-                : 'bg-amber-50/50 text-amber-700 border-amber-200 hover:bg-amber-100/50'
-            "
-          >
-            Aguardando ({{ qtdPendentes() }})
-            @if (qtdPendentes() > 0 && filtroStatus() !== 'PENDENTE') {
-              <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                <span
-                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"
-                ></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-              </span>
-            }
-          </button>
-
-          <button
-            (click)="definirFiltroStatus('ATIVO')"
-            class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-colors border"
-            [ngClass]="
-              filtroStatus() === 'ATIVO'
-                ? 'bg-emerald-600 text-white border-emerald-600'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-            "
-          >
-            Ativos ({{ qtdAtivos() }})
-          </button>
-
-          <button
-            (click)="definirFiltroStatus('INATIVO')"
-            class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-colors border"
-            [ngClass]="
-              filtroStatus() === 'INATIVO'
-                ? 'bg-red-600 text-white border-red-600'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-            "
-          >
-            Inativos ({{ qtdInativos() }})
-          </button>
         </div>
-      </div>
-    </app-page-header>
+      </app-page-header>
+    </div>
 
     @if (carregando()) {
-      <div class="flex justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
+      <div
+        class="max-w-3xl mx-auto flex justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100 mt-6"
+      >
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     } @else if (erroMembros()) {
       <div
-        class="bg-red-50 text-red-600 text-center py-6 px-6 rounded-3xl border border-red-100 shadow-sm"
+        class="max-w-3xl mx-auto bg-red-50 text-red-600 text-center py-6 px-6 rounded-3xl border border-red-100 shadow-sm mt-6"
       >
         <p class="font-bold text-sm">⚠️ Erro de Conexão</p>
         <p class="text-xs mt-1 text-red-500">{{ erroMembros() }}</p>
@@ -158,11 +163,11 @@
         </button>
       </div>
     } @else {
-      <div class="space-y-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-6">
         @for (membro of membrosExibidos(); track membro.id) {
           <div
             (click)="podeEditarMembro(membro) ? abrirEdicaoMembro(membro) : null"
-            class="p-4 rounded-3xl border shadow-sm flex flex-col gap-3 transition-all relative overflow-hidden"
+            class="h-full p-4 rounded-3xl border shadow-sm flex flex-col justify-between gap-3 transition-all relative overflow-hidden"
             [ngClass]="{
               'bg-red-50/50 border-red-100 hover:border-red-200 opacity-80':
                 membro.status === 'INATIVO' && podeEditarMembro(membro),
@@ -185,7 +190,7 @@
               <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-400"></div>
             }
 
-            <div class="flex items-center justify-between gap-3 w-full z-10 pl-1">
+            <div class="flex items-start justify-between gap-3 w-full z-10 pl-1">
               <div class="flex items-center gap-3.5 overflow-hidden">
                 @if (membro.foto_url) {
                   <img
@@ -235,7 +240,6 @@
                       class="inline-flex items-center gap-1 mt-1 text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider"
                     >
                       <mat-icon class="!w-3 !h-3 !text-[12px]">schedule</mat-icon> Aguardando
-                      Aprovação
                     </span>
                   }
                 </div>
@@ -255,7 +259,7 @@
                 >
                   {{ membro.cargo }}
                 </span>
-                <mat-icon class="!text-[16px] !w-[16px] !h-[16px] text-slate-300 mt-1"
+                <mat-icon class="!text-[16px] !w-[16px] !h-[16px] text-slate-300 mt-2"
                   >chevron_right</mat-icon
                 >
               </div>
@@ -263,7 +267,7 @@
 
             @if (membro.filhos && membro.filhos.length > 0) {
               <div
-                class="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-1.5 z-10 pl-1 mt-1"
+                class="pt-3 mt-auto border-t border-slate-100 flex flex-wrap items-center gap-1.5 z-10 pl-1"
               >
                 <span
                   class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1"
@@ -289,7 +293,7 @@
           </div>
         } @empty {
           <div
-            class="text-center py-12 bg-white border border-dashed border-slate-200 rounded-3xl p-6"
+            class="col-span-full text-center py-12 bg-white border border-dashed border-slate-200 rounded-3xl p-6 max-w-3xl mx-auto w-full"
           >
             <div
               class="w-12 h-12 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-3"
@@ -309,11 +313,13 @@
       </div>
 
       @if (mostrarBotaoCarregarMais()) {
-        <app-botao-carregar-mais
-          texto="Carregar mais membros"
-          [restantes]="totalLista() - membrosLista().length"
-          (carregarMais)="carregarMaisMembros()"
-        />
+        <div class="flex justify-center pt-8">
+          <app-botao-carregar-mais
+            texto="Carregar mais membros"
+            [restantes]="totalLista() - membrosLista().length"
+            (carregarMais)="carregarMaisMembros()"
+          />
+        </div>
       }
     }
   </div>

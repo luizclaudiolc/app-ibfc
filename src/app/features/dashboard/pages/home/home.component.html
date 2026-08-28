@@ -1,341 +1,356 @@
 <app-page-layout>
-  <div class="space-y-8 pb-4">
+  <div class="space-y-8 pb-4 lg:pb-8">
     @if (carregando()) {
-      <div class="space-y-4 animate-pulse">
-        <div class="h-24 bg-slate-200 rounded-2xl"></div>
-        <div class="h-44 bg-slate-200 rounded-2xl"></div>
-        <div class="h-28 bg-slate-200 rounded-2xl"></div>
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <div class="space-y-4 animate-pulse lg:col-span-7 xl:col-span-8">
+          <div class="h-24 rounded-2xl bg-slate-200"></div>
+          <div class="h-44 rounded-2xl bg-slate-200"></div>
+          <div class="h-28 rounded-2xl bg-slate-200"></div>
+        </div>
+        <div class="hidden animate-pulse lg:col-span-5 lg:block xl:col-span-4">
+          <div class="h-96 rounded-2xl bg-slate-200"></div>
+        </div>
       </div>
     } @else {
-      @if (versiculoDiario()) {
-        <app-versiculo-card [versiculo]="versiculoDiario()!" />
-      }
+      <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
+        <div class="min-w-0 space-y-8 lg:col-span-7 xl:col-span-8">
+          @if (versiculoDiario()) {
+            <app-versiculo-card [versiculo]="versiculoDiario()!" />
+          }
 
-      <app-pulso-card />
+          <app-pulso-card />
 
-      @if (pwaService.mostrarBotaoInstalar()) {
-        <div
-          class="bg-gradient-to-r from-sky-600 to-indigo-600 rounded-3xl p-5 shadow-sm text-white flex items-center justify-between gap-4 relative overflow-hidden"
-        >
-          <div
-            class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full pointer-events-none blur-sm"
-          ></div>
-          <div class="flex items-center gap-3.5 relative z-10">
+          @if (pwaService.mostrarBotaoInstalar()) {
             <div
-              class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 shadow-inner"
+              class="relative flex flex-col gap-4 overflow-hidden rounded-3xl bg-gradient-to-r from-sky-600 to-indigo-600 p-5 text-white shadow-sm sm:flex-row sm:items-center sm:justify-between"
             >
-              <mat-icon class="!w-6 !h-6 !text-[24px]">install_mobile</mat-icon>
-            </div>
-            <div>
-              <h3 class="text-xs sm:text-sm font-extrabold tracking-tight">Instalar Aplicativo</h3>
-              <p class="text-[11px] text-sky-100 font-medium">
-                Acesso rápido na tela inicial do celular.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            (click)="pwaService.instalarApp()"
-            class="relative z-10 px-4 py-2.5 bg-white text-sky-700 hover:bg-sky-50 font-extrabold text-xs rounded-2xl shadow-sm transition-all active:scale-95 cursor-pointer shrink-0"
-          >
-            Instalar
-          </button>
-        </div>
-      }
-
-      @if (pwaService.mostrarInstrucoesIos()) {
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 relative mt-3 mb-3">
-          <button
-            type="button"
-            (click)="pwaService.dispensarInstrucoesIos()"
-            class="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors"
-            title="Fechar dica"
-          >
-            <mat-icon class="!w-4 !h-4 !text-[16px]">close</mat-icon>
-          </button>
-
-          <div class="flex items-center gap-3 mb-3 pr-6">
-            <div
-              class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 border border-slate-200 shrink-0"
-            >
-              <mat-icon class="!w-5 !h-5 !text-[20px]">phone_iphone</mat-icon>
-            </div>
-            <div>
-              <h3 class="text-xs font-bold text-slate-800 uppercase tracking-tight">
-                Instale no iPhone
-              </h3>
-              <p class="text-[10px] text-slate-500 font-medium">
-                Acesse o app direto da tela inicial.
-              </p>
-            </div>
-          </div>
-
-          <ol
-            class="text-[11px] text-slate-600 space-y-2.5 font-medium bg-slate-50 p-3 rounded-xl border border-slate-100"
-          >
-            <li class="flex items-center gap-2">
-              <span
-                class="flex items-center justify-center w-4 h-4 rounded-full bg-sky-100 text-sky-700 font-bold text-[9px] shrink-0"
-                >1</span
-              >
-              <span>Toque no botão Compartilhar</span>
-              <mat-icon class="!w-4 !h-4 !text-[16px] text-sky-600 ml-auto shrink-0"
-                >ios_share</mat-icon
-              >
-            </li>
-            <li class="flex items-center gap-2">
-              <span
-                class="flex items-center justify-center w-4 h-4 rounded-full bg-sky-100 text-sky-700 font-bold text-[9px] shrink-0"
-                >2</span
-              >
-              <span>Role e toque em <strong>"Adicionar à Tela de Início"</strong></span>
-              <mat-icon class="!w-4 !h-4 !text-[16px] text-slate-400 ml-auto shrink-0"
-                >add_box</mat-icon
-              >
-            </li>
-          </ol>
-        </div>
-      }
-
-      @if (escalasPessoais().length > 0) {
-        <section class="space-y-3">
-          <app-section-header
-            title="Suas Escalas"
-            icon="event_available"
-            subtitle="{{
-              escalasPessoais().length > 1
-                ? 'Confira seus próximos dias de servir.'
-                : 'Confira seu próximo dia de servir.'
-            }}"
-            [badgeText]="escalasPessoais().length"
-          />
-
-          <app-scrollable-carousel [itemCount]="escalasPessoais().length">
-            @for (escala of escalasPessoais(); track escala.id) {
               <div
-                class="snap-center shrink-0 transition-all duration-300"
-                [ngClass]="escalasPessoais().length === 1 ? 'w-full' : 'w-[92%] sm:w-[70%]'"
-              >
-                <app-escala-card
-                  [escala]="escala"
-                  [nomeEvento]="eventosMap[escala.evento] || escala.evento"
-                  [nomeDepartamento]="obterNomeDepartamento(escala.departamento)"
-                  [nomeUsuario]="nomeUsuario() || ''"
-                  (solicitarSubstituicao)="solicitarTrocaEscala($event)"
-                ></app-escala-card>
-              </div>
-            }
-          </app-scrollable-carousel>
-        </section>
-      }
-
-      @if (aniversariantesDaSemana().length > 0) {
-        <section class="space-y-3">
-          <app-section-header
-            title="Aniversariantes da Semana"
-            icon="cake"
-            subtitle="{{
-              aniversariantesDaSemana().length > 1
-                ? 'Celebre a vida dos nossos irmãos.'
-                : 'Celebre a vida do nosso irmão(ã).'
-            }}"
-            [badgeText]="aniversariantesDaSemana().length"
-          />
-
-          <app-scrollable-carousel [itemCount]="aniversariantesDaSemana().length">
-            @for (aniversariante of aniversariantesDaSemana(); track aniversariante.id) {
-              <div
-                class="snap-center shrink-0 transition-all duration-300"
-                [ngClass]="aniversariantesDaSemana().length === 1 ? 'w-full' : 'w-[92%] sm:w-[70%]'"
-              >
-                <app-birthday-card
-                  [membro]="aniversariante"
-                  [ehHoje]="ehHoje(aniversariante.data_nascimento!)"
-                  (enviarMensagem)="abrirWhatsApp(aniversariante)"
-                />
-              </div>
-            }
-          </app-scrollable-carousel>
-        </section>
-      }
-
-      <section class="space-y-3">
-        <app-section-header
-          title="Quadro de Avisos"
-          icon="campaign"
-          subtitle="Fique por dentro dos próximos eventos da igreja."
-          [badgeText]="avisos().length > 1 ? currentIndex() + 1 + '/' + avisos().length : undefined"
-        />
-
-        @if (avisos().length > 0) {
-          <div
-            #carousel
-            class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-2"
-            (touchstart)="restartAutoScroll()"
-            (mousedown)="restartAutoScroll()"
-          >
-            @for (aviso of avisos(); track aviso.id; let i = $index) {
-              <div class="snap-center shrink-0 w-[90%]">
-                <app-aviso-card [aviso]="aviso" (ampliar)="abrirFoto(aviso.foto_url, 'Aviso')" />
-              </div>
-            }
-          </div>
-
-          @if (avisos().length > 1) {
-            <div class="flex justify-center items-center gap-2 mt-2">
-              @for (aviso of avisos(); track aviso.id; let i = $index) {
+                class="pointer-events-none absolute -right-6 -bottom-6 h-24 w-24 rounded-full bg-white/10 blur-sm"
+              ></div>
+              <div class="relative z-10 flex items-center gap-3.5">
                 <div
-                  class="rounded-full transition-all duration-300"
-                  [ngClass]="
-                    i === currentIndex() % avisos().length
-                      ? 'w-8 h-2 bg-sky-600'
-                      : 'w-2 h-2 bg-slate-200'
-                  "
-                ></div>
-              }
+                  class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 shadow-inner backdrop-blur-md"
+                >
+                  <mat-icon class="!h-6 !w-6 !text-[24px]">install_mobile</mat-icon>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-xs font-extrabold tracking-tight sm:text-sm">
+                    Instalar Aplicativo
+                  </h3>
+                  <p class="text-[11px] font-medium text-sky-100">
+                    Acesso rápido na tela inicial do celular.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                (click)="pwaService.instalarApp()"
+                class="relative z-10 shrink-0 cursor-pointer rounded-2xl bg-white px-4 py-2.5 text-xs font-extrabold text-sky-700 shadow-sm transition-all hover:bg-sky-50 active:scale-95"
+              >
+                Instalar
+              </button>
             </div>
           }
-        } @else {
-          <div
-            class="rounded-3xl border border-dashed border-slate-200 bg-white py-12 flex flex-col items-center justify-center"
-          >
-            <mat-icon class="!w-12 !h-12 !text-[48px] text-slate-300 mb-3"> campaign </mat-icon>
-            <p class="font-semibold text-slate-500">Nenhum aviso disponível</p>
-            <p class="text-sm text-slate-400 mt-1">Novos avisos aparecerão aqui.</p>
-          </div>
-        }
-      </section>
 
-      <app-pix-card />
-
-      <section class="space-y-3">
-        <app-section-header
-          title="Membros da Família"
-          icon="groups"
-          subtitle="Encontre irmãos, líderes e ministérios."
-          [badgeText]="membrosFiltrados().length + ' ativos'"
-        />
-
-        <div class="flex items-center gap-2 w-full mt-1">
-          <div class="relative flex-1">
-            <input
-              type="text"
-              (input)="aoBuscarMembro($any($event.target).value)"
-              placeholder="Pesquisar irmão, líder ou ministério..."
-              class="w-full pl-5 pr-12 py-3 text-sm bg-white border border-slate-200 text-slate-800 rounded-2xl focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-sm placeholder-slate-400"
-            />
-            <mat-icon
-              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none w-5 h-5 flex justify-center items-center"
+          @if (pwaService.mostrarInstrucoesIos()) {
+            <div
+              class="relative mt-3 mb-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
             >
-              search
-            </mat-icon>
-          </div>
+              <button
+                type="button"
+                (click)="pwaService.dispensarInstrucoesIos()"
+                class="absolute top-2 right-2 rounded-full bg-slate-50 p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                title="Fechar dica"
+              >
+                <mat-icon class="!h-4 !w-4 !text-[16px]">close</mat-icon>
+              </button>
+              <div class="mb-3 flex items-center gap-3 pr-6">
+                <div
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-slate-700"
+                >
+                  <mat-icon class="!h-5 !w-5 !text-[20px]">phone_iphone</mat-icon>
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-xs font-bold tracking-tight text-slate-800 uppercase">
+                    Instale no iPhone
+                  </h3>
+                  <p class="text-[10px] font-medium text-slate-500">
+                    Acesse o app direto da tela inicial.
+                  </p>
+                </div>
+              </div>
+              <ol
+                class="space-y-2.5 rounded-xl border border-slate-100 bg-slate-50 p-3 text-[11px] font-medium text-slate-600"
+              >
+                <li class="flex items-center gap-2">
+                  <span
+                    class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-sky-100 text-[9px] font-bold text-sky-700"
+                    >1</span
+                  >
+                  <span>Toque no botão Compartilhar</span>
+                  <mat-icon class="ml-auto h-4 w-4 shrink-0 !text-[16px] text-sky-600"
+                    >ios_share</mat-icon
+                  >
+                </li>
+                <li class="flex items-center gap-2">
+                  <span
+                    class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-sky-100 text-[9px] font-bold text-sky-700"
+                    >2</span
+                  >
+                  <span>Role e toque em <strong>"Adicionar à Tela de Início"</strong></span>
+                  <mat-icon class="ml-auto h-4 w-4 shrink-0 !text-[16px] text-slate-400"
+                    >add_box</mat-icon
+                  >
+                </li>
+              </ol>
+            </div>
+          }
 
-          <button
-            type="button"
-            (click)="mostrarFiltrosAvancados.set(!mostrarFiltrosAvancados())"
-            class="shrink-0 h-[46px] w-[46px] rounded-2xl border flex items-center justify-center transition-all relative cursor-pointer shadow-sm"
-            [ngClass]="
-              filtroMinisterio() !== 'TODOS'
-                ? 'bg-sky-50 border-sky-300 text-sky-600 shadow-sky-100'
-                : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
-            "
-          >
-            <mat-icon class="!w-5 !h-5 !text-[20px]">tune</mat-icon>
+          @if (escalasPessoais().length > 0) {
+            <section class="space-y-3">
+              <app-section-header
+                title="Suas Escalas"
+                icon="event_available"
+                subtitle="{{
+                  escalasPessoais().length > 1
+                    ? 'Confira seus próximos dias de servir.'
+                    : 'Confira seu próximo dia de servir.'
+                }}"
+                [badgeText]="escalasPessoais().length"
+              />
+              <app-scrollable-carousel [itemCount]="escalasPessoais().length">
+                @for (escala of escalasPessoais(); track escala.id) {
+                  <div
+                    class="snap-center shrink-0 transition-all duration-300"
+                    [ngClass]="
+                      escalasPessoais().length === 1
+                        ? 'w-full'
+                        : 'w-[92%] sm:w-[75%] md:w-[55%] lg:w-[85%]'
+                    "
+                  >
+                    <app-escala-card
+                      [escala]="escala"
+                      [nomeEvento]="eventosMap[escala.evento] || escala.evento"
+                      [nomeDepartamento]="obterNomeDepartamento(escala.departamento)"
+                      [nomeUsuario]="nomeUsuario() || ''"
+                      (solicitarSubstituicao)="solicitarTrocaEscala($event)"
+                    ></app-escala-card>
+                  </div>
+                }
+              </app-scrollable-carousel>
+            </section>
+          }
 
-            @if (filtroMinisterio() !== 'TODOS') {
-              <span
-                class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-sky-500 shadow-sm border border-white"
-              ></span>
+          @if (aniversariantesDaSemana().length > 0) {
+            <section class="space-y-3">
+              <app-section-header
+                title="Aniversariantes da Semana"
+                icon="cake"
+                subtitle="{{
+                  aniversariantesDaSemana().length > 1
+                    ? 'Celebre a vida dos nossos irmãos.'
+                    : 'Celebre a vida do nosso irmão(ã).'
+                }}"
+                [badgeText]="aniversariantesDaSemana().length"
+              />
+              <app-scrollable-carousel [itemCount]="aniversariantesDaSemana().length">
+                @for (aniversariante of aniversariantesDaSemana(); track aniversariante.id) {
+                  <div
+                    class="snap-center shrink-0 transition-all duration-300"
+                    [ngClass]="
+                      aniversariantesDaSemana().length === 1
+                        ? 'w-full'
+                        : 'w-[92%] sm:w-[75%] md:w-[55%] lg:w-[85%]'
+                    "
+                  >
+                    <app-birthday-card
+                      [membro]="aniversariante"
+                      [ehHoje]="ehHoje(aniversariante.data_nascimento!)"
+                      (enviarMensagem)="abrirWhatsApp(aniversariante)"
+                    />
+                  </div>
+                }
+              </app-scrollable-carousel>
+            </section>
+          }
+
+          <section class="space-y-3">
+            <app-section-header
+              title="Quadro de Avisos"
+              icon="campaign"
+              subtitle="Fique por dentro dos próximos eventos da igreja."
+              [badgeText]="
+                avisos().length > 1 ? currentIndex() + 1 + '/' + avisos().length : undefined
+              "
+            />
+            @if (avisos().length > 0) {
+              <div
+                #carousel
+                class="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2"
+                (touchstart)="restartAutoScroll()"
+                (mousedown)="restartAutoScroll()"
+              >
+                @for (aviso of avisos(); track aviso.id; let i = $index) {
+                  <div class="w-[90%] shrink-0 snap-center sm:w-[80%] md:w-[60%] lg:w-[92%]">
+                    <app-aviso-card
+                      [aviso]="aviso"
+                      (ampliar)="abrirFoto(aviso.foto_url, 'Aviso')"
+                    />
+                  </div>
+                }
+              </div>
+              @if (avisos().length > 1) {
+                <div class="mt-2 flex items-center justify-center gap-2">
+                  @for (aviso of avisos(); track aviso.id; let i = $index) {
+                    <div
+                      class="rounded-full transition-all duration-300"
+                      [ngClass]="
+                        i === currentIndex() % avisos().length
+                          ? 'h-2 w-8 bg-sky-600'
+                          : 'h-2 w-2 bg-slate-200'
+                      "
+                    ></div>
+                  }
+                </div>
+              }
+            } @else {
+              <div
+                class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white py-12"
+              >
+                <mat-icon class="mb-3 !h-12 !w-12 !text-[48px] text-slate-300">campaign</mat-icon>
+                <p class="font-semibold text-slate-500">Nenhum aviso disponível</p>
+                <p class="mt-1 text-sm text-slate-400">Novos avisos aparecerão aqui.</p>
+              </div>
             }
-          </button>
+          </section>
+
+          <app-pix-card />
         </div>
 
-        @if (mostrarFiltrosAvancados()) {
-          <div class="animate-fade-in bg-white border border-slate-200 rounded-2xl p-3 shadow-sm">
-            <div class="flex items-center justify-between mb-2 px-1">
-              <p
-                class="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1"
+        <section class="min-w-0 space-y-3 lg:sticky lg:top-20 lg:col-span-5 xl:col-span-4">
+          <app-section-header
+            title="Membros da Família"
+            icon="groups"
+            subtitle="Encontre irmãos, líderes e ministérios."
+            [badgeText]="membrosFiltrados().length + ' ativos'"
+          />
+
+          <div class="mt-1 flex w-full items-center gap-2">
+            <div class="relative min-w-0 flex-1">
+              <input
+                type="text"
+                (input)="aoBuscarMembro($any($event.target).value)"
+                placeholder="Pesquisar irmão, líder ou ministério..."
+                class="w-full rounded-2xl border border-slate-200 bg-white py-3 pr-12 pl-5 text-sm text-slate-800 shadow-sm placeholder-slate-400 transition-all focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 focus:outline-none"
+              />
+              <mat-icon
+                class="pointer-events-none absolute top-1/2 right-4 flex h-5 w-5 -translate-y-1/2 items-center justify-center text-slate-400"
               >
-                <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">groups</mat-icon> Filtrar por
-                Ministério
-              </p>
+                search
+              </mat-icon>
+            </div>
+            <button
+              type="button"
+              (click)="mostrarFiltrosAvancados.set(!mostrarFiltrosAvancados())"
+              class="relative flex h-[46px] w-[46px] shrink-0 cursor-pointer items-center justify-center rounded-2xl border shadow-sm transition-all"
+              [ngClass]="
+                filtroMinisterio() !== 'TODOS'
+                  ? 'border-sky-300 bg-sky-50 text-sky-600 shadow-sky-100'
+                  : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50'
+              "
+            >
+              <mat-icon class="!h-5 !w-5 !text-[20px]">tune</mat-icon>
               @if (filtroMinisterio() !== 'TODOS') {
+                <span
+                  class="absolute top-2.5 right-2.5 h-2 w-2 rounded-full border border-white bg-sky-500 shadow-sm"
+                ></span>
+              }
+            </button>
+          </div>
+
+          @if (mostrarFiltrosAvancados()) {
+            <div class="animate-fade-in rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+              <div class="mb-2 flex items-center justify-between px-1">
+                <p
+                  class="flex items-center gap-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase"
+                >
+                  <mat-icon class="!h-3.5 !w-3.5 !text-[14px]">groups</mat-icon> Filtrar por
+                  Ministério
+                </p>
+                @if (filtroMinisterio() !== 'TODOS') {
+                  <button
+                    type="button"
+                    (click)="definirFiltroMinisterio('TODOS')"
+                    class="cursor-pointer text-[10px] font-bold text-sky-600 hover:underline"
+                  >
+                    Limpar filtro
+                  </button>
+                }
+              </div>
+              <div class="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
                 <button
                   type="button"
                   (click)="definirFiltroMinisterio('TODOS')"
-                  class="text-[10px] font-bold text-sky-600 hover:underline cursor-pointer"
-                >
-                  Limpar filtro
-                </button>
-              }
-            </div>
-
-            <div class="flex gap-2 overflow-x-auto no-scrollbar items-center pb-1">
-              <button
-                type="button"
-                (click)="definirFiltroMinisterio('TODOS')"
-                class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer"
-                [ngClass]="
-                  filtroMinisterio() === 'TODOS'
-                    ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
-                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                "
-              >
-                Todos
-              </button>
-
-              @for (min of ministeriosDisponiveis; track min.value) {
-                <button
-                  type="button"
-                  (click)="definirFiltroMinisterio(min.value)"
-                  class="whitespace-nowrap px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer flex items-center gap-1"
+                  class="cursor-pointer rounded-xl border px-3.5 py-1.5 text-xs font-bold whitespace-nowrap transition-all"
                   [ngClass]="
-                    filtroMinisterio() === min.value
-                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-200'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-sky-600'
+                    filtroMinisterio() === 'TODOS'
+                      ? 'border-slate-800 bg-slate-800 text-white shadow-sm'
+                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
                   "
                 >
-                  @if (filtroMinisterio() === min.value) {
-                    <mat-icon class="!w-3.5 !h-3.5 !text-[14px]">check</mat-icon>
-                  }
-                  {{ min.label }}
+                  Todos
                 </button>
-              }
-            </div>
-          </div>
-        }
-
-        <div class="space-y-2.5">
-          @for (membro of membrosExibidos(); track membro.id) {
-            <app-membro-list-item
-              [membro]="membro"
-              [isCurrentUser]="membro.email?.toLowerCase() === emailUsuario().toLowerCase()"
-              [cargoNome]="cargosDisponiveis[membro.cargo || ''] || 'Membro'"
-              [departamentoNome]="
-                membro.setor_responsavel && membro.setor_responsavel !== 'membro'
-                  ? departamentos[membro.setor_responsavel]
-                  : undefined
-              "
-            />
-          } @empty {
-            <div
-              class="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-sm"
-            >
-              Nenhum membro encontrado com esse filtro.
+                @for (min of ministeriosDisponiveis; track min.value) {
+                  <button
+                    type="button"
+                    (click)="definirFiltroMinisterio(min.value)"
+                    class="flex cursor-pointer items-center gap-1 rounded-xl border px-3.5 py-1.5 text-xs font-bold whitespace-nowrap transition-all"
+                    [ngClass]="
+                      filtroMinisterio() === min.value
+                        ? 'border-sky-600 bg-sky-600 text-white shadow-sm shadow-sky-200'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-sky-600'
+                    "
+                  >
+                    @if (filtroMinisterio() === min.value) {
+                      <mat-icon class="!h-3.5 !w-3.5 !text-[14px]">check</mat-icon>
+                    }
+                    {{ min.label }}
+                  </button>
+                }
+              </div>
             </div>
           }
-        </div>
 
-        @if (mostrarBotaoCarregarMais()) {
-          <app-botao-carregar-mais
-            texto="Carregar mais membros"
-            [restantes]="membrosFiltrados().length - membrosExibidos().length"
-            (carregarMais)="carregarMaisMembros()"
-          />
-        }
-      </section>
+          <div class="space-y-2.5">
+            @for (membro of membrosExibidos(); track membro.id) {
+              <app-membro-list-item
+                [membro]="membro"
+                [isCurrentUser]="membro.email?.toLowerCase() === emailUsuario().toLowerCase()"
+                [cargoNome]="cargosDisponiveis[membro.cargo || ''] || 'Membro'"
+                [departamentoNome]="
+                  membro.setor_responsavel && membro.setor_responsavel !== 'membro'
+                    ? departamentos[membro.setor_responsavel]
+                    : undefined
+                "
+              />
+            } @empty {
+              <div
+                class="rounded-2xl border border-dashed border-slate-200 bg-white py-12 text-center text-sm text-slate-400"
+              >
+                Nenhum membro encontrado com esse filtro.
+              </div>
+            }
+          </div>
+
+          @if (mostrarBotaoCarregarMais()) {
+            <app-botao-carregar-mais
+              texto="Carregar mais membros"
+              [restantes]="membrosFiltrados().length - membrosExibidos().length"
+              (carregarMais)="carregarMaisMembros()"
+            />
+          }
+        </section>
+      </div>
     }
   </div>
 </app-page-layout>
