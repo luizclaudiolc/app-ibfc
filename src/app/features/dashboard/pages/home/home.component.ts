@@ -56,6 +56,9 @@ import { MembroListItemComponent } from '../../../../shared/components/lista-mem
 import { PixCardComponent } from '../../../../shared/components/pix/pix-card.component';
 import { PulsoCardComponent } from '../../../../shared/components/pulso-card/pulso-card.component';
 import { SectionHeaderComponent } from '../../../../shared/components/section-header/section-header.component';
+import { SkeletonCardComponent } from '../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
+import { LoadingSpinnerComponent } from '../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
+import { EmptyStateComponent } from '../../../../shared/components/app-empty-state/app-empty-state.component';
 
 @Component({
   selector: 'app-home',
@@ -75,6 +78,9 @@ import { SectionHeaderComponent } from '../../../../shared/components/section-he
     PulsoCardComponent,
     BotaoCarregarMaisComponent,
     PixCardComponent,
+    EmptyStateComponent,
+    LoadingSpinnerComponent,
+    SkeletonCardComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',

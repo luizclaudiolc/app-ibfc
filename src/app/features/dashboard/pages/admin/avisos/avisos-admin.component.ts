@@ -12,6 +12,8 @@ import { AvisoFormDialogComponent } from './modal/aviso-form-dialog.component';
 import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
 import { BotaoCarregarMaisComponent } from '../../../../../shared/components/botao-carregar-mais/botao-carregar-mais.component';
 import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../../shared/models/consts';
+import { SkeletonCardComponent } from '../../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
+import { LoadingSpinnerComponent } from '../../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
 
 @Component({
   selector: 'app-avisos-admin',
@@ -22,6 +24,8 @@ import { LIMITE_CARREGAMENTO_INICIAL } from '../../../../../shared/models/consts
     PageLayoutComponent,
     PageHeaderComponent,
     BotaoCarregarMaisComponent,
+    SkeletonCardComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './avisos-admin.component.html',
 })

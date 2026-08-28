@@ -13,6 +13,9 @@ import { NotificationService } from '../../../../core/services/notifications.ser
 import { VideoPlayerModalComponent } from '../../../../shared/components/modal-player-video/video-player-modal.component';
 import { MidiaFormDialogComponent } from '../../../../shared/components/midias/modal/midia-form-dialog.component';
 import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
+import { SkeletonCardComponent } from '../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
+import { LoadingSpinnerComponent } from '../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
+import { EmptyStateComponent } from '../../../../shared/components/app-empty-state/app-empty-state.component';
 
 @Component({
   selector: 'app-midias',
@@ -23,6 +26,9 @@ import { GenericDialogComponent } from '../../../../shared/components/modal-gene
     PageLayoutComponent,
     PageHeaderComponent,
     BotaoCarregarMaisComponent,
+    SkeletonCardComponent,
+    LoadingSpinnerComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './midias.component.html',
 })

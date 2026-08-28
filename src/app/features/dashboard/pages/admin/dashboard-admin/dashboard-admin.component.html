@@ -7,9 +7,7 @@
     ></app-page-header>
 
     @if (carregando()) {
-      <div class="flex justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
-        <mat-spinner diameter="40"></mat-spinner>
-      </div>
+      <app-skeleton-card [quantidade]="4" tipo="quadrado" />
     } @else if (dados(); as d) {
       @if (d.membrosPendentes > 0) {
         <div

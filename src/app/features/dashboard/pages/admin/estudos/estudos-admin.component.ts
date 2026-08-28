@@ -14,6 +14,9 @@ import { BotaoCarregarMaisComponent } from '../../../../../shared/components/bot
 import { ENiveisAcesso, LIMITE_CARREGAMENTO_INICIAL } from '../../../../../shared/models/consts';
 import { AcoesEstudoComponent } from '../../../../../shared/components/botoes-acoes-estudo/acoes-estudo.component';
 import { AuthService } from '../../../../../core/services/auth.service';
+import { EmptyStateComponent } from '../../../../../shared/components/app-empty-state/app-empty-state.component';
+import { SkeletonCardComponent } from '../../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
+import { LoadingSpinnerComponent } from '../../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
 
 @Component({
   selector: 'app-estudos-admin',
@@ -26,6 +29,9 @@ import { AuthService } from '../../../../../core/services/auth.service';
     PageHeaderComponent,
     BotaoCarregarMaisComponent,
     AcoesEstudoComponent,
+    EmptyStateComponent,
+    SkeletonCardComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './estudos-admin.component.html',
 })

@@ -1,16 +1,7 @@
 <app-page-layout>
   <div class="space-y-8 pb-4 lg:pb-8">
     @if (carregando()) {
-      <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
-        <div class="space-y-4 animate-pulse lg:col-span-7 xl:col-span-8">
-          <div class="h-24 rounded-2xl bg-slate-200"></div>
-          <div class="h-44 rounded-2xl bg-slate-200"></div>
-          <div class="h-28 rounded-2xl bg-slate-200"></div>
-        </div>
-        <div class="hidden animate-pulse lg:col-span-5 lg:block xl:col-span-4">
-          <div class="h-96 rounded-2xl bg-slate-200"></div>
-        </div>
-      </div>
+      <app-skeleton-card [quantidade]="8" tipo="quadrado" />
     } @else {
       <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
         <div class="min-w-0 space-y-8 lg:col-span-7 xl:col-span-8">
@@ -334,10 +325,12 @@
                 "
               />
             } @empty {
-              <div
-                class="rounded-2xl border border-dashed border-slate-200 bg-white py-12 text-center text-sm text-slate-400"
-              >
-                Nenhum membro encontrado com esse filtro.
+              <div class="col-span-full">
+                <app-empty-state
+                  icone="search_off"
+                  titulo="Nenhum membro encontrado"
+                  subtitulo="Tente pesquisar por outro nome, termo ou limpar os filtros aplicados."
+                />
               </div>
             }
           </div>

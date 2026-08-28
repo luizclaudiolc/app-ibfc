@@ -18,6 +18,7 @@ import {
   EstatisticasService,
 } from '../../../../../core/services/estatisticas.service';
 import { PageHeaderComponent } from '../../../../../shared/components/page-header/page-header.component';
+import { SkeletonCardComponent } from '../../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
@@ -30,6 +31,7 @@ Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
     PageLayoutComponent,
     BaseChartDirective,
     PageHeaderComponent,
+    SkeletonCardComponent,
   ],
   templateUrl: './dashboard-admin.component.html',
 })

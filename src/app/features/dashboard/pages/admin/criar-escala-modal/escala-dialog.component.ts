@@ -14,11 +14,19 @@ import { EscalaService } from '../../../../../core/services/escala.service';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { GenericDialogComponent } from '../../../../../shared/components/modal-generico/modal-generico.component';
 import { DialogLayoutComponent } from '../../../../../shared/components/layout-modal/dialog-layout.component';
+import { LoadingSpinnerComponent } from '../../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
 
 @Component({
   selector: 'app-escala-dialog',
   standalone: true,
-  imports: [ReactiveFormsModule, MaterialModule, DatePipe, CommonModule, DialogLayoutComponent],
+  imports: [
+    ReactiveFormsModule,
+    MaterialModule,
+    DatePipe,
+    CommonModule,
+    DialogLayoutComponent,
+    LoadingSpinnerComponent,
+  ],
   templateUrl: './escala-dialog.component.html',
 })
 export class EscalaDialogComponent implements OnInit {

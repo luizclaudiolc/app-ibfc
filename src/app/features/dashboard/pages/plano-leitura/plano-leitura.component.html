@@ -7,11 +7,7 @@
     ></app-page-header>
 
     @if (carregando()) {
-      <div
-        class="flex w-full justify-center rounded-3xl border border-slate-100 bg-white py-20 shadow-sm"
-      >
-        <mat-spinner diameter="40" class="!stroke-indigo-500"></mat-spinner>
-      </div>
+      <app-skeleton-card [quantidade]="8" tipo="card" />
     } @else if (planoSelecionado()) {
       <div
         class="no-scrollbar flex items-center gap-2 overflow-x-auto px-1 pb-2 sm:flex-wrap sm:overflow-visible"

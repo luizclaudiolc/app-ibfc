@@ -28,6 +28,8 @@ import {
 import { Filho } from '../../../../shared/models/filhos.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../../core/services/notifications.service';
+import { EmptyStateComponent } from '../../../../shared/components/app-empty-state/app-empty-state.component';
+import { SkeletonCardComponent } from '../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
 
 @Component({
   selector: 'app-admin',
@@ -38,6 +40,8 @@ import { NotificationService } from '../../../../core/services/notifications.ser
     PageLayoutComponent,
     PageHeaderComponent,
     BotaoCarregarMaisComponent,
+    EmptyStateComponent,
+    SkeletonCardComponent,
   ],
   templateUrl: './admin.html',
   styleUrl: './admin.css',

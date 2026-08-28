@@ -144,11 +144,7 @@
     </div>
 
     @if (carregando()) {
-      <div
-        class="max-w-3xl mx-auto flex justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100 mt-6"
-      >
-        <mat-spinner diameter="40"></mat-spinner>
-      </div>
+      <app-skeleton-card [quantidade]="8" tipo="card" />
     } @else if (erroMembros()) {
       <div
         class="max-w-3xl mx-auto bg-red-50 text-red-600 text-center py-6 px-6 rounded-3xl border border-red-100 shadow-sm mt-6"
@@ -292,22 +288,16 @@
             }
           </div>
         } @empty {
-          <div
-            class="col-span-full text-center py-12 bg-white border border-dashed border-slate-200 rounded-3xl p-6 max-w-3xl mx-auto w-full"
-          >
-            <div
-              class="w-12 h-12 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-3"
-            >
-              <mat-icon>search_off</mat-icon>
-            </div>
-            <p class="text-sm font-bold text-slate-700">Nenhum membro encontrado</p>
-            <p class="text-xs text-slate-400 mt-1">
-              {{
+          <div class="col-span-full">
+            <app-empty-state
+              icone="search_off"
+              titulo="Nenhum membro encontrado"
+              subtitulo="{{
                 filtroStatus() === 'TODOS' && filtroMinisterio() === 'TODOS'
                   ? 'Tente buscar por outro termo ou nome.'
                   : 'Nenhum membro com os filtros selecionados.'
-              }}
-            </p>
+              }}"
+            />
           </div>
         }
       </div>

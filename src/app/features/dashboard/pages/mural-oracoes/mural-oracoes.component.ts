@@ -17,6 +17,7 @@ import { GenericDialogComponent } from '../../../../shared/components/modal-gene
 import { EditarPedidoDialogComponent } from '../../../../shared/components/editar-oracao/editar-pedido-dialog.component';
 import { ENiveisAcesso, LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/models/consts';
 import { PedidoOracao, PedidoOracaoService } from '../../../../core/services/pedido-oracao.service';
+import { LoadingSpinnerComponent } from '../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
 
 @Component({
   selector: 'app-mural-oracoes',
@@ -29,6 +30,7 @@ import { PedidoOracao, PedidoOracaoService } from '../../../../core/services/ped
     OracaoCardComponent,
     PageHeaderComponent,
     BotaoCarregarMaisComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './mural-oracoes.component.html',
 })

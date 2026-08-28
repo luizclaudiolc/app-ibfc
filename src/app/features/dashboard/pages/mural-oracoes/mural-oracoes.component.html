@@ -115,7 +115,7 @@
               [disabled]="salvando() || oracaoForm.invalid"
             >
               @if (salvando()) {
-                <mat-spinner diameter="16" class="!mr-2 !inline-block"></mat-spinner>
+                <app-loading-spinner [diametro]="16" [inline]="true" />
               }
               {{ salvando() ? 'Publicando...' : 'Publicar no Mural' }}
             </button>
@@ -128,9 +128,9 @@
       <mat-tab label="Para Interceder">
         @if (pedidos().length > 0) {
           <div
-            class="flex h-full flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:shadow-md"
+            class="flex flex-col gap-3 rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:shadow-md"
           >
-            <div class="relative min-w-0 flex-1">
+            <div class="relative w-full min-w-0">
               <input
                 type="text"
                 [formControl]="buscaControl"

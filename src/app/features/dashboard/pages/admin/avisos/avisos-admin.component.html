@@ -13,7 +13,7 @@
           class="w-full sm:w-auto px-5 py-3 bg-sky-600 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-sm hover:bg-sky-700 hover:shadow-md transition-all active:scale-95 disabled:opacity-60 disabled:bg-slate-300 flex items-center justify-center gap-2 cursor-pointer"
         >
           @if (carregandoUpload()) {
-            <mat-spinner diameter="18" class="!stroke-white"></mat-spinner>
+            <app-loading-spinner [diametro]="16" [inline]="true" />
             <span class="pt-[1px]">Enviando...</span>
           } @else {
             <mat-icon class="!w-[18px] !h-[18px] !text-[18px] !leading-none overflow-visible"
@@ -47,12 +47,7 @@
       </div>
 
       @if (carregandoAvisos()) {
-        <div class="flex flex-col items-center justify-center py-20 gap-3 text-slate-500">
-          <mat-spinner diameter="36" class="!stroke-sky-600"></mat-spinner>
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
-            Carregando banners...
-          </p>
-        </div>
+        <app-skeleton-card [quantidade]="4" tipo="quadrado" />
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-2">
           @for (aviso of avisosExibidos(); track aviso.id) {

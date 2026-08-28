@@ -7,11 +7,18 @@ import { PageHeaderComponent } from '../../../../shared/components/page-header/p
 import { PlanoLeituraService } from '../../../../core/services/plano-leitura.service';
 import { ItemPlanoLeitura, PlanoLeitura } from '../../../../shared/models/plano-leitura.const';
 import { LeituraBiblicaDialogComponent } from '../../../../shared/components/leitura-biblica-dialog/leitura-biblica-dialog.component';
+import { SkeletonCardComponent } from '../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
 
 @Component({
   selector: 'app-plano-leitura',
   standalone: true,
-  imports: [CommonModule, MaterialModule, PageLayoutComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    PageLayoutComponent,
+    PageHeaderComponent,
+    SkeletonCardComponent,
+  ],
   templateUrl: './plano-leitura.component.html',
 })
 export class PlanoLeituraComponent implements OnInit {
