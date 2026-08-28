@@ -24,27 +24,13 @@ jobs:
       - name: Instalar Dependências
         run: npm ci --legacy-peer-deps
 
-      - name: Injetar Variáveis nos Environments
+      - name: Gerar Arquivo Environment com Variáveis
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          VAPID_PUBLICKEY: ${{ secrets.VAPID_PUBLIC_KEY }}
         run: |
-          cat << EOF > src/environments/environments.ts
-          export const environment = {
-            production: true,
-            supabaseUrl: '${{ secrets.SUPABASE_URL }}',
-            supabaseKey: '${{ secrets.SUPABASE_ANON_KEY }}',
-            youtubeApiKey: '${{ secrets.YOUTUBE_API_KEY }}',
-            vapidPublicKey: '${{ secrets.VAPID_PUBLIC_KEY }}'
-          };
-          EOF
-
-          cat << EOF > src/environments/environments.ts
-          export const environment = {
-            production: false,
-            supabaseUrl: '${{ secrets.SUPABASE_URL }}',
-            supabaseKey: '${{ secrets.SUPABASE_ANON_KEY }}',
-            youtubeApiKey: '${{ secrets.YOUTUBE_API_KEY }}',
-            vapidPublicKey: '${{ secrets.VAPID_PUBLIC_KEY }}'
-          };
-          EOF
 
       - name: Build do Projeto (Angular)
         run: npm run build -- --configuration production --base-href /app-ibfc/
