@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
       titulo = 'Nova Escala atribuída a você! 📅';
       const departamento = record.departamento ?? 'seu departamento';
       const data = record.data_escala ?? '';
-      texto = `Você foi escalado(a) para servir em: ${DEPARTAMENTOS_DISPONIVEIS_MAP[departamento]} na data: ${formatarParaBr(data)}.`;
+      texto = `Sua escala para servir no(a) ${DEPARTAMENTOS_DISPONIVEIS_MAP[departamento]} está confirmada para o dia ${formatarParaBr(data)}.`;
       url = '/dashboard/home';
 
       const textoVoluntarios = record.voluntarios;
