@@ -22,6 +22,12 @@ const normalizarNome = (str: string) => {
     .trim();
 };
 
+const formatarParaBr = (dataIso: string) => {
+  if (!dataIso) return '';
+  const [ano, mes, dia] = dataIso.split('-');
+  return `${dia}/${mes}/${ano}`;
+};
+
 const LISTA_BASE_MINISTERIOS_DEPARTAMENTOS = [
   { label: 'Louvor', value: 'louvor' },
   { label: 'Mídia', value: 'midia' },
@@ -88,9 +94,10 @@ Deno.serve(async (req) => {
     // 2. CENÁRIO: ESCALA
     // ==========================================
     else if (isEscala) {
-      titulo = 'Nova Escala Atribuída! 📅';
+      titulo = 'Nova Escala atribuída a você! 📅';
       const departamento = record.departamento ?? 'seu departamento';
-      texto = `Você foi escalado(a) para servir em: ${DEPARTAMENTOS_DISPONIVEIS_MAP[departamento]}.`;
+      const data = record.data_escala ?? '';
+      texto = `Você foi escalado(a) para servir em: ${DEPARTAMENTOS_DISPONIVEIS_MAP[departamento]} na data: ${formatarParaBr(data)}.`;
       url = '/dashboard/home';
 
       const textoVoluntarios = record.voluntarios;
