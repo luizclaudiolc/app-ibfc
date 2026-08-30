@@ -466,4 +466,27 @@ export class AuthService {
 
     this.atualizarPropriedadeSessao({ bibliaCache: cacheMap });
   }
+
+  async verificarEAtualizarStatus(): Promise<EStatusMembro | null> {
+    try {
+      const { data: authData, error: authError } =
+        await this.supabaseService.supabase.auth.getUser();
+      if (authError || !authData.user) return null;
+
+      const { data: perfil, error } = await this.supabaseService.supabase
+        .from('membros')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (error || !perfil) return null;
+
+      this.atualizarLocalStorage(perfil);
+
+      return perfil.status as EStatusMembro;
+    } catch (error) {
+      console.error('Erro ao verificar status:', error);
+      return null;
+    }
+  }
 }
