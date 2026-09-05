@@ -5,6 +5,7 @@
     } @else {
       <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
         <div class="min-w-0 space-y-8 lg:col-span-7 xl:col-span-8">
+          <app-streak-chip [streak]="streak()" />
           @if (versiculoDiario()) {
             <app-versiculo-card [versiculo]="versiculoDiario()!" />
           }

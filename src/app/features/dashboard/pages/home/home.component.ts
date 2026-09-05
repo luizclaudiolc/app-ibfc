@@ -60,6 +60,11 @@ import { SkeletonCardComponent } from '../../../../shared/components/app-skeleto
 import { LoadingSpinnerComponent } from '../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
 import { EmptyStateComponent } from '../../../../shared/components/app-empty-state/app-empty-state.component';
 import { OnboardingService } from '../../../../core/services/onboarding.service';
+import {
+  PlanoLeituraService,
+  StreakLeitura,
+} from '../../../../core/services/plano-leitura.service';
+import { StreakChipComponent } from '../../../../shared/components/streak-chip/streak-chip.component';
 
 @Component({
   selector: 'app-home',
@@ -82,6 +87,7 @@ import { OnboardingService } from '../../../../core/services/onboarding.service'
     EmptyStateComponent,
     LoadingSpinnerComponent,
     SkeletonCardComponent,
+    StreakChipComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
@@ -97,6 +103,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly notification = inject(NotificationService);
   public readonly pwaService = inject(PwaService);
   private readonly onboarding = inject(OnboardingService);
+  private readonly planoService = inject(PlanoLeituraService);
 
   nomeUsuario = this.authService.nomeUsuario$;
   emailUsuario = signal<string>(this.authService.obterUsuarioLogado().email || '');
@@ -105,6 +112,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   avisos = signal<Aviso[]>([]);
   escalas = signal<Escala[]>([]);
   versiculoDiario = signal<VersiculoDia | null>(null);
+  streak = signal<StreakLeitura>({ atual: 0, recorde: 0, ultima: null });
 
   aniversariantes = signal<Membro[]>([]);
   membrosLista = signal<Membro[]>([]);
@@ -173,6 +181,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         ministerio: this.filtroMinisterio(),
       }),
       versiculo: this.devocionalService.obterVersiculoDoDia(),
+      streak: this.planoService.obterStreak(),
     })
       .pipe(finalize(() => this.carregando.set(false)))
       .subscribe({
@@ -183,6 +192,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.membrosLista.set(res.membros.data);
           this.totalMembros.set(res.membros.total);
           this.versiculoDiario.set(res.versiculo);
+          this.streak.set(res.streak);
         },
         error: (err) => console.error('Erro ao carregar dados', err),
       });

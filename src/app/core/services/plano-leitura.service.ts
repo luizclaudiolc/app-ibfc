@@ -5,9 +5,58 @@ import { SupabaseService } from './supabase';
 import { AuthService } from './auth.service';
 import { PlanoLeitura, PLANOS_LEITURA } from '../../shared/models/plano-leitura.const';
 
+const STREAK_KEY = '_streak';
+const STREAK_VAZIO: StreakLeitura = { atual: 0, recorde: 0, ultima: null };
+
+const hojeISO = (): string => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+const ontemISO = (): string => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+const ehStreak = (valor: unknown): valor is StreakLeitura => {
+  return !!valor && typeof valor === 'object' && 'atual' in (valor as object);
+};
+
+const soPlanos = (raw: Record<string, unknown> | null | undefined): Record<string, number[]> => {
+  const out: Record<string, number[]> = {};
+  if (!raw) return out;
+  for (const [chave, valor] of Object.entries(raw)) {
+    if (chave === STREAK_KEY) continue;
+    if (Array.isArray(valor)) out[chave] = valor as number[];
+  }
+  return out;
+};
+
+const lerStreak = (raw: Record<string, unknown> | null | undefined): StreakLeitura => {
+  const s = raw?.[STREAK_KEY];
+  return ehStreak(s) ? s : STREAK_VAZIO;
+};
+
+const avancarStreak = (atual: StreakLeitura): StreakLeitura => {
+  const hoje = hojeISO();
+  if (atual.ultima === hoje) return atual;
+  const novoAtual = atual.ultima === ontemISO() ? atual.atual + 1 : 1;
+  return {
+    atual: novoAtual,
+    recorde: Math.max(atual.recorde, novoAtual),
+    ultima: hoje,
+  };
+};
 export interface CapituloBiblia {
   referencia: string;
   versiculos: { verse: number; text: string }[];
+}
+
+export interface StreakLeitura {
+  atual: number;
+  recorde: number;
+  ultima: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,16 +75,32 @@ export class PlanoLeituraService {
     const usuario = this.authService.obterUsuarioLogado();
     if (!usuario.id) return of({});
 
-    const promise = this.supabase.supabase
-      .from('membros')
-      .select('progresso_leitura')
-      .eq('id', usuario.id)
-      .single();
+    return from(
+      this.supabase.supabase
+        .from('membros')
+        .select('progresso_leitura')
+        .eq('id', usuario.id)
+        .single(),
+    ).pipe(map((res) => soPlanos(res.data?.progresso_leitura as Record<string, unknown>)));
+  }
 
-    return from(promise).pipe(
+  obterStreak(): Observable<StreakLeitura> {
+    const usuario = this.authService.obterUsuarioLogado();
+    if (!usuario.id) return of(STREAK_VAZIO);
+
+    return from(
+      this.supabase.supabase
+        .from('membros')
+        .select('progresso_leitura')
+        .eq('id', usuario.id)
+        .single(),
+    ).pipe(
       map((res) => {
-        if (res.error || !res.data?.progresso_leitura) return {};
-        return res.data.progresso_leitura as Record<string, number[]>;
+        const s = lerStreak(res.data?.progresso_leitura as Record<string, unknown>);
+        if (s.ultima !== hojeISO() && s.ultima !== ontemISO()) {
+          return { ...s, atual: 0 };
+        }
+        return s;
       }),
     );
   }
@@ -48,12 +113,21 @@ export class PlanoLeituraService {
     const usuario = this.authService.obterUsuarioLogado();
     if (!usuario.id) throw new Error('Usuário não autenticado');
 
-    const progressoDoPlano = progressoAtualGeral[planoId] || [];
-    const novoProgressoDoPlano = [...new Set([...progressoDoPlano, dia])].sort((a, b) => a - b);
+    const { data: row } = await this.supabase.supabase
+      .from('membros')
+      .select('progresso_leitura')
+      .eq('id', usuario.id)
+      .single();
+
+    const raw = (row?.progresso_leitura as Record<string, unknown>) || {};
+    const planos = soPlanos(raw);
+    const merged: Record<string, number[]> = { ...planos, ...progressoAtualGeral };
+
+    merged[planoId] = [...new Set([...(merged[planoId] || []), dia])].sort((a, b) => a - b);
 
     const payload = {
-      ...progressoAtualGeral,
-      [planoId]: novoProgressoDoPlano,
+      ...merged,
+      [STREAK_KEY]: avancarStreak(lerStreak(raw)),
     };
 
     const { error } = await this.supabase.supabase
