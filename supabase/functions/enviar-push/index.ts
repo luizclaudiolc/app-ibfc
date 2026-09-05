@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
     // ==========================================
     else if (isPedidoOracao) {
       titulo = 'Novo pedido no Mural de Orações 🙏';
-      texto = 'Um novo pedido foi compartilhado. Toque para interceder.';
+      texto = 'Um novo pedido de oração foi compartilhado. Toque para interceder.';
       url = '/dashboard/mural-oracoes';
 
       // Opcional: Se quiser não enviar notificação para quem criou o próprio pedido
