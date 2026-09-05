@@ -11,7 +11,7 @@ import { StreakLeitura } from '../../../core/services/plano-leitura.service';
   template: `
     <a
       routerLink="/dashboard/plano-leitura"
-      class="flex items-center gap-4 rounded-3xl border p-5 shadow-sm transition-all duration-300 active:scale-[0.99]"
+      class="flex items-center mb-8 mt-2 gap-4 rounded-3xl border p-5 shadow-sm transition-all duration-300 active:scale-[0.99]"
       [ngClass]="
         aceso()
           ? 'border-amber-100 bg-amber-50 text-amber-900'
