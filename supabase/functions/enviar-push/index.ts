@@ -80,6 +80,7 @@ Deno.serve(async (req) => {
       record.departamento !== undefined;
 
     const isAniversario = table === 'membros_aniversario' || tipoManual === 'aniversario';
+    const isPedidoOracao = table === 'pedidos_oracao' || tipoManual === 'pedido_oracao';
 
     // ==========================================
     // 1. CENÁRIO: AVISOS
@@ -158,6 +159,21 @@ Deno.serve(async (req) => {
       titulo = 'Aniversariante do Dia! 🎂🎉';
       texto = `Hoje é o aniversário de ${record.nome}. Deixe sua felicitação!`;
       url = '/dashboard/home';
+    }
+
+    // ==========================================
+    // 4. CENÁRIO: NOVO PEDIDO DE ORAÇÃO
+    // ==========================================
+    else if (isPedidoOracao) {
+      titulo = 'Novo pedido no Mural de Orações 🙏';
+      texto = 'Um novo pedido foi compartilhado. Toque para interceder.';
+      url = '/dashboard/mural-oracoes';
+
+      // Opcional: Se quiser não enviar notificação para quem criou o próprio pedido
+      const membroIdAutor = record.membro_id;
+      if (membroIdAutor) {
+        queryInscricoes = queryInscricoes.neq('user_id', membroIdAutor);
+      }
     }
 
     const { data: inscricoes, error } = await queryInscricoes;
