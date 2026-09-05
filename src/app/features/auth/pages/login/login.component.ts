@@ -7,6 +7,7 @@ import { MaterialModule } from '../../../../core/modules/material.module';
 import { NotificationService } from '../../../../core/services/notifications.service';
 import { GENERO_MAP } from '../../../../shared/models/consts';
 import { PwaService } from '../../../../core/services/pwa.service';
+import { OnboardingService } from '../../../../core/services/onboarding.service';
 
 @Component({
   selector: 'app-login',
@@ -24,6 +25,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
   public pwaService = inject(PwaService);
+  private onboarding = inject(OnboardingService);
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -57,6 +59,7 @@ export class LoginComponent {
                 : 'Bem-vindo(a)!';
 
           this.notification.sucesso(`Login realizado com sucesso! ${saudacao}`);
+          this.onboarding.marcarPosLogin();
           this.router.navigate(['/dashboard/home']);
         } else {
           this.carregando.set(false);

@@ -308,7 +308,7 @@ export class PerfilComponent implements OnInit {
     };
 
     const enderecoString =
-      formValues.logradouro || formValues.cep ? JSON.stringify(objEndereco) : undefined;
+      formValues.logradouro || formValues.cep ? JSON.stringify(objEndereco) : null;
 
     const dadosEnvio: UsuarioAtualizacao = {
       nome: formValues.nome,

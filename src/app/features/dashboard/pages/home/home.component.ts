@@ -59,6 +59,7 @@ import { SectionHeaderComponent } from '../../../../shared/components/section-he
 import { SkeletonCardComponent } from '../../../../shared/components/app-skeleton-card/app-skeleton-card.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
 import { EmptyStateComponent } from '../../../../shared/components/app-empty-state/app-empty-state.component';
+import { OnboardingService } from '../../../../core/services/onboarding.service';
 
 @Component({
   selector: 'app-home',
@@ -94,7 +95,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly devocionalService = inject(DevocionalService);
   private readonly notification = inject(NotificationService);
-  public pwaService = inject(PwaService);
+  public readonly pwaService = inject(PwaService);
+  private readonly onboarding = inject(OnboardingService);
 
   nomeUsuario = this.authService.nomeUsuario$;
   emailUsuario = signal<string>(this.authService.obterUsuarioLogado().email || '');
@@ -132,6 +134,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.carregarTodosOsDados();
     this.setupScrollSync();
     this.startAutoScroll();
+    void this.onboarding.executarSeNecessario();
 
     this.busca$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((termo) => {
       this.termoBusca.set(termo);

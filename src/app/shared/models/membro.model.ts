@@ -8,7 +8,7 @@ export interface PerfilBase {
   cargo?: string;
   genero?: number;
   nivel_escolaridade?: number;
-  endereco?: string;
+  endereco?: string | null;
   estado_civil?: number | string;
   pedido_oracao?: string;
   total_oracoes?: number;
