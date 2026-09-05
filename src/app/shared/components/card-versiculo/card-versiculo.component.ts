@@ -4,6 +4,7 @@ import { toPng } from 'html-to-image';
 import { MaterialModule } from '../../../core/modules/material.module';
 import { VersiculoDia } from '../../../core/services/devocional.service';
 import { NotificationService } from '../../../core/services/notifications.service';
+import { GRADIENTES_VERSICULOS_DIARIOS } from '../../models/consts';
 
 @Component({
   selector: 'app-versiculo-card',
@@ -11,22 +12,21 @@ import { NotificationService } from '../../../core/services/notifications.servic
   imports: [CommonModule, MaterialModule],
   template: `
     <div
-      class="relative mt-2 mb-8 overflow-hidden rounded-3xl p-7 shadow-sm ring-1 ring-black/5 transition-all duration-500"
+      class="relative mt-2 mb-8 overflow-hidden rounded-3xl p-6 shadow-sm ring-1 ring-black/5 transition-all duration-500"
       [style.background]="gradienteDiario()"
     >
-      <mat-icon
-        class="pointer-events-none absolute -left-4 -top-4 z-0 rotate-12 select-none text-white/50 mix-blend-overlay !h-[140px] !w-[140px] !text-[140px]"
-        aria-hidden="true"
+      <div
+        class="pointer-events-none absolute right-4 bottom-2 select-none text-white/30 mix-blend-overlay"
       >
-        format_quote
-      </mat-icon>
+        <mat-icon class="!h-24 !w-24 !text-[96px]">format_quote</mat-icon>
+      </div>
 
       <button
         type="button"
         (click)="compartilhar()"
         [disabled]="gerando()"
         title="Compartilhar versículo"
-        class="absolute right-4 top-4 z-20 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/60 text-slate-700 shadow-sm ring-1 ring-white/50 backdrop-blur-md transition-all hover:bg-white/80 active:scale-95 disabled:opacity-70"
+        class="absolute right-4 top-4 z-20 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/80 text-slate-700 shadow-sm ring-1 ring-black/5 backdrop-blur-md transition-all hover:bg-white active:scale-95 disabled:opacity-70"
       >
         @if (gerando()) {
           <mat-spinner diameter="16" class="!stroke-slate-600"></mat-spinner>
@@ -35,19 +35,25 @@ import { NotificationService } from '../../../core/services/notifications.servic
         }
       </button>
 
-      <div class="relative z-10 mt-6 flex flex-col items-center text-center">
-        <h2
-          class="mb-5 text-[10px] font-extrabold tracking-[0.25em] text-slate-700/80 uppercase mix-blend-multiply"
+      <div class="relative z-10 flex flex-col items-center text-center pt-2">
+        <div
+          class="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/80 shadow-sm ring-1 ring-black/5 backdrop-blur-md"
         >
+          <mat-icon class="!h-7 !w-7 !text-[28px] text-slate-700">menu_book</mat-icon>
+        </div>
+
+        <h2 class="mb-3 text-[10px] font-extrabold tracking-[0.25em] text-slate-700/80 uppercase">
           Versículo do Dia
         </h2>
 
-        <p class="mb-7 text-[16px] leading-relaxed font-medium text-slate-800 md:text-[18px]">
+        <blockquote
+          class="mb-5 px-2 text-[15px] leading-relaxed font-medium italic text-slate-800 md:text-[17px]"
+        >
           "{{ versiculo().texto }}"
-        </p>
+        </blockquote>
 
         <div
-          class="inline-flex items-center gap-1.5 rounded-full bg-white/60 px-4 py-2 shadow-sm ring-1 ring-white/50 backdrop-blur-md"
+          class="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 shadow-sm ring-1 ring-black/5 backdrop-blur-md"
         >
           <mat-icon class="!h-[14px] !w-[14px] !text-[14px] !leading-none text-slate-600">
             auto_stories
@@ -66,42 +72,42 @@ import { NotificationService } from '../../../core/services/notifications.servic
         style="width:1080px;height:1350px;padding:80px;box-sizing:border-box;display:flex;flex-direction:column;font-family:system-ui,-apple-system,sans-serif;"
       >
         <div
-          style="flex:1;background:rgba(255,255,255,0.65);border-radius:64px;border:2px solid rgba(255,255,255,0.8);box-shadow:0 32px 64px rgba(0,0,0,0.05);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:80px 60px;text-align:center;position:relative;overflow:hidden;"
+          style="flex:1;background:rgba(255,255,255,0.85);border-radius:56px;border:2px solid rgba(255,255,255,0.95);box-shadow:0 32px 64px rgba(0,0,0,0.06);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:90px 70px;text-align:center;position:relative;overflow:hidden;"
         >
           <div
-            style="position:absolute;top:-40px;left:-20px;font-size:300px;line-height:1;font-family:serif;color:rgba(255,255,255,0.7);z-index:0;pointer-events:none;"
+            style="position:absolute;top:30px;left:40px;font-size:180px;line-height:1;font-family:serif;color:rgba(0,0,0,0.04);z-index:0;pointer-events:none;"
           >
             “
           </div>
 
-          <div style="position:relative;z-index:1;">
+          <div
+            style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;"
+          >
             <img
-              src="img/logo-ibfc.png"
+              src="img/logo-ibfc-preto.png"
               alt=""
-              width="120"
-              height="120"
-              style="height:88px;width:auto;object-fit:contain;margin:0 auto 24px;display:block;opacity:0.9;"
+              style="height:64px;width:auto;object-fit:contain;margin-bottom:20px;display:block;"
             />
             <p
-              style="margin:0;font-size:20px;font-weight:800;letter-spacing:0.25em;text-transform:uppercase;color:rgba(15,23,42,0.4);"
+              style="margin:0;font-size:18px;font-weight:800;letter-spacing:0.25em;text-transform:uppercase;color:rgba(15,23,42,0.5);"
             >
-              Igreja Batista Filadélfia CHURCH
+              Igreja Batista Filadélfia church
             </p>
           </div>
 
           <div style="position:relative;z-index:1;width:100%;">
             <p
-              style="margin:0 0 40px;font-size:16px;font-weight:800;letter-spacing:0.3em;text-transform:uppercase;color:rgba(15,23,42,0.5);"
+              style="margin:0 0 32px;font-size:16px;font-weight:800;letter-spacing:0.3em;text-transform:uppercase;color:rgba(15,23,42,0.45);"
             >
               Versículo do Dia
             </p>
-            <p
-              style="margin:0;font-size:48px;line-height:1.4;font-weight:500;color:#1e293b;padding:0 20px;"
+            <blockquote
+              style="margin:0;font-size:44px;line-height:1.45;font-weight:500;font-style:italic;color:#1e293b;padding:0 20px;"
             >
               "{{ versiculo().texto }}"
-            </p>
+            </blockquote>
             <div
-              style="display:inline-block;margin-top:48px;padding:16px 36px;border-radius:999px;background:#ffffff;box-shadow:0 8px 16px rgba(0,0,0,0.03);font-size:24px;font-weight:800;color:#0f172a;"
+              style="display:inline-block;margin-top:44px;padding:16px 36px;border-radius:999px;background:#ffffff;box-shadow:0 8px 24px rgba(0,0,0,0.06);font-size:24px;font-weight:800;color:#0f172a;border:1px solid rgba(0,0,0,0.03);"
             >
               {{ versiculo().referencia }}
             </div>
@@ -109,7 +115,7 @@ import { NotificationService } from '../../../core/services/notifications.servic
 
           <div style="position:relative;z-index:1;">
             <p
-              style="margin:0;font-size:18px;font-weight:700;letter-spacing:0.1em;color:rgba(15,23,42,0.4);"
+              style="margin:0;font-size:16px;font-weight:700;letter-spacing:0.15em;color:rgba(15,23,42,0.4);"
             >
               Rede de Membros IBFC
             </p>
@@ -127,20 +133,8 @@ export class VersiculoCardComponent {
   gerando = signal(false);
 
   gradienteDiario = computed(() => {
-    const paleta = [
-      'linear-gradient(160deg, #fecaca 0%, #fed7aa 100%)',
-      'linear-gradient(160deg, #fed7aa 0%, #fde68a 100%)',
-      'linear-gradient(160deg, #fde68a 0%, #fef08a 100%)',
-      'linear-gradient(160deg, #bbf7d0 0%, #a7f3d0 100%)',
-      'linear-gradient(160deg, #99f6e4 0%, #a5f3fc 100%)',
-      'linear-gradient(160deg, #bae6fd 0%, #bfdbfe 100%)',
-      'linear-gradient(160deg, #c7d2fe 0%, #ddd6fe 100%)',
-      'linear-gradient(160deg, #e9d5ff 0%, #f5d0fe 100%)',
-      'linear-gradient(160deg, #fbcfe8 0%, #fecdd3 100%)',
-    ];
-
     const diaAtual = new Date().getDate();
-    return paleta[diaAtual % paleta.length];
+    return GRADIENTES_VERSICULOS_DIARIOS[diaAtual % GRADIENTES_VERSICULOS_DIARIOS.length];
   });
 
   async compartilhar(): Promise<void> {

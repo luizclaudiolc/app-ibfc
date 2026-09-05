@@ -317,7 +317,7 @@
             @for (membro of membrosExibidos(); track membro.id) {
               <app-membro-list-item
                 [membro]="membro"
-                [isCurrentUser]="membro.email?.toLowerCase() === emailUsuario().toLowerCase()"
+                [isCurrentUser]="membro.email.toLowerCase() === emailUsuario().toLowerCase()"
                 [cargoNome]="cargosDisponiveis[membro.cargo || ''] || 'Membro'"
                 [departamentoNome]="
                   membro.setor_responsavel && membro.setor_responsavel !== 'membro'

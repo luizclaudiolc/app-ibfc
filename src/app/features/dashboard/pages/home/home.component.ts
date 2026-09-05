@@ -85,7 +85,6 @@ import { StreakChipComponent } from '../../../../shared/components/streak-chip/s
     BotaoCarregarMaisComponent,
     PixCardComponent,
     EmptyStateComponent,
-    LoadingSpinnerComponent,
     SkeletonCardComponent,
     StreakChipComponent,
   ],
