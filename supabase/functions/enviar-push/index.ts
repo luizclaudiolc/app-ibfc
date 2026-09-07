@@ -165,14 +165,54 @@ Deno.serve(async (req) => {
     // 4. CENÁRIO: NOVO PEDIDO DE ORAÇÃO
     // ==========================================
     else if (isPedidoOracao) {
-      titulo = 'Novo pedido no Mural de Orações 🙏';
-      texto = 'Um novo pedido de oração foi compartilhado. Toque para interceder.';
-      url = '/dashboard/mural-oracoes';
+      const tipoEvento = body.type ?? 'INSERT';
+      const oldRecord = body.old_record ?? {};
+      const autorId = record.membro_id as string | undefined;
 
-      // Opcional: Se quiser não enviar notificação para quem criou o próprio pedido
-      const membroIdAutor = record.membro_id;
-      if (membroIdAutor) {
-        queryInscricoes = queryInscricoes.neq('user_id', membroIdAutor);
+      if (tipoEvento === 'UPDATE') {
+        const antes = Array.isArray(oldRecord.intercessores)
+          ? (oldRecord.intercessores as string[])
+          : [];
+        const depois = Array.isArray(record.intercessores)
+          ? (record.intercessores as string[])
+          : [];
+
+        if (depois.length <= antes.length) {
+          return new Response(
+            JSON.stringify({ ok: true, enviados: 0, motivo: 'nao_foi_nova_oracao' }),
+            { headers: { ...cors, 'Content-Type': 'application/json' } },
+          );
+        }
+
+        if (!autorId) {
+          return new Response(JSON.stringify({ ok: true, enviados: 0 }), {
+            headers: { ...cors, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const novos = depois.filter((id) => !antes.includes(id));
+        if (novos.length === 1 && novos[0] === autorId) {
+          return new Response(
+            JSON.stringify({ ok: true, enviados: 0, motivo: 'orou_no_proprio_pedido' }),
+            { headers: { ...cors, 'Content-Type': 'application/json' } },
+          );
+        }
+
+        const total = depois.length;
+        titulo = 'Alguém está orando por você 🙏';
+        texto =
+          total === 1
+            ? 'Um irmão está intercedendo pelo seu pedido.'
+            : `${total} irmãos já oraram pelo seu pedido.`;
+        url = '/dashboard/mural-oracoes';
+        queryInscricoes = queryInscricoes.eq('user_id', autorId);
+      } else {
+        titulo = 'Novo pedido no Mural de Orações 🙏';
+        texto = 'Um novo pedido de oração foi compartilhado. Toque para interceder.';
+        url = '/dashboard/mural-oracoes';
+        if (autorId) {
+          queryInscricoes = queryInscricoes.neq('user_id', autorId);
+        }
       }
     }
 
