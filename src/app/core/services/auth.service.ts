@@ -18,6 +18,17 @@ export interface RespostaLogin {
   mensagem?: string;
 }
 
+const capitalizarNome = (nome: string) => {
+  if (!nome) return '';
+
+  return nome
+    .toLowerCase()
+    .trim()
+    .split(' ')
+    .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
+    .join(' ');
+};
+
 const SESSION_KEY = 'app_user_session';
 
 @Injectable({
@@ -253,9 +264,9 @@ export class AuthService {
       const { error: insertError } = await this.supabaseService.supabase.from('membros').insert([
         {
           id: userId,
-          nome: membro.nome,
-          sobrenome: membro.sobrenome,
-          email: membro.email,
+          nome: capitalizarNome(membro.nome),
+          sobrenome: capitalizarNome(membro.sobrenome),
+          email: membro.email.trim(),
           telefone: membro.telefone,
           data_nascimento: membro.dataNascimento || null,
           cargo: membro.cargo || ECargos.Membro,
@@ -278,7 +289,7 @@ export class AuthService {
       if (membro.filhos && membro.filhos.length > 0) {
         const filhosParaInserir = membro.filhos.map((filho) => ({
           membro_id: userId,
-          nome: filho.nome,
+          nome: capitalizarNome(filho.nome!),
           data_nascimento: filho.data_nascimento || null,
           informacoes_medicas: filho.informacoes_medicas || null,
         }));

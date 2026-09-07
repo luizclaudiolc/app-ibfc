@@ -321,7 +321,7 @@
                 [cargoNome]="cargosDisponiveis[membro.cargo || ''] || 'Membro'"
                 [departamentoNome]="
                   membro.setor_responsavel && membro.setor_responsavel !== 'membro'
-                    ? departamentos[membro.setor_responsavel]
+                    ? 'Lider' + ' ' + (departamentos[membro.setor_responsavel] || '')
                     : undefined
                 "
               />
