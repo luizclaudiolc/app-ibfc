@@ -65,7 +65,11 @@ import { GRADIENTES_VERSICULOS_DIARIOS } from '../../models/consts';
       </div>
     </div>
 
-    <div class="pointer-events-none fixed -left-[9999px] top-0" aria-hidden="true">
+    <div
+      class="pointer-events-none fixed top-0 left-0 z-[-1] overflow-hidden"
+      style="width:1px;height:1px;opacity:0.01"
+      aria-hidden="true"
+    >
       <div
         #arte
         [style.background]="gradienteDiario()"
@@ -107,7 +111,7 @@ import { GRADIENTES_VERSICULOS_DIARIOS } from '../../models/consts';
               "{{ versiculo().texto }}"
             </blockquote>
             <div
-              style="display:inline-block;margin-top:44px;padding:16px 36px;border-radius:999px;background:#ffffff;box-shadow:0 8px 24px rgba(0,0,0,0.06);font-size:24px;font-weight:800;color:#0f172a;border:1px solid rgba(0,0,0,0.03);"
+              style="display:inline-block;margin-top:44px;padding:16px 36px;border-radius:999px;background:#ffffff;font-size:24px;font-weight:800;color:#0f172a;border:1px solid rgba(15,23,42,0.08);"
             >
               {{ versiculo().referencia }}
             </div>
@@ -142,14 +146,17 @@ export class VersiculoCardComponent {
     this.gerando.set(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 150));
+      const no = this.arte().nativeElement;
+      await this.embutirImagens(no);
 
-      const dataUrl = await toPng(this.arte().nativeElement, {
+      const dataUrl = await toPng(no, {
         pixelRatio: 2,
         fontEmbedCSS: '',
         cacheBust: true,
         width: 1080,
         height: 1350,
+        skipAutoScale: true,
+        style: { opacity: '1', transform: 'none' },
       });
 
       const blob = await (await fetch(dataUrl)).blob();
@@ -163,7 +170,7 @@ export class VersiculoCardComponent {
       if (nav.share && nav.canShare?.({ files: [arquivo] })) {
         await nav.share({ files: [arquivo], title: 'Versículo do Dia', text: texto });
       } else if (nav.share) {
-        await nav.share({ title: 'Versículo do Dia', text: texto, url: dataUrl });
+        await nav.share({ title: 'Versículo do Dia', text: texto });
       } else {
         const link = document.createElement('a');
         link.href = dataUrl;
@@ -180,5 +187,26 @@ export class VersiculoCardComponent {
     } finally {
       this.gerando.set(false);
     }
+  }
+
+  private async embutirImagens(raiz: HTMLElement): Promise<void> {
+    const imgs = [...raiz.querySelectorAll('img')];
+    await Promise.all(
+      imgs.map(async (img) => {
+        if (!img.src.startsWith('data:')) {
+          const abs = new URL(img.getAttribute('src') || '', document.baseURI).href;
+          const res = await fetch(abs);
+          const blob = await res.blob();
+          img.src = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+          });
+        }
+        try {
+          await img.decode();
+        } catch {}
+      }),
+    );
   }
 }
