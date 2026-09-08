@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1788902563970,
+  "timestamp": 1788903317419,
   "index": "/app-ibfc/index.html",
   "assetGroups": [
     {
@@ -12,14 +12,13 @@
       },
       "urls": [
         "/app-ibfc/chunk-2ASFLX6Y.js",
+        "/app-ibfc/chunk-3ONS4IPW.js",
         "/app-ibfc/chunk-3SJW2DGQ.js",
         "/app-ibfc/chunk-4DR3Z77N.js",
         "/app-ibfc/chunk-4OCZGXTH.js",
-        "/app-ibfc/chunk-4R3DMBG5.js",
         "/app-ibfc/chunk-4RDD5SRK.js",
         "/app-ibfc/chunk-57PUXZYG.js",
         "/app-ibfc/chunk-64QS2EF2.js",
-        "/app-ibfc/chunk-6TJ5DVWF.js",
         "/app-ibfc/chunk-6ZROASIU.js",
         "/app-ibfc/chunk-7EKPX37X.js",
         "/app-ibfc/chunk-7GVURG5I.js",
@@ -40,7 +39,7 @@
         "/app-ibfc/chunk-JI4UIQJ5.js",
         "/app-ibfc/chunk-KJNNTEPB.js",
         "/app-ibfc/chunk-LL2QI6RT.js",
-        "/app-ibfc/chunk-LLE7EAS7.js",
+        "/app-ibfc/chunk-MG24ES3C.js",
         "/app-ibfc/chunk-MPXHBAXI.js",
         "/app-ibfc/chunk-NLA2I24Y.js",
         "/app-ibfc/chunk-NUCTSSKS.js",
@@ -61,10 +60,11 @@
         "/app-ibfc/chunk-WWRVNNHY.js",
         "/app-ibfc/chunk-X27YPVVG.js",
         "/app-ibfc/chunk-XA743QF7.js",
+        "/app-ibfc/chunk-YDP53X2O.js",
         "/app-ibfc/index.html",
-        "/app-ibfc/main-GQ7PRC5R.js",
+        "/app-ibfc/main-JYPHHN3T.js",
         "/app-ibfc/manifest.webmanifest",
-        "/app-ibfc/styles-3RMRE64M.css"
+        "/app-ibfc/styles-O5OSKW7F.css"
       ],
       "patterns": []
     },
@@ -134,14 +134,13 @@
     "/app-ibfc/app-icons/logo-dark-192.png": "c18ebdcb09f12a4985a47111d2843e575d27ef89",
     "/app-ibfc/app-icons/logo-dark-512.png": "27043b60f1e30883237d051811d8a53331ba8505",
     "/app-ibfc/chunk-2ASFLX6Y.js": "40f0bd70f5b8e377cf6e9dbfab35b3adb6318e9e",
+    "/app-ibfc/chunk-3ONS4IPW.js": "efae539e5549bdae2101986d1f91285aac731b99",
     "/app-ibfc/chunk-3SJW2DGQ.js": "7d0d352988b8c6f0604d032315f58d5b94ce8524",
     "/app-ibfc/chunk-4DR3Z77N.js": "309114efa9da6a80199ac9eb8520493f2543c4b1",
     "/app-ibfc/chunk-4OCZGXTH.js": "7c5872c9f9cda6f929115f706923151a97ce884d",
-    "/app-ibfc/chunk-4R3DMBG5.js": "1b79e1cf48c31872667c8a277890dd4c905640e2",
     "/app-ibfc/chunk-4RDD5SRK.js": "fb214f57c4908e79d7d5bab40330b89124750e52",
     "/app-ibfc/chunk-57PUXZYG.js": "efbf5b0e70bfd61d5961672bc7f360a6791bfcc1",
     "/app-ibfc/chunk-64QS2EF2.js": "6ec57e652203f6f520783095c945d3db35c60b68",
-    "/app-ibfc/chunk-6TJ5DVWF.js": "37d826e206547917d6956dd02b9ea49a3c90148a",
     "/app-ibfc/chunk-6ZROASIU.js": "7306a89a57a50dacf7213f23425f538dc1cb1c57",
     "/app-ibfc/chunk-7EKPX37X.js": "0ef8c0b86eda5a990fda8e84dcee3824341e627f",
     "/app-ibfc/chunk-7GVURG5I.js": "db9d44b1e78ce7aabe9fac1b952a1f90ea036764",
@@ -162,7 +161,7 @@
     "/app-ibfc/chunk-JI4UIQJ5.js": "f48c8878aee7d5beaae8f4ce5a08d7f6a8fd397c",
     "/app-ibfc/chunk-KJNNTEPB.js": "cd34145109ae4edc1c0a6b27a715817471f7688d",
     "/app-ibfc/chunk-LL2QI6RT.js": "1641c3155d1ba412a15e7fe7dcdf6769557426ac",
-    "/app-ibfc/chunk-LLE7EAS7.js": "28dabbf791f3444410ff2113e3bd92a75cb8e4ce",
+    "/app-ibfc/chunk-MG24ES3C.js": "d136cb943a7d2c6b99052552cec319340a89a023",
     "/app-ibfc/chunk-MPXHBAXI.js": "fd30719fb2a241dcb8c960a7f0ffa8de2341ab45",
     "/app-ibfc/chunk-NLA2I24Y.js": "70cc7b8de935b297d70d2083aa3166f0c620691c",
     "/app-ibfc/chunk-NUCTSSKS.js": "0f528f15190938894485af0d9f3b6c894e790351",
@@ -183,10 +182,11 @@
     "/app-ibfc/chunk-WWRVNNHY.js": "9314a864685b908c7ccc41bf58704343707e65eb",
     "/app-ibfc/chunk-X27YPVVG.js": "7c909784704acf3bbe6575d3d9cf361279b5fcbc",
     "/app-ibfc/chunk-XA743QF7.js": "d13f8f47edf0ac2ad12e5384591463f6f3b969f4",
-    "/app-ibfc/index.html": "76f5aaf016ac2315fb82e28266fd151115fedcc5",
-    "/app-ibfc/main-GQ7PRC5R.js": "38361daffa2b3db43d1910dce247b1028fa7efa3",
+    "/app-ibfc/chunk-YDP53X2O.js": "bbd2ed93a20afe755b040cfbd2018b06e26f06d5",
+    "/app-ibfc/index.html": "0808882fed605850bbf5f425b72342f392f5c82a",
+    "/app-ibfc/main-JYPHHN3T.js": "a60ebf5272e1a92db98654c1f54802d3781fce8f",
     "/app-ibfc/manifest.webmanifest": "1d37a39982e1bcb265d5f2e37923d793f7a1442e",
-    "/app-ibfc/styles-3RMRE64M.css": "af1f49e284e1b3a25fd6976b2412f4f576f71e70"
+    "/app-ibfc/styles-O5OSKW7F.css": "9aba47300d93ba5d16c466030766c6c48d713084"
   },
   "navigationUrls": [
     {
