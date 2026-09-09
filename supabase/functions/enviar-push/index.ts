@@ -81,11 +81,45 @@ Deno.serve(async (req) => {
 
     const isAniversario = table === 'membros_aniversario' || tipoManual === 'aniversario';
     const isPedidoOracao = table === 'pedidos_oracao' || tipoManual === 'pedido_oracao';
+    const isLembreteStreak = tipoManual === 'lembrete_streak';
+
+    if (isLembreteStreak) {
+      const hoje = new Date().toLocaleDateString('en-CA', {
+        timeZone: 'America/Sao_Paulo',
+      });
+
+      const { data: membros, error: erroMembros } = await supabase
+        .from('membros')
+        .select('id, progresso_leitura')
+        .eq('status', 'ATIVO');
+
+      if (erroMembros) throw erroMembros;
+
+      const ids = (membros ?? [])
+        .filter((m) => {
+          const streak = (m.progresso_leitura as { _streak?: { ultima?: string } } | null)?._streak;
+          if (!streak?.ultima) return false;
+          return streak.ultima !== hoje;
+        })
+        .map((m) => m.id);
+
+      if (ids.length === 0) {
+        return new Response(
+          JSON.stringify({ ok: true, enviados: 0, motivo: 'todos_ja_leram_ou_sem_streak' }),
+          { headers: { ...cors, 'Content-Type': 'application/json' } },
+        );
+      }
+
+      titulo = 'Seu fogo apaga à meia-noite';
+      texto = 'Conclua a leitura de hoje e mantenha sua sequência na Palavra.';
+      url = '/dashboard/plano-leitura';
+      queryInscricoes = queryInscricoes.in('user_id', ids);
+    }
 
     // ==========================================
     // 1. CENÁRIO: AVISOS
     // ==========================================
-    if (isAviso) {
+    else if (isAviso) {
       titulo = 'Novo aviso - IBFC! 📣';
       texto = record.descricao ?? 'Novo evento postado, confira!';
       url = '/dashboard/home';
