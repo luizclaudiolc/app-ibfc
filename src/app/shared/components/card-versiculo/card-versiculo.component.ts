@@ -86,7 +86,7 @@ const ehIOS = (): boolean =>
             <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;">
               <img src="img/logo-ibfc-preto.png" alt="" style="height:64px;width:auto;object-fit:contain;margin-bottom:20px;display:block;" />
               <p style="margin:0;font-size:18px;font-weight:800;letter-spacing:0.25em;text-transform:uppercase;color:rgba(15,23,42,0.5);">
-                Igreja Batista Filadélfia church
+                Igreja Batista Filadélfia
               </p>
             </div>
             <div style="position:relative;z-index:1;width:100%;">
@@ -205,7 +205,7 @@ export class VersiculoCardComponent {
     ctx.fillStyle = 'rgba(15,23,42,0.5)';
     ctx.font = '800 18px -apple-system, system-ui, sans-serif';
     ctx.letterSpacing = '4px';
-    ctx.fillText('IGREJA BATISTA FILADÉLFIA CHURCH', cx, 280);
+    ctx.fillText('IGREJA BATISTA FILADÉLFIA', cx, 280);
     ctx.letterSpacing = '0px';
 
     ctx.fillStyle = 'rgba(15,23,42,0.45)';
