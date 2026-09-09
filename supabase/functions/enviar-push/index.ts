@@ -87,6 +87,11 @@ Deno.serve(async (req) => {
       const hoje = new Date().toLocaleDateString('en-CA', {
         timeZone: 'America/Sao_Paulo',
       });
+      const ontemDate = new Date();
+      ontemDate.setDate(ontemDate.getDate() - 1);
+      const ontemIso = ontemDate.toLocaleDateString('en-CA', {
+        timeZone: 'America/Sao_Paulo',
+      });
 
       const { data: membros, error: erroMembros } = await supabase
         .from('membros')
@@ -98,8 +103,7 @@ Deno.serve(async (req) => {
       const ids = (membros ?? [])
         .filter((m) => {
           const streak = (m.progresso_leitura as { _streak?: { ultima?: string } } | null)?._streak;
-          if (!streak?.ultima) return false;
-          return streak.ultima !== hoje;
+          return !!streak?.ultima && streak.ultima === ontemIso;
         })
         .map((m) => m.id);
 
