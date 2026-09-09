@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1788954897331,
+  "timestamp": 1788954918380,
   "index": "/app-ibfc/index.html",
   "assetGroups": [
     {
@@ -11,7 +11,6 @@
         "ignoreVary": true
       },
       "urls": [
-        "/app-ibfc/chunk-2ASFLX6Y.js",
         "/app-ibfc/chunk-3SJW2DGQ.js",
         "/app-ibfc/chunk-4DR3Z77N.js",
         "/app-ibfc/chunk-4OCZGXTH.js",
@@ -61,8 +60,9 @@
         "/app-ibfc/chunk-WWRVNNHY.js",
         "/app-ibfc/chunk-X27YPVVG.js",
         "/app-ibfc/chunk-XA743QF7.js",
+        "/app-ibfc/chunk-ZTXBIM3R.js",
         "/app-ibfc/index.html",
-        "/app-ibfc/main-KTKL5K7B.js",
+        "/app-ibfc/main-PVB4YEIC.js",
         "/app-ibfc/manifest.webmanifest",
         "/app-ibfc/styles-O5OSKW7F.css"
       ],
@@ -133,7 +133,6 @@
     "/app-ibfc/app-icons/icon-96x96.png": "b81b45b689b429447a85ad634e50fd2ee58edbd7",
     "/app-ibfc/app-icons/logo-dark-192.png": "c18ebdcb09f12a4985a47111d2843e575d27ef89",
     "/app-ibfc/app-icons/logo-dark-512.png": "27043b60f1e30883237d051811d8a53331ba8505",
-    "/app-ibfc/chunk-2ASFLX6Y.js": "40f0bd70f5b8e377cf6e9dbfab35b3adb6318e9e",
     "/app-ibfc/chunk-3SJW2DGQ.js": "7d0d352988b8c6f0604d032315f58d5b94ce8524",
     "/app-ibfc/chunk-4DR3Z77N.js": "309114efa9da6a80199ac9eb8520493f2543c4b1",
     "/app-ibfc/chunk-4OCZGXTH.js": "7c5872c9f9cda6f929115f706923151a97ce884d",
@@ -183,8 +182,9 @@
     "/app-ibfc/chunk-WWRVNNHY.js": "9314a864685b908c7ccc41bf58704343707e65eb",
     "/app-ibfc/chunk-X27YPVVG.js": "7c909784704acf3bbe6575d3d9cf361279b5fcbc",
     "/app-ibfc/chunk-XA743QF7.js": "d13f8f47edf0ac2ad12e5384591463f6f3b969f4",
-    "/app-ibfc/index.html": "d4db4563ca48c55974195312382393115fa1f17a",
-    "/app-ibfc/main-KTKL5K7B.js": "b73b3793ada2c1f2754a3af9e6c8b06a8770fbf1",
+    "/app-ibfc/chunk-ZTXBIM3R.js": "6ea894e5486a0c9d5b128a82048bd1e807a6dfdc",
+    "/app-ibfc/index.html": "8d32edbf7cd4a12ef6c838a376ea04984fef276d",
+    "/app-ibfc/main-PVB4YEIC.js": "568d0fff31f45f9abd143a2854593cbcdf5c55dc",
     "/app-ibfc/manifest.webmanifest": "1d37a39982e1bcb265d5f2e37923d793f7a1442e",
     "/app-ibfc/styles-O5OSKW7F.css": "9aba47300d93ba5d16c466030766c6c48d713084"
   },
