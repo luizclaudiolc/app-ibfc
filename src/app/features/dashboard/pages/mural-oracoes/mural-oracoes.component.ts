@@ -19,6 +19,7 @@ import { ENiveisAcesso, LIMITE_CARREGAMENTO_INICIAL } from '../../../../shared/m
 import { PedidoOracao, PedidoOracaoService } from '../../../../core/services/pedido-oracao.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/app-loading-spinner/app-loading-spinner.component';
 import { EmptyStateComponent } from '../../../../shared/components/app-empty-state/app-empty-state.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-mural-oracoes',
@@ -42,6 +43,9 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
   salvando = signal<boolean>(false);
   composerAberto = signal(false);
   processandoOracao = signal<Record<string, boolean>>({});
+
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   limiteExibicao = signal<number>(LIMITE_CARREGAMENTO_INICIAL);
   filtroTipo = signal<'TODOS' | 'MEUS'>('TODOS');
@@ -152,6 +156,15 @@ export class MuralOracoesComponent implements OnInit, OnDestroy {
       onPresenca: (qtd) => this.presentes.set(qtd),
       onEvento: (tipo, row) => this.aplicarEventoRealtime(tipo, row),
     });
+
+    if (this.route.snapshot.queryParamMap.get('pedir') === '1') {
+      this.composerAberto.set(true);
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {},
+        replaceUrl: true,
+      });
+    }
   }
 
   ngOnDestroy() {

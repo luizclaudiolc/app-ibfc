@@ -124,8 +124,8 @@ Deno.serve(async (req) => {
     // 1. CENÁRIO: AVISOS
     // ==========================================
     else if (isAviso) {
-      titulo = 'Novo aviso - IBFC! 📣';
-      texto = record.descricao ?? 'Novo evento postado, confira!';
+      titulo = 'Novo evento/aviso - IBF! 📣';
+      texto = record.descricao ?? 'Novo evento/aviso postado, confira!';
       url = '/dashboard/home';
     }
 

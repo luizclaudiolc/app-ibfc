@@ -42,6 +42,12 @@ import { StreakLeitura } from '../../../core/services/plano-leitura.service';
             Recorde: {{ streak().recorde }}
             {{ streak().recorde === 1 ? 'dia' : 'dias' }}
           </p>
+        } @else if (streak().recorde > 0) {
+          <h4 class="mt-0.5 text-sm font-bold text-slate-800">Retome sua sequência</h4>
+          <p class="mt-0.5 text-xs text-slate-500">
+            Seu recorde é {{ streak().recorde }} {{ streak().recorde === 1 ? 'dia' : 'dias' }}. Um
+            capítulo hoje reacende o fogo.
+          </p>
         } @else {
           <h4 class="mt-0.5 text-sm font-bold text-slate-800">Comece sua sequência hoje</h4>
           <p class="mt-0.5 text-xs text-slate-500">Conclua a leitura do dia para acender o fogo.</p>

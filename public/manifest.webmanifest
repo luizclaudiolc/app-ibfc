@@ -1,6 +1,6 @@
 {
-  "name": "Igreja Batista Filadélfia Church",
-  "short_name": "Rede IBFC",
+  "name": "Igreja Batista Filadélfia",
+  "short_name": "Rede IBF",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",

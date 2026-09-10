@@ -5,6 +5,7 @@ import { PulsoService } from '../../../core/services/pulso.service';
 import { NotificationService } from '../../../core/services/notifications.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Subject, take, takeUntil, timer } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pulso-card',
@@ -16,11 +17,13 @@ export class PulsoCardComponent implements OnInit {
   jaVotou = signal<boolean>(false);
   carregando = signal<boolean>(false);
   visivel = signal<boolean>(true);
+  pediuOracao = signal(false);
   destroy$ = new Subject<void>();
 
   private pulsoService = inject(PulsoService);
   private notification = inject(NotificationService);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   ngOnInit() {
     const semanaAtual = this.pulsoService.getSemanaAtual();
@@ -43,14 +46,14 @@ export class PulsoCardComponent implements OnInit {
         this.carregando.set(false);
         if (res.sucesso) {
           this.authService.salvarSemanaVotadaPulso(semanaAtual);
-
           this.jaVotou.set(true);
+          this.pediuOracao.set(status === 3);
 
-          timer(4000)
-            .pipe(take(1), takeUntil(this.destroy$))
-            .subscribe(() => {
-              this.visivel.set(false);
-            });
+          if (status !== 3) {
+            timer(4000)
+              .pipe(take(1), takeUntil(this.destroy$))
+              .subscribe(() => this.visivel.set(false));
+          }
         } else {
           this.notification.erro(res.mensagem || 'Erro ao registrar resposta.');
         }
@@ -59,6 +62,12 @@ export class PulsoCardComponent implements OnInit {
         this.carregando.set(false);
         this.notification.erro('Erro de comunicação.');
       },
+    });
+  }
+
+  irAoMural(): void {
+    void this.router.navigate(['/dashboard/mural-oracoes'], {
+      queryParams: { pedir: '1' },
     });
   }
 }

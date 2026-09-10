@@ -56,6 +56,29 @@
         </div>
       </div>
     </div>
+  } @else if (pediuOracao()) {
+    <div
+      class="my-4 flex items-center gap-4 rounded-3xl border border-rose-100 bg-rose-50 p-5 text-rose-900 shadow-sm"
+    >
+      <div
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-600"
+      >
+        <mat-icon class="!h-[20px] !w-[20px] !text-[20px]">volunteer_activism</mat-icon>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h4 class="text-sm font-bold">A igreja está com você</h4>
+        <p class="mt-0.5 text-xs text-rose-800/80">
+          Se quiser, compartilhe o motivo no mural para os irmãos intercederem.
+        </p>
+        <button
+          type="button"
+          (click)="irAoMural()"
+          class="mt-3 cursor-pointer rounded-xl bg-rose-700 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-rose-800 active:scale-95"
+        >
+          Pedir oração no mural
+        </button>
+      </div>
+    </div>
   } @else {
     <div
       class="bg-emerald-50 border border-emerald-100 rounded-3xl p-5 flex items-center gap-4 text-emerald-800 shadow-sm my-4 transition-all duration-500 animate-fade-in"
