@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1788990937521,
+  "timestamp": 1789066597293,
   "index": "/app-ibfc/index.html",
   "assetGroups": [
     {
@@ -21,6 +21,8 @@
         "/app-ibfc/chunk-7CXSEL6Z.js",
         "/app-ibfc/chunk-7EKPX37X.js",
         "/app-ibfc/chunk-7GVURG5I.js",
+        "/app-ibfc/chunk-7ZJD5I7N.js",
+        "/app-ibfc/chunk-BYREEQRD.js",
         "/app-ibfc/chunk-CV3UJ3LG.js",
         "/app-ibfc/chunk-EB65AZOR.js",
         "/app-ibfc/chunk-EBOKXLZ5.js",
@@ -31,7 +33,6 @@
         "/app-ibfc/chunk-G7VDPVG5.js",
         "/app-ibfc/chunk-GD2HYJOW.js",
         "/app-ibfc/chunk-HCCA3WLW.js",
-        "/app-ibfc/chunk-HOJ5YASH.js",
         "/app-ibfc/chunk-IFGU66OU.js",
         "/app-ibfc/chunk-IFYQH7LW.js",
         "/app-ibfc/chunk-IV6YNSU3.js",
@@ -48,7 +49,7 @@
         "/app-ibfc/chunk-PJLLA4MY.js",
         "/app-ibfc/chunk-QM6MM7VO.js",
         "/app-ibfc/chunk-QNTJXOJ6.js",
-        "/app-ibfc/chunk-QV2HU3F3.js",
+        "/app-ibfc/chunk-QO5W6BZ7.js",
         "/app-ibfc/chunk-SSF7FCHN.js",
         "/app-ibfc/chunk-SVIG2OCA.js",
         "/app-ibfc/chunk-TXSPOCHE.js",
@@ -59,12 +60,11 @@
         "/app-ibfc/chunk-WGRCXRS2.js",
         "/app-ibfc/chunk-WWRVNNHY.js",
         "/app-ibfc/chunk-X27YPVVG.js",
-        "/app-ibfc/chunk-XA743QF7.js",
         "/app-ibfc/chunk-ZTXBIM3R.js",
         "/app-ibfc/index.html",
-        "/app-ibfc/main-PVB4YEIC.js",
+        "/app-ibfc/main-CS77Q2K6.js",
         "/app-ibfc/manifest.webmanifest",
-        "/app-ibfc/styles-O5OSKW7F.css"
+        "/app-ibfc/styles-SVXZLEYZ.css"
       ],
       "patterns": []
     },
@@ -143,6 +143,8 @@
     "/app-ibfc/chunk-7CXSEL6Z.js": "8197a80991263a64aa548cd9212886f37ab3bdb3",
     "/app-ibfc/chunk-7EKPX37X.js": "0ef8c0b86eda5a990fda8e84dcee3824341e627f",
     "/app-ibfc/chunk-7GVURG5I.js": "db9d44b1e78ce7aabe9fac1b952a1f90ea036764",
+    "/app-ibfc/chunk-7ZJD5I7N.js": "16f7c4f669c1f45aa9fb66f90fedad5c614c643e",
+    "/app-ibfc/chunk-BYREEQRD.js": "978b8e6b2f71e68138972f821d98baccb91b0fa9",
     "/app-ibfc/chunk-CV3UJ3LG.js": "36e0883e831f6ca2f4d5ee220a983b0a5b4c742f",
     "/app-ibfc/chunk-EB65AZOR.js": "9161bb4fb4347ddb0d081dd5fb8ba1760ba3d299",
     "/app-ibfc/chunk-EBOKXLZ5.js": "8434f5c467343ab052608acfb63b5ceb02ac9006",
@@ -153,7 +155,6 @@
     "/app-ibfc/chunk-G7VDPVG5.js": "809e44310583b8c45a47a91e7b407a2ee15ac0c5",
     "/app-ibfc/chunk-GD2HYJOW.js": "bebe4995c796ae29ed84219757298f409d4ae5c3",
     "/app-ibfc/chunk-HCCA3WLW.js": "65ff4023d98c94b69ec050fee685813f71060ae9",
-    "/app-ibfc/chunk-HOJ5YASH.js": "a287639b542012b50bda4fa1d3f3e9f177a5b345",
     "/app-ibfc/chunk-IFGU66OU.js": "99b79b2d59bdef9eaf68be6e1bfbce786994fc54",
     "/app-ibfc/chunk-IFYQH7LW.js": "35abc0b890c4aff94cd883de1c013c8ed7a91576",
     "/app-ibfc/chunk-IV6YNSU3.js": "8296982c6193f38a8ce21ddb91901fd313b1db5d",
@@ -170,7 +171,7 @@
     "/app-ibfc/chunk-PJLLA4MY.js": "bf05fde1147580d82f192f9dce06d46f38301b81",
     "/app-ibfc/chunk-QM6MM7VO.js": "e3a025b265804f46378c9cdc5ced755c00637b43",
     "/app-ibfc/chunk-QNTJXOJ6.js": "f6803c33bc9a49d0a03483764511645981faf913",
-    "/app-ibfc/chunk-QV2HU3F3.js": "69a6d5757097ae4d164428dae7493c1d8de4af61",
+    "/app-ibfc/chunk-QO5W6BZ7.js": "a181e3eb01d1ace17bf46b6e251c803db06934d3",
     "/app-ibfc/chunk-SSF7FCHN.js": "483d82d6f2b256e1c4ebc64b7cdc7fdb26f7899f",
     "/app-ibfc/chunk-SVIG2OCA.js": "40526339b137155980915645b6ba1e14300352f6",
     "/app-ibfc/chunk-TXSPOCHE.js": "31c052b4c1a32d4f0c907e9721df223814de6a5f",
@@ -181,12 +182,11 @@
     "/app-ibfc/chunk-WGRCXRS2.js": "db39d877695478e37576238f9574a46bf583cb59",
     "/app-ibfc/chunk-WWRVNNHY.js": "9314a864685b908c7ccc41bf58704343707e65eb",
     "/app-ibfc/chunk-X27YPVVG.js": "7c909784704acf3bbe6575d3d9cf361279b5fcbc",
-    "/app-ibfc/chunk-XA743QF7.js": "d13f8f47edf0ac2ad12e5384591463f6f3b969f4",
     "/app-ibfc/chunk-ZTXBIM3R.js": "6ea894e5486a0c9d5b128a82048bd1e807a6dfdc",
-    "/app-ibfc/index.html": "8d32edbf7cd4a12ef6c838a376ea04984fef276d",
-    "/app-ibfc/main-PVB4YEIC.js": "568d0fff31f45f9abd143a2854593cbcdf5c55dc",
-    "/app-ibfc/manifest.webmanifest": "1d37a39982e1bcb265d5f2e37923d793f7a1442e",
-    "/app-ibfc/styles-O5OSKW7F.css": "9aba47300d93ba5d16c466030766c6c48d713084"
+    "/app-ibfc/index.html": "c123c18fe55b87a579151f72d9e68a5087d5634e",
+    "/app-ibfc/main-CS77Q2K6.js": "c1831be67d4292200097a38574dc5c74df9f3d4f",
+    "/app-ibfc/manifest.webmanifest": "c10aee03058454a93d6a3c6a80cbf5eef99f5d5c",
+    "/app-ibfc/styles-SVXZLEYZ.css": "5b785ce47ed6d484a11f69507580a6d8a52ed955"
   },
   "navigationUrls": [
     {
