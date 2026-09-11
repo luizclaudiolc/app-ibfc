@@ -342,10 +342,36 @@ export class PerfilComponent implements OnInit {
 
             await this.filhoService.atualizar(f.id, payloadFilho);
           } else {
-            payloadFilho.membro_id = usuarioLogado.id;
-            payloadFilho.outro_responsavel_id = f.outro_responsavel_id || null;
+            const existente = await this.filhoService.buscarExistente(
+              f.nome.trim(),
+              f.data_nascimento,
+            );
 
-            await this.filhoService.criar(payloadFilho);
+            let forcarNovo = false;
+            if (existente) {
+              const ref = this.dialog.open(GenericDialogComponent, {
+                data: {
+                  titulo: 'Criança já cadastrada',
+                  mensagem: `Já existe ${existente.nome} no cadastro de ${existente.nome_responsavel}. É a mesma criança?`,
+                  textoConfirmar: 'Sim, vincular',
+                  textoCancelar: 'Não, é outra',
+                  tipo: 'padrao',
+                },
+                panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+                width: '90%',
+                maxWidth: '400px',
+              });
+              const mesmo = await firstValueFrom(ref.afterClosed());
+              forcarNovo = !mesmo;
+            }
+
+            await this.filhoService.vincularOuCriar({
+              nome: f.nome.trim(),
+              data_nascimento: f.data_nascimento,
+              informacoes_medicas: f.informacoes_medicas?.trim() || null,
+              outro_responsavel_id: forcarNovo ? f.outro_responsavel_id || null : null,
+              forcarNovo,
+            });
           }
         }
       }

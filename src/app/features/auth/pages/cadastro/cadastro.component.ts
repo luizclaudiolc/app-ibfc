@@ -10,7 +10,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import imageCompression from 'browser-image-compression';
-import { timer } from 'rxjs';
+import { firstValueFrom, timer } from 'rxjs';
 import { MaterialModule } from '../../../../core/modules/material.module';
 import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../../core/services/notifications.service';
@@ -24,6 +24,8 @@ import {
 import { UsuarioCadastro } from '../../../../shared/models/membro.model';
 import { CepService } from '../../../../core/services/busca-cep.service';
 import { Filho } from '../../../../shared/models/filhos.model';
+import { MatDialog } from '@angular/material/dialog';
+import { GenericDialogComponent } from '../../../../shared/components/modal-generico/modal-generico.component';
 
 @Component({
   selector: 'app-cadastro',
@@ -98,12 +100,10 @@ export class CadastroComponent {
     let idade = hoje.getFullYear() - nascimento.getFullYear();
     const m = hoje.getMonth() - nascimento.getMonth();
 
-    // Ajusta a idade caso ainda não tenha feito aniversário no ano atual
     if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
       idade--;
     }
 
-    // Se a idade for maior que 12 anos, retorna o erro
     if (idade > 12) {
       return { idadeMaximaExcedida: true };
     }
@@ -127,6 +127,7 @@ export class CadastroComponent {
   private fb = inject(FormBuilder);
   private notification = inject(NotificationService);
   private buscacepService = inject(CepService);
+  private dialog = inject(MatDialog);
 
   cargosDisponiveis = CARGOS_DISPONIVEIS;
   ministeriosDisponiveis = MINISTERIOS_DISPONIVEIS;
@@ -360,26 +361,42 @@ export class CadastroComponent {
       endereco: enderecoString,
     };
 
-    this.authService.cadastrar(dadosEnvio).subscribe({
-      next: (res) => {
-        if (res.sucesso) {
-          this.notification.sucesso(
-            'Cadastro realizado com sucesso! Redirecionando para o login...',
-          );
-          timer(2500).subscribe(() => this.router.navigate(['/login']));
-        } else {
-          this.notification.erro(res.mensagem || 'Erro ao realizar cadastro.');
+    this.authService
+      .cadastrar(dadosEnvio, async (nomeCrianca, nomeResponsavel) => {
+        const ref = this.dialog.open(GenericDialogComponent, {
+          data: {
+            titulo: 'Criança já cadastrada',
+            mensagem: `Já existe ${nomeCrianca} no cadastro de ${nomeResponsavel}. É a mesma criança?`,
+            textoConfirmar: 'Sim, vincular',
+            textoCancelar: 'Não, é outra',
+            tipo: 'padrao',
+          },
+          panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+          width: '90%',
+          maxWidth: '400px',
+        });
+        return !!(await firstValueFrom(ref.afterClosed()));
+      })
+      .subscribe({
+        next: (res) => {
+          if (res.sucesso) {
+            this.notification.sucesso(
+              'Cadastro realizado com sucesso! Redirecionando para o login...',
+            );
+            timer(2500).subscribe(() => this.router.navigate(['/login']));
+          } else {
+            this.notification.erro(res.mensagem || 'Erro ao realizar cadastro.');
+            this.carregando.set(false);
+            this.cadastroForm.enable();
+          }
+        },
+        error: (err) => {
+          console.error('Erro de cadastro:', err);
+          this.notification.erro('Erro ao processar o cadastro. Tente novamente mais tarde.');
           this.carregando.set(false);
           this.cadastroForm.enable();
-        }
-      },
-      error: (err) => {
-        console.error('Erro de cadastro:', err);
-        this.notification.erro('Erro ao processar o cadastro. Tente novamente mais tarde.');
-        this.carregando.set(false);
-        this.cadastroForm.enable();
-      },
-    });
+        },
+      });
   }
 
   get filhosFormArray(): FormArray {

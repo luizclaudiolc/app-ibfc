@@ -53,8 +53,11 @@ export class AuthService {
     return from(this.executarLoginSupabase(email, senha));
   }
 
-  cadastrar(membro: UsuarioCadastro): Observable<{ sucesso: boolean; mensagem: string }> {
-    return from(this.executarCadastroSupabase(membro));
+  cadastrar(
+    membro: UsuarioCadastro,
+    onConfirmarVinculo?: (nomeCrianca: string, nomeResponsavel: string) => Promise<boolean>,
+  ): Observable<{ sucesso: boolean; mensagem: string }> {
+    return from(this.executarCadastroSupabase(membro, onConfirmarVinculo));
   }
 
   async logout(): Promise<void> {
@@ -227,6 +230,7 @@ export class AuthService {
 
   private async executarCadastroSupabase(
     membro: UsuarioCadastro,
+    onConfirmarVinculo?: (nomeCrianca: string, nomeResponsavel: string) => Promise<boolean>,
   ): Promise<{ sucesso: boolean; mensagem: string }> {
     try {
       const { data: authData, error: authError } = await this.supabaseService.supabase.auth.signUp({
@@ -287,21 +291,36 @@ export class AuthService {
       }
 
       if (membro.filhos && membro.filhos.length > 0) {
-        const filhosParaInserir = membro.filhos.map((filho) => ({
-          membro_id: userId,
-          nome: capitalizarNome(filho.nome!),
-          data_nascimento: filho.data_nascimento || null,
-          informacoes_medicas: filho.informacoes_medicas || null,
-        }));
+        for (const filho of membro.filhos) {
+          const { data: existente, error: erroBusca } = await this.supabaseService.supabase.rpc(
+            'buscar_filho_existente',
+            {
+              p_nome: capitalizarNome(filho.nome!),
+              p_data_nascimento: filho.data_nascimento,
+            },
+          );
+          if (erroBusca) throw erroBusca;
 
-        const { error: insertFilhosError } = await this.supabaseService.supabase
-          .from('filhos')
-          .insert(filhosParaInserir);
+          let forcarNovo = false;
+          if (existente && onConfirmarVinculo) {
+            const mesmo = await onConfirmarVinculo(
+              existente.nome as string,
+              existente.nome_responsavel as string,
+            );
+            forcarNovo = !mesmo;
+          }
 
-        if (insertFilhosError) {
-          console.error('Erro ao salvar filhos no cadastro:', insertFilhosError);
-
-          throw new Error('Membro salvo, mas houve um erro ao registrar os dados dos filhos.');
+          const { error: erroFilho } = await this.supabaseService.supabase.rpc(
+            'vincular_ou_criar_filho',
+            {
+              p_nome: capitalizarNome(filho.nome!),
+              p_data_nascimento: filho.data_nascimento,
+              p_informacoes_medicas: filho.informacoes_medicas || null,
+              p_outro_responsavel_id: null,
+              p_forcar_novo: forcarNovo,
+            },
+          );
+          if (erroFilho) throw erroFilho;
         }
       }
 

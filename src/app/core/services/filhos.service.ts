@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable, from, map, of } from 'rxjs';
 import { SupabaseService } from './supabase';
-import { Filho } from '../../shared/models/filhos.model';
+import { Filho, FilhoExistente } from '../../shared/models/filhos.model';
 
 @Injectable({ providedIn: 'root' })
 export class FilhoService {
@@ -67,5 +67,32 @@ export class FilhoService {
     const { error } = await this.supabase.supabase.from('filhos').delete().eq('id', id);
 
     if (error) throw error;
+  }
+
+  async buscarExistente(nome: string, dataNascimento: string): Promise<FilhoExistente | null> {
+    const { data, error } = await this.supabase.supabase.rpc('buscar_filho_existente', {
+      p_nome: nome,
+      p_data_nascimento: dataNascimento,
+    });
+    if (error) throw error;
+    return (data as FilhoExistente) ?? null;
+  }
+
+  async vincularOuCriar(input: {
+    nome: string;
+    data_nascimento: string;
+    informacoes_medicas?: string | null;
+    outro_responsavel_id?: string | null;
+    forcarNovo?: boolean;
+  }): Promise<{ id: string; acao: 'criado' | 'vinculado' | 'ja_vinculado' }> {
+    const { data, error } = await this.supabase.supabase.rpc('vincular_ou_criar_filho', {
+      p_nome: input.nome,
+      p_data_nascimento: input.data_nascimento,
+      p_informacoes_medicas: input.informacoes_medicas ?? null,
+      p_outro_responsavel_id: input.outro_responsavel_id ?? null,
+      p_forcar_novo: input.forcarNovo ?? false,
+    });
+    if (error) throw error;
+    return data as { id: string; acao: 'criado' | 'vinculado' | 'ja_vinculado' };
   }
 }
