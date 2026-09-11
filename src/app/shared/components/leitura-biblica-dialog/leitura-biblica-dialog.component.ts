@@ -1,10 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from '../../../core/modules/material.module';
 import { DialogLayoutComponent } from '../layout-modal/dialog-layout.component';
 import { CapituloBiblia, PlanoLeituraService } from '../../../core/services/plano-leitura.service';
 import { NotificationService } from '../../../core/services/notifications.service';
+import { ShareVersiculoDialogComponent } from '../shared-versiculo-dialog/shared-versiculo-dialog.component';
+import { VersiculoDia } from '../../../core/services/devocional.service';
 
 export interface LeituraDialogData {
   planoId: string;
@@ -59,11 +61,25 @@ export interface LeituraDialogData {
                   </span>
                 </div>
               } @else {
-                <p class="mb-4">
-                  <sup class="text-[10px] font-sans font-bold text-indigo-400 mr-1.5">{{
+                <p
+                  class="-mx-1 mb-4 cursor-pointer rounded-xl px-2 py-1 transition-colors"
+                  [class.bg-indigo-50]="selecionado() === v.verse"
+                  (click)="selecionar(v)"
+                >
+                  <sup class="mr-1.5 font-sans text-[10px] font-bold text-indigo-400">{{
                     v.verse
                   }}</sup>
                   <span>{{ v.text }}</span>
+                  @if (selecionado() === v.verse) {
+                    <button
+                      type="button"
+                      (click)="abrirShare(v); $event.stopPropagation()"
+                      class="ml-2 inline-flex h-7 w-7 translate-y-0.5 cursor-pointer items-center justify-center rounded-full bg-indigo-600 text-white"
+                      title="Compartilhar"
+                    >
+                      <mat-icon class="!h-4 !w-4 !text-[16px]">ios_share</mat-icon>
+                    </button>
+                  }
                 </p>
               }
             }
@@ -104,6 +120,8 @@ export class LeituraBiblicaDialogComponent implements OnInit {
   erro = signal(false);
   finalizando = signal(false);
   capitulo = signal<CapituloBiblia | null>(null);
+  private dialog = inject(MatDialog);
+  selecionado = signal<number | null>(null);
 
   ngOnInit() {
     this.planoService.obterCapitulo(this.data.referencia).subscribe({
@@ -133,5 +151,26 @@ export class LeituraBiblicaDialogComponent implements OnInit {
       this.notification.erro('Erro ao salvar progresso. Tente novamente.');
       this.finalizando.set(false);
     }
+  }
+
+  selecionar(v: { verse: number; text: string }): void {
+    this.selecionado.update((atual) => (atual === v.verse ? null : v.verse));
+  }
+
+  abrirShare(v: { verse: number; text: string }): void {
+    const cap = this.capitulo();
+    if (!cap) return;
+
+    const versiculo: VersiculoDia = {
+      texto: v.text.trim(),
+      referencia: `${cap.referencia}:${v.verse}`,
+    };
+
+    this.dialog.open(ShareVersiculoDialogComponent, {
+      data: versiculo,
+      width: '92%',
+      maxWidth: '420px',
+      panelClass: ['!p-0', '!bg-transparent', '!shadow-none'],
+    });
   }
 }

@@ -51,7 +51,7 @@ const ehIOS = (): boolean =>
         </div>
 
         <h2 class="mb-3 text-[10px] font-extrabold tracking-[0.25em] text-slate-700/80 uppercase">
-          Versículo do Dia
+          {{ rotulo() }}
         </h2>
 
         <blockquote
@@ -83,25 +83,41 @@ const ehIOS = (): boolean =>
           <div
             style="flex:1;background:rgba(255,255,255,0.85);border-radius:56px;border:2px solid rgba(255,255,255,0.95);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:90px 70px;text-align:center;position:relative;overflow:hidden;"
           >
-            <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;">
-              <img src="img/logo-ibfc-preto.png" alt="" style="height:64px;width:auto;object-fit:contain;margin-bottom:20px;display:block;" />
-              <p style="margin:0;font-size:18px;font-weight:800;letter-spacing:0.25em;text-transform:uppercase;color:rgba(15,23,42,0.5);">
+            <div
+              style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;"
+            >
+              <img
+                src="img/logo-ibfc-preto.png"
+                alt=""
+                style="height:64px;width:auto;object-fit:contain;margin-bottom:20px;display:block;"
+              />
+              <p
+                style="margin:0;font-size:18px;font-weight:800;letter-spacing:0.25em;text-transform:uppercase;color:rgba(15,23,42,0.5);"
+              >
                 Igreja Batista Filadélfia
               </p>
             </div>
             <div style="position:relative;z-index:1;width:100%;">
-              <p style="margin:0 0 32px;font-size:16px;font-weight:800;letter-spacing:0.3em;text-transform:uppercase;color:rgba(15,23,42,0.45);">
-                Versículo do Dia
+              <p
+                style="margin:0 0 32px;font-size:16px;font-weight:800;letter-spacing:0.3em;text-transform:uppercase;color:rgba(15,23,42,0.45);"
+              >
+                {{ rotulo() }}
               </p>
-              <blockquote style="margin:0;font-size:44px;line-height:1.45;font-weight:500;font-style:italic;color:#1e293b;padding:0 20px;">
+              <blockquote
+                style="margin:0;font-size:44px;line-height:1.45;font-weight:500;font-style:italic;color:#1e293b;padding:0 20px;"
+              >
                 "{{ versiculo().texto }}"
               </blockquote>
-              <div style="display:inline-block;margin-top:44px;padding:16px 36px;border-radius:999px;background:#ffffff;font-size:24px;font-weight:800;color:#0f172a;border:1px solid rgba(15,23,42,0.08);">
+              <div
+                style="display:inline-block;margin-top:44px;padding:16px 36px;border-radius:999px;background:#ffffff;font-size:24px;font-weight:800;color:#0f172a;border:1px solid rgba(15,23,42,0.08);"
+              >
                 {{ versiculo().referencia }}
               </div>
             </div>
             <div style="position:relative;z-index:1;">
-              <p style="margin:0;font-size:16px;font-weight:700;letter-spacing:0.15em;color:rgba(15,23,42,0.4);">
+              <p
+                style="margin:0;font-size:16px;font-weight:700;letter-spacing:0.15em;color:rgba(15,23,42,0.4);"
+              >
                 Rede de Membros IBFC
               </p>
             </div>
@@ -113,6 +129,7 @@ const ehIOS = (): boolean =>
 })
 export class VersiculoCardComponent {
   versiculo = input.required<VersiculoDia>();
+  rotulo = input.required<string>();
 
   private arte = viewChild<ElementRef<HTMLElement>>('arte');
   private notification = inject(NotificationService);
@@ -137,9 +154,9 @@ export class VersiculoCardComponent {
       const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
 
       if (nav.share && nav.canShare?.({ files: [arquivo] })) {
-        await nav.share({ files: [arquivo], title: 'Versículo do Dia', text: texto });
+        await nav.share({ files: [arquivo], title: this.rotulo(), text: texto });
       } else if (nav.share) {
-        await nav.share({ title: 'Versículo do Dia', text: texto });
+        await nav.share({ title: this.rotulo(), text: texto });
       } else {
         const link = document.createElement('a');
         link.href = dataUrl;
@@ -246,7 +263,9 @@ export class VersiculoCardComponent {
   }
 
   private pintarGradiente(ctx: CanvasRenderingContext2D, css: string): void {
-    const match = css.match(/linear-gradient\((\d+)deg,\s*(#[0-9a-fA-F]{3,8})\s+[\d.]+%,\s*(#[0-9a-fA-F]{3,8})/);
+    const match = css.match(
+      /linear-gradient\((\d+)deg,\s*(#[0-9a-fA-F]{3,8})\s+[\d.]+%,\s*(#[0-9a-fA-F]{3,8})/,
+    );
     const c1 = match?.[2] ?? '#bae6fd';
     const c2 = match?.[3] ?? '#bfdbfe';
     const deg = Number(match?.[1] ?? 160);
