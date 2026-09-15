@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1789135058753,
+  "timestamp": 1789507960263,
   "index": "/app-ibfc/index.html",
   "assetGroups": [
     {
@@ -23,7 +23,6 @@
         "/app-ibfc/chunk-7EKPX37X.js",
         "/app-ibfc/chunk-A3B2CVMX.js",
         "/app-ibfc/chunk-AJK5N2UA.js",
-        "/app-ibfc/chunk-ARM6B7BN.js",
         "/app-ibfc/chunk-BVAVLSEZ.js",
         "/app-ibfc/chunk-BXIOXOPM.js",
         "/app-ibfc/chunk-CV3UJ3LG.js",
@@ -56,6 +55,7 @@
         "/app-ibfc/chunk-VKPJK3JO.js",
         "/app-ibfc/chunk-VMVGRLG4.js",
         "/app-ibfc/chunk-WD2I4I4M.js",
+        "/app-ibfc/chunk-WHFHKVQN.js",
         "/app-ibfc/chunk-WWRVNNHY.js",
         "/app-ibfc/chunk-XFSW7ZTX.js",
         "/app-ibfc/chunk-YHNWYYTQ.js",
@@ -63,7 +63,7 @@
         "/app-ibfc/chunk-ZGUU6HJD.js",
         "/app-ibfc/chunk-ZLPI6HJB.js",
         "/app-ibfc/index.html",
-        "/app-ibfc/main-UCBONH43.js",
+        "/app-ibfc/main-RKRMK77T.js",
         "/app-ibfc/manifest.webmanifest",
         "/app-ibfc/styles-C7A6PLQM.css"
       ],
@@ -146,7 +146,6 @@
     "/app-ibfc/chunk-7EKPX37X.js": "0ef8c0b86eda5a990fda8e84dcee3824341e627f",
     "/app-ibfc/chunk-A3B2CVMX.js": "94e2bb0bd7ccfd8a570e03eed26eeef3598c1ca7",
     "/app-ibfc/chunk-AJK5N2UA.js": "632e16e2faaf30fcb297e11d6887dcbfcd44b4f4",
-    "/app-ibfc/chunk-ARM6B7BN.js": "a89b411b55cb1eb9722ebf43b157cbd4f0cfb7fe",
     "/app-ibfc/chunk-BVAVLSEZ.js": "afe558e5e17fdc2b7284c0132adbbec173b6f9bf",
     "/app-ibfc/chunk-BXIOXOPM.js": "bef0f19c43ad287f2b7a3c82c889ecb821c78eb9",
     "/app-ibfc/chunk-CV3UJ3LG.js": "36e0883e831f6ca2f4d5ee220a983b0a5b4c742f",
@@ -179,14 +178,15 @@
     "/app-ibfc/chunk-VKPJK3JO.js": "0ffa3733055cfb1a125103ac0a591b7dfcfb1286",
     "/app-ibfc/chunk-VMVGRLG4.js": "58460ae90d508d3dcf2cd2ba7a416836f0379a72",
     "/app-ibfc/chunk-WD2I4I4M.js": "d0dd2a904c93530fdfdacaa9ae00256642c15f59",
+    "/app-ibfc/chunk-WHFHKVQN.js": "4a5a176a36891e01a3090833332b91c0f9b85900",
     "/app-ibfc/chunk-WWRVNNHY.js": "9314a864685b908c7ccc41bf58704343707e65eb",
     "/app-ibfc/chunk-XFSW7ZTX.js": "c96d53f43d915a66902313dac9004bc5e9149314",
     "/app-ibfc/chunk-YHNWYYTQ.js": "a97e22854891fdce01807c60bd6366663598c70f",
     "/app-ibfc/chunk-YTDHYFID.js": "807e307b6e59641e3aeb43e92c3cf3db58de22c3",
     "/app-ibfc/chunk-ZGUU6HJD.js": "e073eee5dc98a3f1c98a35b2d3dad664d2967a26",
     "/app-ibfc/chunk-ZLPI6HJB.js": "49ce5d20ba6b7dcd12d5b7c789f424dc39464396",
-    "/app-ibfc/index.html": "9adcb9c516a7af02911e1133a091c398afd35101",
-    "/app-ibfc/main-UCBONH43.js": "960041d8be31f7e1a44d6eb930f55fbc1f88c697",
+    "/app-ibfc/index.html": "9b342deab1cc49f7620778a2f384ce5f1b26a412",
+    "/app-ibfc/main-RKRMK77T.js": "8b4ff2de04fd4d35942d6c263275a7109cc3e598",
     "/app-ibfc/manifest.webmanifest": "c10aee03058454a93d6a3c6a80cbf5eef99f5d5c",
     "/app-ibfc/styles-C7A6PLQM.css": "14046b8cf8808941d34684a9d03b83408f15934e"
   },
