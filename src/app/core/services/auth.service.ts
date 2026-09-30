@@ -418,7 +418,7 @@ export class AuthService {
       const redirectUrl =
         window.location.hostname === 'localhost'
           ? 'http://localhost:4200/atualizar-senha'
-          : 'https://luizclaudiolc.github.io/app-ibfc/atualizar-senha';
+          : 'https://app-ibfc.vercel.app/atualizar-senha';
 
       const { error } = await this.supabaseService.supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
