@@ -33,12 +33,12 @@ export class DevocionalService {
     const indice = semente % this.referenciasCuradas.length;
     const ref = this.referenciasCuradas[indice];
 
-    const url = `https://bible-api.com/${ref}?translation=almeida`;
+    const url = this.urlBiblia(ref);
 
     return this.http.get<any>(url).pipe(
       map((res) => ({
-        texto: res.text.replace(/\n/g, ' ').trim(),
-        referencia: res.reference,
+        texto: String(res.data.text).replace(/\n/g, ' ').trim(),
+        referencia: ref,
       })),
       tap((versiculo) => {
         this.authService.salvarVersiculoEmCache({
@@ -54,5 +54,18 @@ export class DevocionalService {
         });
       }),
     );
+  }
+
+  private urlBiblia(refPt: string): string {
+    const m = refPt.trim().match(/^(.+?)\s+(\d+):(\d+(?:-\d+)?)$/);
+    if (!m) throw new Error(`Referência inválida: ${refPt}`);
+
+    const livro = m[1]
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, '-');
+
+    return `https://api.midvash.com/v1/almeida-livre/${livro}/${m[2]}/${m[3]}`;
   }
 }
