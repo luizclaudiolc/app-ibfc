@@ -155,13 +155,12 @@ export class PlanoLeituraService {
 
       const chamadas: Observable<any>[] = [];
       for (let c = capInicial; c <= capFinal; c++) {
-        const url = `https://bible-api.com/${livro} ${c}?translation=almeida`;
-        chamadas.push(this.http.get<any>(url));
+        chamadas.push(this.http.get<any>(this.urlCapitulo(livro, c)));
       }
 
       return forkJoin(chamadas).pipe(
         map((respostas: any[]) => {
-          let todosVersiculos: { verse: number; text: string }[] = [];
+          const todosVersiculos: { verse: number; text: string }[] = [];
 
           respostas.forEach((res, index) => {
             const numeroCapitulo = capInicial + index;
@@ -171,20 +170,10 @@ export class PlanoLeituraService {
               text: `Capítulo ${numeroCapitulo}`,
             });
 
-            res.verses.forEach((v: any) => {
-              todosVersiculos.push({
-                verse: v.verse,
-                text: v.text.trim(),
-              });
-            });
+            this.versosDoCapitulo(res).forEach((v) => todosVersiculos.push(v));
           });
 
-          const capituloConsolidado: CapituloBiblia = {
-            referencia: referencia,
-            versiculos: todosVersiculos,
-          };
-
-          return capituloConsolidado;
+          return { referencia, versiculos: todosVersiculos };
         }),
         tap((capitulo) => {
           this.authService.salvarCapituloEmCache(cacheKey, capitulo);
@@ -192,19 +181,40 @@ export class PlanoLeituraService {
       );
     }
 
-    const url = `https://bible-api.com/${referencia}?translation=almeida`;
+    const matchCapitulo = referencia.match(/^(.+?)\s+(\d+)$/);
+    if (!matchCapitulo) {
+      throw new Error(`Referência inválida: ${referencia}`);
+    }
+
+    const url = this.urlCapitulo(matchCapitulo[1], parseInt(matchCapitulo[2], 10));
 
     return this.http.get<any>(url).pipe(
       map((res) => ({
-        referencia: res.reference,
-        versiculos: res.verses.map((v: any) => ({
-          verse: v.verse,
-          text: v.text.trim(),
-        })),
+        referencia,
+        versiculos: this.versosDoCapitulo(res),
       })),
       tap((capitulo) => {
         this.authService.salvarCapituloEmCache(cacheKey, capitulo);
       }),
     );
+  }
+
+  private urlCapitulo(livroPt: string, capitulo: number): string {
+    const livro = livroPt
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-');
+
+    return `https://api.midvash.com/v1/almeida-livre/${livro}/${capitulo}`;
+  }
+
+  private versosDoCapitulo(res: any): { verse: number; text: string }[] {
+    const versos: string[] = res?.data?.verses ?? [];
+    return versos.map((text, i) => ({
+      verse: i + 1,
+      text: String(text).trim(),
+    }));
   }
 }
