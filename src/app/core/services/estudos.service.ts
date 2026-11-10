@@ -48,7 +48,7 @@ export class EstudoService {
     descricao?: string | null,
   ): Promise<Estudo> {
     const payloadParaSalvar: any = {
-      titulo: titulo.trim().toLowerCase(),
+      titulo: titulo.trim().toUpperCase(),
       arquivo_url: url.trim(),
     };
 
